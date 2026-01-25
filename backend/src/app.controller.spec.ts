@@ -15,8 +15,12 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return health check object', () => {
+      expect(appController.getHealth()).toEqual({
+        status_code: 200,
+        detail: 'ok',
+        result: 'working',
+      });
     });
   });
 });

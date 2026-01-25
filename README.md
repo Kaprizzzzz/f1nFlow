@@ -1,0 +1,3 @@
+Front = Angular
+
+Back = Nest

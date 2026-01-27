@@ -1,12 +1,22 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
 
-@Controller()
+@Controller() // Порожньо, отже префікса немає
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
 
-  @Get()
-  getHealth() {
-    return this.appService.getHealth();
+  @Get('add-test-user') // Шлях: localhost:3000/add-test-user
+  async addUser() {
+    const newUser = this.userRepository.create({
+      firstName: 'Ulas',
+      isActive: true,
+    });
+    await this.userRepository.save(newUser);
+    return { message: 'User added to Supabase!', user: newUser };
   }
 }

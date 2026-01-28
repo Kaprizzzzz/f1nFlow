@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { User } from './user.entity'; // Обов'язково імпортуй!
+import { User } from './entities/user.entity'; // Обов'язково імпортуй!
 import { AppController } from './app.controller';
 
 @Module({

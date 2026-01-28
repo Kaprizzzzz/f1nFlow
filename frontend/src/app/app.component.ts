@@ -1,29 +1,30 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common'; 
+import { UserService, User } from './user/user.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [CommonModule], // Це виправить помилку NG0303
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
-  title = 'f1nFlow-frontend';
+export class AppComponent implements OnInit {
+  users: User[] = []; // Початковий порожній масив
 
-  constructor() {
-    this.checkBackendConnection();
-  }
+  constructor(private userService: UserService) {}
 
-  checkBackendConnection(){
-    fetch('http://localhost:3000/')
-      .then(res => res.json())
-      .then(data => {
-        console.log('✅ Звʼязок з NestJS встановлено!');
-        console.log('Дані:', data);
-      })
-      .catch(err => {
-        console.error('❌ Помилка звʼязку з бекендом:', err);
-      });
+  ngOnInit() {
+    this.userService.getUsers().subscribe({
+      next: (data) => {
+        console.log('Дані з бекенду:', data);
+        // ПЕРЕВІРКА: якщо прийшов не масив, робимо його порожнім
+        this.users = Array.isArray(data) ? data : [];
+      },
+      error: (err) => {
+        console.error('Помилка звʼязку з Docker-бекендом:', err);
+        this.users = [];
+      }
+    });
   }
-  
 }

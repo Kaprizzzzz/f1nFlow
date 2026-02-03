@@ -1,13 +1,24 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Transaction } from './transaction.entity';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid') // Справжній UUID
+  id: string;
 
-  @Column()
-  firstName: string;
+  @Column({ unique: true }) // Telegram ID має бути унікальним
+  telegramId: string;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column({ nullable: true })
+  userName: string;
+
+  @Column({ unique: true })
+  referralCode: string;
+
+  @Column({ nullable: true })
+  referredBy: string;
+
+  // Зв'язок: один користувач має багато транзакцій
+  @OneToMany(() => Transaction, (transaction) => transaction.user)
+  transactions: Transaction[];
 }

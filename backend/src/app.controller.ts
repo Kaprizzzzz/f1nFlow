@@ -15,13 +15,4 @@ export class AppController {
     return this.userRepository.find();
   }
 
-  @Get('add-test-user') // Шлях: http://localhost:3000/users/add-test-user
-  async addUser() {
-    const newUser = this.userRepository.create({
-      firstName: 'Ulas',
-      isActive: true,
-    });
-    await this.userRepository.save(newUser);
-    return { message: 'User added!', user: newUser };
-  }
 }

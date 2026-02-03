@@ -1,12 +1,6 @@
-<div *ngIf="users && users.length > 0; else noData">
-  <table>
-    <tr *ngFor="let user of users">
-      <td>{{ user.id }}</td>
-      <td>{{ user.firstName }}</td>
-    </tr>
-  </table>
-</div>
+<head>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
 
-<ng-template #noData>
-  <p>Користувачів не знайдено. Перевір шлях /users на бекенді.</p>
-</ng-template>
+<div class="app-container">
+  <router-outlet></router-outlet> </div>

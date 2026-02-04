@@ -10,8 +10,7 @@ import { RouterOutlet } from '@angular/router'; // Додай це, щоб ба�
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-  constructor(private userService: UserService) {}
-
+ 
   ngOnInit(): void {
     // Тут буде ініціалізація, якщо знадобиться
   }

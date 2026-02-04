@@ -1,46 +1,45 @@
+// src/app/pages/main/main.component.ts
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { UserService } from '../../user/service/user.service'; // Перевір шлях до файлу
 
-// Повідомляємо компилятору, що Telegram існує в глобальному полі (в index.html)
 declare var Telegram: any;
 
 @Component({
   selector: 'app-main',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './main.component.html',
-  styleUrl: './main.component.scss'
+  styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit {
-  // Початкове значення, поки Telegram не завантажиться
-  username: string = 'F1N User'; 
+  userName: string = 'Завантаження...';
+  userUUID: string = '';
+
+  constructor(private userService: UserService) {}
 
   ngOnInit(): void {
-    // Перевіряємо, чи доступний об'єкт Telegram
     if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
       const tg = Telegram.WebApp;
-
-      // Повідомляємо Telegram, що ми завантажились
       tg.ready();
-      
-      // Розгортаємо додаток на максимум
-      tg.expand();
 
-      // Отримуємо дані користувача
-      const user = tg.initDataUnsafe?.user;
-      if (user) {
-        // Пріоритет: username (@nick), якщо немає — First Name
-        this.username = user.username ? `@${user.username}` : user.first_name;
+      const tgUser = tg.initDataUnsafe?.user;
+      if (tgUser) {
+        // Відправляємо ID як рядок, бо в Entity це string
+        this.userService.login(tgUser.id.toString(), tgUser.username).subscribe({
+          next: (dbUser) => {
+            this.userName = dbUser.userName;
+            this.userUUID = dbUser.id; // Це твій PrimaryGeneratedColumn('uuid')
+            console.log('Користувач успішно синхронізований з базою');
+          },
+          error: (err) => console.error('Помилка авторизації:', err)
+        });
       }
     }
   }
-
-  // Функція для кнопки
+  // Додай цей метод сюди:
   onClaim(): void {
     if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-      // Робимо легку вібрацію при натисканні
+      // Викликаємо вібровідгук Telegram
       Telegram.WebApp.HapticFeedback.impactOccurred('medium');
     }
-    console.log('Claim button clicked');
+    console.log('Rewards claimed!');
   }
 }

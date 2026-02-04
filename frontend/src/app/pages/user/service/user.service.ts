@@ -6,18 +6,12 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class UserService {
-  // Оскільки NestJS працює в Docker на порту 3000
-  private apiUrl = 'http://localhost:3000/users'; 
+  // Твій Ngrok URL з терміналу
+  private apiUrl = 'https://e73e-45-89-90-142.ngrok-free.app/users';
 
   constructor(private http: HttpClient) {}
 
-  // Метод для отримання всіх користувачів
-  getUsers(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
-  }
-
-  // Метод для створення нового користувача (знадобиться пізніше для Telegram)
-  createUser(userData: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, userData);
+  login(telegramId: string, userName: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, { telegramId, userName });
   }
 }

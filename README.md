@@ -17,6 +17,9 @@ add new page with refferal and about
 add new page events
 
 ------------------------fday
+
+add page with voutings
+
 future:
 
 Добавити weekly game awards(flappy bird // turtle jump)

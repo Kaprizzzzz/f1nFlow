@@ -1,22 +1,24 @@
 <div class="main-container">
-  <div class="header">
+  <div class="user-header">
     <div class="user-info">
-      <span class="avatar">👤</span>
-      <span class="username">{{ userName }}</span>
+      <span class="icon">👤</span>
+      <span class="name">{{ userName || 'Завантаження...' }}</span>
     </div>
   </div>
 
   <div class="balance-section">
-    <div class="neon-circle">
-      <div class="inner-content">
-        <span class="label">Total Balance</span>
-        <h1 class="amount">1,250.00</h1>
-        <span class="currency">F1N</span>
-      </div>
+    <div class="circle outer-circle"></div>
+    <div class="circle middle-circle"></div>
+    <div class="circle main-circle">
+      <span class="label">Total Balance</span>
+      <span class="amount">{{ balance | number:'1.2-2' }}</span>
+      <span class="currency">F1N</span>
     </div>
   </div>
 
-  <div class="action-buttons">
-    <button class="btn-primary" (click)="onClaim()">Claim Rewards</button>
+  <div class="action-section">
+    <button class="claim-btn" (click)="onClaim()">
+      Claim Rewards
+    </button>
   </div>
 </div>

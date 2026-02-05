@@ -1,1 +1,52 @@
-/* You can add global styles to this file, and also import other style files */
+/* src/app/app.component.scss */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #000; // Темний фон під стиль Telegram
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto; // Дозволяє прокручувати тільки контент сторінки
+  padding-bottom: 80px; // Запас місця, щоб контент не перекривався меню
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 70px;
+  background: rgba(20, 20, 20, 0.95); // Напівпрозорий ефект
+  backdrop-filter: blur(10px); // Ефект розмиття фону як в iOS
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #333;
+  z-index: 1000;
+
+  a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #888;
+    text-decoration: none;
+    font-size: 10px; // Трохи менше для витонченості
+    transition: all 0.3s ease;
+    flex: 1;
+
+    .icon {
+      font-size: 24px; // Збільшимо іконки для зручності натискання
+      margin-bottom: 4px;
+    }
+
+    &.active {
+      color: #00d4ff; // Твій фірмовий блакитний колір
+      transform: translateY(-2px); // Легкий підйом при активації
+      
+      .icon {
+        filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.5)); // Світіння іконки
+      }
+    }
+  }
+}

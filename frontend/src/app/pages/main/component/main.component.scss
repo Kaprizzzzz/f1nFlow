@@ -1,53 +1,89 @@
 .main-container {
-  height: 100vh;
-  background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
-  color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  color: white;
+}
+
+.user-header {
+  width: 100%;
+  margin-bottom: 40px;
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 500;
+  }
 }
 
 .balance-section {
-  flex: 1;
+  position: relative;
+  width: 300px;
+  height: 300px;
   display: flex;
-  align-items: center;
   justify-content: center;
-}
-
-.neon-circle {
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
-  border: 4px solid #00f2ff;
-  box-shadow: 0 0 20px #00f2ff, inset 0 0 20px #00f2ff;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  animation: pulse 2s infinite ease-in-out;
+  margin-bottom: 50px;
+
+  .main-circle {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #0a0a0a 0%, #000 100%);
+    border: 4px solid #00d4ff; // Твій фірмовий колір
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+    box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+
+    .label { font-size: 14px; opacity: 0.8; margin-bottom: 10px; }
+    .amount { font-size: 36px; font-weight: bold; margin: 0; }
+    .currency { font-size: 14px; opacity: 0.8; margin-top: 5px; }
+  }
+
+  // Додаткові кола
+  .middle-circle {
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    border: 2px solid rgba(0, 212, 255, 0.15);
+    border-radius: 50%;
+    z-index: 2;
+    animation: pulse 4s infinite ease-in-out;
+  }
+
+  .outer-circle {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border: 1px solid rgba(0, 212, 255, 0.08);
+    border-radius: 50%;
+    z-index: 1;
+    animation: pulse 6s infinite ease-in-out reverse;
+  }
 }
 
-.amount {
-  font-size: 2.5rem;
-  margin: 5px 0;
-  text-shadow: 0 0 10px #00f2ff;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); box-shadow: 0 0 20px #00f2ff; }
-  50% { transform: scale(1.02); box-shadow: 0 0 40px #00f2ff; }
-  100% { transform: scale(1); box-shadow: 0 0 20px #00f2ff; }
-}
-
-.btn-primary {
-  background: linear-gradient(90deg, #00f2ff, #0072ff);
+.claim-btn {
+  background: linear-gradient(135deg, #00d4ff 0%, #0072ff 100%);
   border: none;
   padding: 15px 40px;
   border-radius: 30px;
   color: white;
+  font-size: 18px;
   font-weight: bold;
-  font-size: 1.1rem;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+  transition: transform 0.2s;
+
+  &:active { transform: scale(0.95); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 0.5; }
 }

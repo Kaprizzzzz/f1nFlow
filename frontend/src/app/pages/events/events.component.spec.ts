@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Referrals } from './referrals';
+import { EventsComponent } from './events.component';
 
-describe('Referrals', () => {
-  let component: Referrals;
-  let fixture: ComponentFixture<Referrals>;
-
+describe('EventsComponent', () => {
+  let component: EventsComponent;
+  let fixture: ComponentFixture<EventsComponent>;
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Referrals]
+      imports: [EventsComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Referrals);
+    fixture = TestBed.createComponent(EventsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

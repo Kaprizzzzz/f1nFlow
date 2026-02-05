@@ -1,0 +1,71 @@
+/* Кольори для сфер (можеш адаптувати під кожну) */
+$income-glow: #ff9d00;
+$expense-glow: #ff4d00;
+$saving-glow: #00ffcc;
+
+.circle-wrapper {
+  position: relative;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .main-circle {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    /* Градієнт для ефекту об'єму (сфери) */
+    background: radial-gradient(circle at 30% 30%, rgba(255, 157, 0, 0.4) 0%, rgba(0, 0, 0, 1) 100%);
+    border: 1px solid rgba($income-glow, 0.5);
+    box-shadow: 0 0 20px rgba($income-glow, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s ease;
+
+    .label { font-size: 12px; color: #fff; opacity: 0.8; }
+  }
+
+  /* Коли сфера по центру (Active State) */
+  &.active {
+    .main-circle {
+      width: 250px;
+      height: 250px;
+      border-width: 2px;
+      box-shadow: 0 0 60px rgba($income-glow, 0.4);
+      border-color: $income-glow;
+
+      .label { font-size: 18px; margin-bottom: 10px; }
+    }
+  }
+}
+
+/* Менші кружечки (Sub-circles) */
+.sub-circles {
+  margin-top: 40px;
+  display: flex;
+  gap: 30px;
+  animation: slideUp 0.4s ease-out;
+
+  .sub-item {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: #111;
+    border: 1px solid rgba($income-glow, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 0 15px rgba($income-glow, 0.2);
+    cursor: pointer;
+
+    &:active { transform: scale(0.9); }
+  }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

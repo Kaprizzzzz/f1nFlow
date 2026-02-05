@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
   // Твій Ngrok URL з терміналу
-  private apiUrl = 'https://e93a-45-89-90-142.ngrok-free.app/user';
+  private apiUrl = 'https://1184-45-89-90-142.ngrok-free.app/user';
 
   constructor(private http: HttpClient) {}
 

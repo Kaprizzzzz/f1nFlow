@@ -1,4 +1,5 @@
-<div class="main-container">
+<div class="main-container" [class.state-active]="activeCategory !== 'none'">
+  
   <div class="user-header">
     <div class="user-info">
       <span class="icon">👤</span>
@@ -6,19 +7,27 @@
     </div>
   </div>
 
-  <div class="balance-section">
-    <div class="circle outer-circle"></div>
-    <div class="circle middle-circle"></div>
-    <div class="circle main-circle">
-      <span class="label">Total Balance</span>
-      <span class="amount">{{ balance | number:'1.2-2' }}</span>
-      <span class="currency">F1N</span>
-    </div>
+  <div class="circles-container">
+    <app-income 
+      [isFullView]="activeCategory === 'income'"
+      [class.hidden]="activeCategory !== 'none' && activeCategory !== 'income'"
+      (onSelect)="activeCategory = 'income'">
+    </app-income>
+
+    <app-expence 
+      [isFullView]="activeCategory === 'expense'"
+      [class.hidden]="activeCategory !== 'none' && activeCategory !== 'expense'"
+      (onSelect)="activeCategory = 'expense'">
+    </app-expence>
+
+    <app-saving 
+      [isFullView]="activeCategory === 'saving'"
+      [class.hidden]="activeCategory !== 'none' && activeCategory !== 'saving'"
+      (onSelect)="activeCategory = 'saving'">
+    </app-saving>
   </div>
 
-  <div class="action-section">
-    <button class="claim-btn" (click)="onClaim()">
-      Claim Rewards
-    </button>
-  </div>
+  <button class="back-action-btn" *ngIf="activeCategory !== 'none'" (click)="activeCategory = 'none'">
+    Back
+  </button>
 </div>

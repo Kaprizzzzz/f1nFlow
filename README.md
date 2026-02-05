@@ -6,15 +6,12 @@
     Back = Nest
  - npm run start:dev
  - ngrok http 3000
+ - user.service = new ngrok adress
 
 ------------------------tday
-loading:
-check user
-main:
-money from the beginning = 0
+
 add 2 circles to the existed one
-add new page with refferal and about
-add new page events
+
 
 ------------------------fday
 

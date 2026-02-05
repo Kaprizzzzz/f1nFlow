@@ -1,13 +1,19 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Додали ChangeDetectorRef
-import { UserService } from '../../user/service/user.service';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 1. ChangeDetectorRef тут
 import { CommonModule } from '@angular/common';
+import { UserService } from '../../user/service/user.service';
+
+// ІМПОРТИ НОВИХ КОМПОНЕНТІВ
+import { IncomeComponent } from '../../history/income/income.component';
+import { ExpenceComponent } from '../../history/expence/expence.component';
+import { SavingComponent } from '../../history/saving/saving.component';
 
 declare var Telegram: any;
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [CommonModule],
+  // 2. Всі дочірні компоненти в імпортах
+  imports: [CommonModule, IncomeComponent, ExpenceComponent, SavingComponent],
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss']
 })
@@ -17,49 +23,39 @@ export class MainComponent implements OnInit {
   referralCode: string = '';
   balance: number = 0;
   isLoading: boolean = true;
+  activeCategory: 'none' | 'income' | 'expense' | 'saving' = 'none';
 
   constructor(
     private userService: UserService,
-    private cdr: ChangeDetectorRef // Ін'єкція для оновлення екрана
+    private cdr: ChangeDetectorRef // 3. Ін'єкція тут
   ) {}
 
   ngOnInit(): void {
     if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
       const tg = Telegram.WebApp;
       tg.ready();
-      tg.expand(); // Розгорнути на весь екран
+      tg.expand();
 
       const tgUser = tg.initDataUnsafe?.user;
-      
       if (tgUser) {
         this.userService.login(tgUser.id.toString(), tgUser.username).subscribe({
           next: (dbUser) => {
-            console.log('Дані з сервера:', dbUser);
-            
-            // ГНУЧКЕ ЗЧИТУВАННЯ: пробуємо всі варіанти назви поля
-            this.userName = dbUser.userName || dbUser.username || tgUser.username || 'Користувач';
+            // Гнучке отримання імені
+            this.userName = dbUser.userName || dbUser.username || tgUser.username || 'User';
             this.userUUID = dbUser.id;
-            this.referralCode = dbUser.referralCode;
             this.balance = dbUser.balance || 0;
-            
             this.isLoading = false;
-            this.cdr.detectChanges(); // ПРИМУСОВО ОНОВЛЮЄМО ЕКРАН
+            
+            // 4. Примусове оновлення UI
+            this.cdr.detectChanges(); 
           },
           error: (err) => {
-            console.error('Помилка авторизації:', err);
-            this.userName = tgUser.username; // Якщо бекенд ліг, хоча б покажемо нік з ТГ
+            console.error('Login error:', err);
             this.isLoading = false;
             this.cdr.detectChanges();
           }
         });
       }
     }
-  }
-
-  onClaim(): void {
-    if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-      Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-    }
-    this.balance += 10;
   }
 }

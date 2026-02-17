@@ -1,1 +1,22 @@
-<p>expence works!</p>
+<div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
+  <div class="main-circle">
+    <span class="label">Expense</span>
+    <span class="val" *ngIf="totalSpent > 0">{{totalSpent}} F1N</span>
+  </div>
+
+  <div class="sub-circles" *ngIf="isFullView">
+    <div class="sub-item" (click)="openModal($event)">💸</div>
+    <div class="sub-item">📉</div>
+  </div>
+</div>
+
+<div class="full-modal" *ngIf="isModalOpen">
+  <div class="modal-content">
+    <h3>Add Expense</h3>
+    <input type="number" [(ngModel)]="amount" placeholder="0.00" autofocus>
+    <div class="actions">
+      <button (click)="isModalOpen = false">Cancel</button>
+      <button class="save" (click)="saveData()">Save</button>
+    </div>
+  </div>
+</div>

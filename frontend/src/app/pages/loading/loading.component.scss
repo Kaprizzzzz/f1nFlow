@@ -1,0 +1,46 @@
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+
+  .f1n-logo {
+    font-size: 48px;
+    font-weight: 800;
+    color: #fff;
+    span { color: #00d4ff; }
+    text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+    margin-bottom: 20px;
+  }
+
+  .pulse-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    .ring {
+      position: absolute;
+      width: 100%; height: 100%;
+      border: 2px solid #00d4ff;
+      border-radius: 50%;
+      animation: ripple 2s infinite ease-out;
+      &:nth-child(2) { animation-delay: 1s; }
+    }
+  }
+
+  .status-text {
+    margin-top: 50px;
+    color: #444;
+    letter-spacing: 2px;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}

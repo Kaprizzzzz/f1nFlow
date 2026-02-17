@@ -1,33 +1,29 @@
-<div class="main-container" [class.state-active]="activeCategory !== 'none'">
-  
-  <div class="user-header">
-    <div class="user-info">
-      <span class="icon">👤</span>
-      <span class="name">{{ userName || 'Завантаження...' }}</span>
-    </div>
+<div class="main-container" [class.dimmed]="activeCategory !== 'none'">
+  <div class="user-header" *ngIf="activeCategory === 'none'">
+    <span class="name">Hi, {{ userName }}</span>
   </div>
 
-  <div class="circles-container">
+  <div class="circles-layout">
     <app-income 
       [isFullView]="activeCategory === 'income'"
-      [class.hidden]="activeCategory !== 'none' && activeCategory !== 'income'"
-      (onSelect)="activeCategory = 'income'">
+      (onSelect)="setCategory('income')"
+      [class.minimized]="activeCategory !== 'none' && activeCategory !== 'income'">
     </app-income>
 
     <app-expence 
       [isFullView]="activeCategory === 'expense'"
-      [class.hidden]="activeCategory !== 'none' && activeCategory !== 'expense'"
-      (onSelect)="activeCategory = 'expense'">
+      (onSelect)="setCategory('expense')"
+      [class.minimized]="activeCategory !== 'none' && activeCategory !== 'expense'">
     </app-expence>
 
     <app-saving 
       [isFullView]="activeCategory === 'saving'"
-      [class.hidden]="activeCategory !== 'none' && activeCategory !== 'saving'"
-      (onSelect)="activeCategory = 'saving'">
+      (onSelect)="setCategory('saving')"
+      [class.minimized]="activeCategory !== 'none' && activeCategory !== 'saving'">
     </app-saving>
   </div>
 
-  <button class="back-action-btn" *ngIf="activeCategory !== 'none'" (click)="activeCategory = 'none'">
-    Back
+  <button class="back-btn" *ngIf="activeCategory !== 'none'" (click)="activeCategory = 'none'">
+    DONE
   </button>
 </div>

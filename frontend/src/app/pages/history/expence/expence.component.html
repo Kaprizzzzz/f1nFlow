@@ -5,8 +5,9 @@
   </div>
 
   <div class="sub-circles" *ngIf="isFullView">
-    <div class="sub-item" (click)="openModal($event)">💸</div>
-    <div class="sub-item">📉</div>
+    <div class="sub-item" (click)="addExpense(100, 'Home')">🏠</div>
+    <div class="sub-item" (click)="addExpense(50, 'Alcohol')">🍺</div>
+    <div class="sub-item" (click)="addExpense(20, 'Taxi')">🚕</div>
   </div>
 </div>
 

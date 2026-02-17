@@ -1,25 +1,35 @@
 <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
-  <div class="main-circle" [class.negative]="totalBalance < 0">
+  <div class="main-circle saving-glow" [class.negative]="totalDiff < 0">
     <span class="label">Saving</span>
-    <span class="total-diff">{{ totalBalance > 0 ? '+' : '' }}{{ totalBalance }} F1N</span>
+    <span class="balance-text">
+      {{ totalDiff > 0 ? '+' : '' }}{{ totalDiff }} F1N
+    </span>
+  </div>
+
+  <div class="sub-circles" *ngIf="isFullView">
+    <div class="sub-item" (click)="isModalOpen = true; $event.stopPropagation()">📝</div>
+    <div class="sub-item">📊</div>
   </div>
 
   <div class="history-list" *ngIf="isFullView">
-    <div class="history-item" *ngFor="let item of history.slice(0, 3)">
-      <span [class.plus]="item.type === 'plus'" [class.minus]="item.type === 'minus'">
-        {{ item.type === 'plus' ? '↑' : '↓' }} {{ item.amount }}
+    <div class="history-row" *ngFor="let item of history">
+      <span class="history-label">{{ item.label }}</span>
+      <span class="history-amount" [class.plus]="item.type === 'plus'" [class.minus]="item.type === 'minus'">
+        {{ item.type === 'plus' ? '+' : '-' }}{{ item.amount }}
       </span>
-      <small>{{ item.date | date:'HH:mm' }}</small>
     </div>
-    <button class="add-btn" (click)="isModalOpen = true; $event.stopPropagation()">+</button>
   </div>
 </div>
 
-<div class="mini-modal" *ngIf="isModalOpen">
-  <input type="number" [(ngModel)]="amount" placeholder="Сума...">
-  <div class="btns">
-    <button class="btn-plus" (click)="addTransaction('plus')">Поповнити</button>
-    <button class="btn-minus" (click)="addTransaction('minus')">Витратити</button>
+<div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <h3>Add Record</h3>
+    <input type="number" [(ngModel)]="amount" placeholder="Amount">
+    <input type="text" [(ngModel)]="note" placeholder="Note (optional)">
+    
+    <div class="modal-actions">
+      <button class="btn-plus" (click)="addRecord('plus')">Deposit (+)</button>
+      <button class="btn-minus" (click)="addRecord('minus')">Withdraw (-)</button>
+    </div>
   </div>
-  <button (click)="isModalOpen = false">Закрити</button>
 </div>

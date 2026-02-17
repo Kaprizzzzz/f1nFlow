@@ -1,43 +1,69 @@
-.main-circle {
+.saving-glow {
+  border-color: #00ffcc !important;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+  
   &.negative {
-    border-color: #ff4444 !important;
-    box-shadow: 0 0 20px rgba(255, 68, 68, 0.3) !important;
-    .total-diff { color: #ff4444; }
+    border-color: #ff4d4d !important;
+    box-shadow: 0 0 20px rgba(255, 77, 77, 0.3);
+    .balance-text { color: #ff4d4d; }
   }
 }
 
-.total-diff {
-  font-size: 20px;
-  font-weight: bold;
+.balance-text {
   color: #00ffcc;
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
 .history-list {
-  margin-top: 20px;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  margin-top: 20px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
 
-  .history-item {
-    background: rgba(255,255,255,0.05);
-    padding: 8px 15px;
-    border-radius: 10px;
+  .history-row {
     display: flex;
     justify-content: space-between;
-    font-size: 14px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     
     .plus { color: #00ffcc; }
-    .minus { color: #ff4444; }
-    small { opacity: 0.5; }
+    .minus { color: #ff4d4d; }
   }
 }
 
-.add-btn {
-  background: #00ffcc;
-  border: none;
-  border-radius: 50%;
-  width: 40px; height: 40px;
-  margin: 10px auto;
-  font-size: 24px;
+.modal-card {
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #333;
+  text-align: center;
+  
+  input {
+    width: 100%;
+    margin: 10px 0;
+    background: #000;
+    border: 1px solid #444;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .btn-plus { background: #00ffcc; color: #000; }
+  .btn-minus { background: #ff4d4d; color: #fff; }
 }

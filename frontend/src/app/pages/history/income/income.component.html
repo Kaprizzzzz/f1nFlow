@@ -4,8 +4,9 @@
   </div>
 
   <div class="sub-circles" *ngIf="isFullView">
-    <div class="sub-item" (click)="openAddMoney()">💰</div>
-    <div class="sub-item">📊</div>
+    <div class="sub-item" (click)="addIncome(500, 'Salary')">💼</div>
+    <div class="sub-item" (click)="addIncome(1000, 'Motherlode')">💎</div>
+    <div class="sub-item" (click)="openCustomModal()">➕</div>
   </div>
 </div>
 

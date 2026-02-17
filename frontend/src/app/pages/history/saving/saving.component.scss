@@ -1,0 +1,43 @@
+.main-circle {
+  &.negative {
+    border-color: #ff4444 !important;
+    box-shadow: 0 0 20px rgba(255, 68, 68, 0.3) !important;
+    .total-diff { color: #ff4444; }
+  }
+}
+
+.total-diff {
+  font-size: 20px;
+  font-weight: bold;
+  color: #00ffcc;
+}
+
+.history-list {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .history-item {
+    background: rgba(255,255,255,0.05);
+    padding: 8px 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    
+    .plus { color: #00ffcc; }
+    .minus { color: #ff4444; }
+    small { opacity: 0.5; }
+  }
+}
+
+.add-btn {
+  background: #00ffcc;
+  border: none;
+  border-radius: 50%;
+  width: 40px; height: 40px;
+  margin: 10px auto;
+  font-size: 24px;
+}

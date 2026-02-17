@@ -1,1 +1,25 @@
-<p>saving works!</p>
+<div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
+  <div class="main-circle" [class.negative]="totalBalance < 0">
+    <span class="label">Saving</span>
+    <span class="total-diff">{{ totalBalance > 0 ? '+' : '' }}{{ totalBalance }} F1N</span>
+  </div>
+
+  <div class="history-list" *ngIf="isFullView">
+    <div class="history-item" *ngFor="let item of history.slice(0, 3)">
+      <span [class.plus]="item.type === 'plus'" [class.minus]="item.type === 'minus'">
+        {{ item.type === 'plus' ? '↑' : '↓' }} {{ item.amount }}
+      </span>
+      <small>{{ item.date | date:'HH:mm' }}</small>
+    </div>
+    <button class="add-btn" (click)="isModalOpen = true; $event.stopPropagation()">+</button>
+  </div>
+</div>
+
+<div class="mini-modal" *ngIf="isModalOpen">
+  <input type="number" [(ngModel)]="amount" placeholder="Сума...">
+  <div class="btns">
+    <button class="btn-plus" (click)="addTransaction('plus')">Поповнити</button>
+    <button class="btn-minus" (click)="addTransaction('minus')">Витратити</button>
+  </div>
+  <button (click)="isModalOpen = false">Закрити</button>
+</div>

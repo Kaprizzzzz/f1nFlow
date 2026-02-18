@@ -1,29 +1,26 @@
-<div class="main-container" [class.dimmed]="activeCategory !== 'none'">
-  <div class="user-header" *ngIf="activeCategory === 'none'">
-    <span class="name">Hi, {{ userName }}</span>
-  </div>
-
+<div class="dashboard-container">
   <div class="circles-layout">
-    <app-income 
-      [isFullView]="activeCategory === 'income'"
-      (onSelect)="setCategory('income')"
-      [class.minimized]="activeCategory !== 'none' && activeCategory !== 'income'">
-    </app-income>
+    
+    <div class="sphere-wrapper income-pos" [class.is-active]="activeTab === 'income'">
+      <app-income 
+        [isFullView]="activeTab === 'income'" 
+        (onSelect)="setActiveTab('income')">
+      </app-income>
+    </div>
 
-    <app-expence 
-      [isFullView]="activeCategory === 'expense'"
-      (onSelect)="setCategory('expense')"
-      [class.minimized]="activeCategory !== 'none' && activeCategory !== 'expense'">
-    </app-expence>
+    <div class="sphere-wrapper expense-pos" [class.is-active]="activeTab === 'expense'">
+      <app-expence 
+        [isFullView]="activeTab === 'expense'" 
+        (onSelect)="setActiveTab('expense')">
+      </app-expence>
+    </div>
 
-    <app-saving 
-      [isFullView]="activeCategory === 'saving'"
-      (onSelect)="setCategory('saving')"
-      [class.minimized]="activeCategory !== 'none' && activeCategory !== 'saving'">
-    </app-saving>
+    <div class="sphere-wrapper saving-pos" [class.is-active]="activeTab === 'saving'">
+      <app-saving 
+        [isFullView]="activeTab === 'saving'" 
+        (onSelect)="setActiveTab('saving')">
+      </app-saving>
+    </div>
+
   </div>
-
-  <button class="back-btn" *ngIf="activeCategory !== 'none'" (click)="activeCategory = 'none'">
-    DONE
-  </button>
 </div>

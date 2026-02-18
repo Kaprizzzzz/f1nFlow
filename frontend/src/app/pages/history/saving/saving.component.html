@@ -1,35 +1,30 @@
 <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
-  <div class="main-circle saving-glow" [class.negative]="totalDiff < 0">
-    <span class="label">Saving</span>
-    <span class="balance-text">
-      {{ totalDiff > 0 ? '+' : '' }}{{ totalDiff }} F1N
-    </span>
+  <div class="main-circle">
+    <span class="label">Заощадження</span>
+    <span class="balance-val">{{ totalBalance >= 0 ? '+' : '' }}{{ totalBalance }} F1N</span>
   </div>
 
   <div class="sub-circles" *ngIf="isFullView">
-    <div class="sub-item" (click)="isModalOpen = true; $event.stopPropagation()">📝</div>
-    <div class="sub-item">📊</div>
+    <div class="sub-item" (click)="openAddModal($event)">➕</div>
   </div>
 
   <div class="history-list" *ngIf="isFullView">
     <div class="history-row" *ngFor="let item of history">
-      <span class="history-label">{{ item.label }}</span>
-      <span class="history-amount" [class.plus]="item.type === 'plus'" [class.minus]="item.type === 'minus'">
+      <span>{{ item.category }}</span>
+      <span [class.plus]="item.type === 'plus'" [class.minus]="item.type === 'minus'">
         {{ item.type === 'plus' ? '+' : '-' }}{{ item.amount }}
       </span>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
+<div class="modal-overlay" *ngIf="isModalOpen" (click)="isModalOpen = false">
   <div class="modal-card" (click)="$event.stopPropagation()">
-    <h3>Add Record</h3>
-    <input type="number" [(ngModel)]="amount" placeholder="Amount">
-    <input type="text" [(ngModel)]="note" placeholder="Note (optional)">
-    
+    <h3>Adjust Balance</h3>
+    <input type="number" [(ngModel)]="amount" placeholder="0.00" autofocus>
     <div class="modal-actions">
-      <button class="btn-plus" (click)="addRecord('plus')">Deposit (+)</button>
-      <button class="btn-minus" (click)="addRecord('minus')">Withdraw (-)</button>
+      <button class="btn-plus" (click)="saveManual('plus')">Deposit</button>
+      <button class="btn-minus" (click)="saveManual('minus')">Withdraw</button>
     </div>
   </div>
 </div>

@@ -1,12 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // ОБОВ'ЯЗКОВО ДЛЯ ngModel
+import { FormsModule } from '@angular/forms';
 import { BalanceService, Transaction } from '../balance.service';
 
 @Component({
   selector: 'app-saving',
   standalone: true,
-  imports: [CommonModule, FormsModule], // Додали FormsModule
+  imports: [CommonModule, FormsModule],
   templateUrl: './saving.component.html',
   styleUrl: './saving.component.scss'
 })
@@ -16,11 +16,8 @@ export class SavingComponent implements OnInit {
 
   totalBalance = 0;
   history: Transaction[] = [];
-  
-  // Додаємо відсутні змінні для шаблону
   isModalOpen = false;
   amount: number | null = null;
-  note: string = '';
 
   constructor(private balanceService: BalanceService) {}
 
@@ -29,25 +26,18 @@ export class SavingComponent implements OnInit {
     this.balanceService.transactions$.subscribe(list => this.history = list);
   }
 
-  // Геттер для шаблону, який ти використовуєш
-  get totalDiff(): number {
-    return this.totalBalance;
+  handleCircleClick() { this.onSelect.emit(); }
+
+  openAddModal(event: Event) {
+    event.stopPropagation();
+    this.isModalOpen = true;
   }
 
-  handleCircleClick() {
-    this.onSelect.emit();
-  }
-
-  addRecord(type: 'plus' | 'minus') {
+  saveManual(type: 'plus' | 'minus') {
     if (this.amount) {
-      this.balanceService.addTransaction(this.amount, this.note || 'Saving', type);
-      this.closeModal();
+      this.balanceService.addTransaction(this.amount, 'Manual Adj', type);
+      this.isModalOpen = false;
+      this.amount = null;
     }
-  }
-
-  closeModal() {
-    this.isModalOpen = false;
-    this.amount = null;
-    this.note = '';
   }
 }

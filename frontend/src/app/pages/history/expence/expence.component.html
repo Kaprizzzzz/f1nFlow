@@ -1,23 +1,20 @@
 <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
   <div class="main-circle">
-    <span class="label">Expense</span>
-    <span class="val" *ngIf="totalSpent > 0">{{totalSpent}} F1N</span>
+    <span class="label">Витрати</span>
+    <span class="val">{{ totalSpent }} F1N</span>
   </div>
 
   <div class="sub-circles" *ngIf="isFullView">
-    <div class="sub-item" (click)="addExpense(100, 'Home')">🏠</div>
-    <div class="sub-item" (click)="addExpense(50, 'Alcohol')">🍺</div>
-    <div class="sub-item" (click)="addExpense(20, 'Taxi')">🚕</div>
+    <div class="sub-item" (click)="selectCategory('Home', $event)">🏠</div>
+    <div class="sub-item" (click)="selectCategory('Alcohol', $event)">🍺</div>
+    <div class="sub-item" (click)="selectCategory('Taxi', $event)">🚕</div>
   </div>
 </div>
 
-<div class="full-modal" *ngIf="isModalOpen">
-  <div class="modal-content">
-    <h3>Add Expense</h3>
+<div class="modal-overlay" *ngIf="isModalOpen" (click)="isModalOpen = false">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <h3>Add {{ selectedCategory }}</h3>
     <input type="number" [(ngModel)]="amount" placeholder="0.00" autofocus>
-    <div class="actions">
-      <button (click)="isModalOpen = false">Cancel</button>
-      <button class="save" (click)="saveData()">Save</button>
-    </div>
+    <button class="save-btn" (click)="saveData()">Save</button>
   </div>
 </div>

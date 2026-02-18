@@ -54,11 +54,69 @@ $expense-glow: #ffb060;
   .sub-item {
     background: rgba(45, 24, 7, 0.84);
     border: 1px solid rgba($expense-glow, 0.7);
-    color: #ffedda;
+   
     border-radius: 16px;
-    padding: 11px 14px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+.category-btn {
+    background: transparent;
+    color: #ffedda;
+    border: 0;
+    text-align: left;
     cursor: pointer;
     font-size: 14px;
+    flex: 1;
+  }
+
+  .row-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .icon-btn,
+  .small-btn {
+    border: 1px solid rgba($expense-glow, 0.7);
+    border-radius: 10px;
+    background: rgba(65, 32, 5, 0.88);
+    color: #ffedda;
+    cursor: pointer;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .icon-btn.danger {
+    border-color: rgba(255, 134, 134, 0.65);
+    background: rgba(87, 22, 34, 0.85);
+  }
+
+  .add-row,
+  .edit-row {
+    background: rgba(27, 13, 4, 0.9);
+    border: 1px solid rgba($expense-glow, 0.45);
+    border-radius: 16px;
+    padding: 8px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+
+    input {
+      width: 100%;
+      border: 1px solid #7d5a3d;
+      border-radius: 10px;
+      background: #170b04;
+      color: #fff;
+      padding: 10px;
+      font-size: 16px;
+      min-width: 0;
+    }
+  }
+
+  .small-btn.ghost {
+    background: transparent;
   }
 }
 
@@ -73,7 +131,7 @@ $expense-glow: #ffb060;
 }
 
 .modal-card {
-  width: min(340px, calc(100vw - 30px));
+  width: min(360px, calc(100vw - 30px));
   padding: 18px;
   border-radius: 16px;
   background: #2b1707;
@@ -92,6 +150,7 @@ $expense-glow: #ffb060;
     color: #fff;
     padding: 10px;
     margin-bottom: 10px;
+    font-size: 16px;
   }
 
   .save-btn {

@@ -1,19 +1,20 @@
+<div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
+   <div class="main-circle" [class.negative]="savings < 0">
+     <span class="label">Savings</span>
+     <span class="value">{{ savings }}</span>
+  </div>
 
- <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
-  <div class="main-circle" [class.negative]="savings < 0">
-    <span class="label">Savings</span>
-    <span class="value">{{ savings }}</span>
-   </div>
+  <div class="history-list" *ngIf="isFullView">
+     <h4>Income & Expense history</h4>
  
-   <div class="history-list" *ngIf="isFullView">
-    <h4>Income & Expense history</h4>
+    <div class="history-row" *ngFor="let item of history">
+       <span class="category">{{ item.category }}</span>
+       <span class="amount" [class.plus]="item.type === 'plus'" [class.minus]="item.type === 'minus'">
+        {{ item.type === 'plus' ? '+' : '-' }}{{ item.amount }}
+      </span>
+      <button type="button" class="delete-btn" (click)="removeTransaction(item.id, $event)">Delete</button>
+    </div>
 
-     <div class="history-row" *ngFor="let item of history">
-      <span class="category">{{ item.category }}</span>
-      <span class="amount" [class.plus]="item.type === 'plus'" [class.minus]="item.type === 'minus'">
-         {{ item.type === 'plus' ? '+' : '-' }}{{ item.amount }}
-       </span>
-     </div>
-    <p class="empty" *ngIf="history.length === 0">No records yet.</p>
-   </div>
-</div>
+     <p class="empty" *ngIf="history.length === 0">No records yet.</p>
+  </div>
+ </div>

@@ -31,6 +31,16 @@
         [isFullView]="activeTab === 'saving'"
         (onSelect)="setActiveTab('saving')"
       ></app-saving>
-     </div>
-   </div>
+      </div>
+    <div
+      class="sphere-wrapper news-pos"
+      [class.is-active]="activeTab === 'news'"
+      [class.is-hidden]="isHidden('news')"
+    >
+      <app-news
+        [isFullView]="activeTab === 'news'"
+        (onSelect)="setActiveTab('news')"
+      ></app-news>
+    </div>
+  </div>
 </div>

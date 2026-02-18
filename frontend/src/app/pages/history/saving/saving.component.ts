@@ -35,4 +35,8 @@
   handleCircleClick(): void {
     this.onSelect.emit();
    }
+   removeTransaction(transactionId: number, event: Event): void {
+    event.stopPropagation();
+    this.balanceService.removeTransaction(transactionId);
+  }
 }

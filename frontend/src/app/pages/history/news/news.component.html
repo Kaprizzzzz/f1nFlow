@@ -1,0 +1,9 @@
+<div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
+  <div class="main-circle">
+    <span class="label">News</span>
+  </div>
+
+  <div class="news-panel" *ngIf="isFullView">
+    <p>Latest updates and finance tips will appear here.</p>
+  </div>
+</div>

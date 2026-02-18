@@ -1,70 +1,67 @@
-.dashboard-container {
-  width: 100%;
-  height: 100vh;
-  background-color: #0b0e14; // Темний фон як на скріні
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 80px;
-  overflow: hidden;
-}
 
-.circles-layout {
-  position: relative;
-  width: 360px;
-  height: 500px;
-
-  .sphere-wrapper {
-    position: absolute;
-    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); // Плавний "стрибок"
-  }
-
-  // СИНЯ СФЕРА (Income)
-  .income-pos {
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
+ .dashboard-container {
+   width: 100%;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(61, 130, 240, 0.35) 0%, transparent 35%),
+    radial-gradient(circle at 22% 72%, rgba(255, 164, 67, 0.2) 0%, transparent 28%),
+    radial-gradient(circle at 80% 68%, rgba(66, 235, 176, 0.2) 0%, transparent 24%),
+    linear-gradient(180deg, #060b17 0%, #02050d 100%);
+   display: flex;
+   justify-content: center;
+   align-items: flex-start;
+  padding: 22px 10px 0;
+   overflow: hidden;
+ }
+ 
+ .circles-layout {
+   position: relative;
+  width: 390px;
+  height: 600px;
+ 
+   .sphere-wrapper {
+     position: absolute;
+    transition: all 0.45s ease;
+   }
+ 
+   .income-pos {
+    top: 12px;
+     left: 50%;
+     transform: translateX(-50%);
+    z-index: 1;
+   }
+ 
+   .expense-pos {
+    top: 230px;
+    left: 14px;
     z-index: 3;
-    ::ng-deep .main-circle {
-      width: 220px; 
-      height: 220px;
-      border: 2px solid #4facfe;
-      box-shadow: 0 0 40px rgba(79, 172, 254, 0.3), inset 0 0 20px rgba(79, 172, 254, 0.2);
-    }
-  }
-
-  // ОРАНЖЕВА СФЕРА (Expense) - 75%
-  .expense-pos {
-    top: 150px;
-    left: 10px;
-    z-index: 4; // Вище за Income, бо накладається знизу
-    ::ng-deep .main-circle {
-      width: 165px; // 75% від 220
-      height: 165px;
-      border: 2px solid #f093fb;
-      box-shadow: 0 0 35px rgba(240, 147, 251, 0.3);
-    }
-  }
-
-  // ЗЕЛЕНА СФЕРА (Saving) - 50%
-  .saving-pos {
-    top: 190px;
-    right: 15px;
-    z-index: 5;
-    ::ng-deep .main-circle {
-      width: 110px; // 50% від 220
-      height: 110px;
-      border: 2px solid #43e97b;
-      box-shadow: 0 0 30px rgba(67, 233, 123, 0.3);
-    }
-  }
+   }
+ 
+   .saving-pos {
+    top: 280px;
+    right: 20px;
+    z-index: 2;
+   }
+ }
+ 
+.sphere-wrapper.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.6);
 }
 
-// ЛОГІКА РОЗГОРТАННЯ: Активна сфера виходить на центр
-.sphere-wrapper.is-active {
-  z-index: 100 !important;
-  top: 20px !important;
-  left: 50% !important;
-  right: auto !important;
-  transform: translateX(-50%) scale(1.1) !important;
+ .sphere-wrapper.is-active {
+  z-index: 20 !important;
+  top: 34px !important;
+   left: 50% !important;
+   right: auto !important;
+  transform: translateX(-50%) !important;
+}
+
+@media (max-width: 560px) {
+  .circles-layout {
+    transform: scale(0.86);
+    transform-origin: top center;
+    margin-top: -10px;
+  }
 }

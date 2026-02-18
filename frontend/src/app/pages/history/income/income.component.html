@@ -1,21 +1,22 @@
-<div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
-  <div class="main-circle">
-    <span class="label">Income</span>
-  </div>
+ <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
+   <div class="main-circle">
+     <span class="label">Income</span>
+    <span class="value">{{ totalIncome }}</span>
+   </div>
+ 
+   <div class="sub-circles" *ngIf="isFullView">
+    <button type="button" class="sub-item" (click)="addIncome(500, 'Salary', $event)">Salary +500</button>
+    <button type="button" class="sub-item" (click)="addIncome(1000, 'Bonus', $event)">Bonus +1000</button>
+    <button type="button" class="sub-item" (click)="openCustomModal($event)">Custom</button>
+   </div>
+ </div>
+ 
+<div class="modal-overlay" *ngIf="isModalOpen" (click)="isModalOpen = false">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <h3>Add Income</h3>
+    <input type="number" [(ngModel)]="amount" placeholder="0.00" autofocus>
+    <button type="button" class="save-btn" (click)="saveData()">Save</button>
+   </div>
 
-  <div class="sub-circles" *ngIf="isFullView">
-    <div class="sub-item" (click)="addIncome(500, 'Salary')">💼</div>
-    <div class="sub-item" (click)="addIncome(1000, 'Motherlode')">💎</div>
-    <div class="sub-item" (click)="openCustomModal()">➕</div>
-  </div>
-</div>
 
-<div class="full-modal" *ngIf="isModalOpen">
-  <div class="header">
-    <button class="back-btn" (click)="isModalOpen = false">Back</button>
-  </div>
-  
-  <input type="number" [(ngModel)]="amount" placeholder="0.00">
-  
-  <button class="save-btn" (click)="saveData()">Save</button>
 </div>

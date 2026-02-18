@@ -1,52 +1,74 @@
-/* src/app/app.component.scss */
-.app-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: #000; // Темний фон під стиль Telegram
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #040914;
 }
 
-.content {
-  flex: 1;
-  overflow-y: auto; // Дозволяє прокручувати тільки контент сторінки
-  padding-bottom: 80px; // Запас місця, щоб контент не перекривався меню
-}
+ .app-container {
+   display: flex;
+   flex-direction: column;
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  border-left: 1px solid rgba(122, 151, 209, 0.18);
+  border-right: 1px solid rgba(122, 151, 209, 0.18);
+  box-shadow: 0 0 45px rgba(0, 0, 0, 0.35);
+  background: #060b17;
+ }
+ 
+ .content {
+   flex: 1;
+  overflow-y: auto;
+  padding-bottom: 106px;
+ }
+ 
+ .bottom-nav {
+   position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(390px, calc(100% - 24px));
+  height: 82px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(16, 25, 44, 0.95) 0%, rgba(10, 14, 28, 0.98) 100%);
+  border: 1px solid rgba(117, 150, 218, 0.22);
+  backdrop-filter: blur(10px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+   align-items: center;
+   z-index: 1000;
+ 
+   a {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #c8d0eb;
+     text-decoration: none;
+    font-size: 14px;
+    border-right: 1px solid rgba(99, 116, 152, 0.26);
+    height: 100%;
 
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 70px;
-  background: rgba(20, 20, 20, 0.95); // Напівпрозорий ефект
-  backdrop-filter: blur(10px); // Ефект розмиття фону як в iOS
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-top: 1px solid #333;
-  z-index: 1000;
-
-  a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #888;
-    text-decoration: none;
-    font-size: 10px; // Трохи менше для витонченості
-    transition: all 0.3s ease;
-    flex: 1;
-
-    .icon {
-      font-size: 24px; // Збільшимо іконки для зручності натискання
-      margin-bottom: 4px;
+    &:last-child {
+      border-right: 0;
     }
+ 
+     .icon {
+      font-size: 17px;
+      line-height: 1;
+     }
+ 
+     &.active {
+      color: #0a1322;
+      font-weight: 600;
+      background: linear-gradient(180deg, #7fd8ff 0%, #59a8ee 100%);
+      border-radius: 18px;
+      margin: 8px;
+      height: calc(100% - 16px);
+      border-right: 0;
+      box-shadow: 0 7px 20px rgba(84, 180, 255, 0.35);
+     }
+   }
 
-    &.active {
-      color: #00d4ff; // Твій фірмовий блакитний колір
-      transform: translateY(-2px); // Легкий підйом при активації
-      
-      .icon {
-        filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.5)); // Світіння іконки
-      }
-    }
-  }
 }

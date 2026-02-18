@@ -1,26 +1,36 @@
-<div class="dashboard-container">
-  <div class="circles-layout">
-    
-    <div class="sphere-wrapper income-pos" [class.is-active]="activeTab === 'income'">
-      <app-income 
-        [isFullView]="activeTab === 'income'" 
-        (onSelect)="setActiveTab('income')">
-      </app-income>
-    </div>
-
-    <div class="sphere-wrapper expense-pos" [class.is-active]="activeTab === 'expense'">
-      <app-expence 
-        [isFullView]="activeTab === 'expense'" 
-        (onSelect)="setActiveTab('expense')">
-      </app-expence>
-    </div>
-
-    <div class="sphere-wrapper saving-pos" [class.is-active]="activeTab === 'saving'">
-      <app-saving 
-        [isFullView]="activeTab === 'saving'" 
-        (onSelect)="setActiveTab('saving')">
-      </app-saving>
-    </div>
-
-  </div>
+ <div class="dashboard-container">
+   <div class="circles-layout">
+    <div
+      class="sphere-wrapper income-pos"
+      [class.is-active]="activeTab === 'income'"
+      [class.is-hidden]="isHidden('income')"
+    >
+      <app-income
+        [isFullView]="activeTab === 'income'"
+        (onSelect)="setActiveTab('income')"
+      ></app-income>
+     </div>
+ 
+    <div
+      class="sphere-wrapper expense-pos"
+      [class.is-active]="activeTab === 'expense'"
+      [class.is-hidden]="isHidden('expense')"
+    >
+      <app-expence
+        [isFullView]="activeTab === 'expense'"
+        (onSelect)="setActiveTab('expense')"
+      ></app-expence>
+     </div>
+ 
+    <div
+      class="sphere-wrapper saving-pos"
+      [class.is-active]="activeTab === 'saving'"
+      [class.is-hidden]="isHidden('saving')"
+    >
+      <app-saving
+        [isFullView]="activeTab === 'saving'"
+        (onSelect)="setActiveTab('saving')"
+      ></app-saving>
+     </div>
+   </div>
 </div>

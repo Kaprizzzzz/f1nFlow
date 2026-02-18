@@ -1,27 +1,24 @@
-<app-loading *ngIf="showSplash"></app-loading>
+ <app-loading *ngIf="showSplash"></app-loading>
+ 
+ <div class="app-container" *ngIf="!showSplash">
+   <div class="content">
+     <router-outlet></router-outlet>
+   </div>
+ 
+   <nav class="bottom-nav">
+     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+       <span class="icon">🏠</span>
+       <span>Main</span>
+     </a>
+     <a routerLink="/referrals" routerLinkActive="active">
+       <span class="icon">👥</span>
+      <span>Referrals</span>
+     </a>
+     <a routerLink="/about" routerLinkActive="active">
+      <span class="icon">ⓘ</span>
+       <span>About</span>
+     </a>
+   </nav>
 
-<div class="app-container" *ngIf="!showSplash">
-  
-  <div class="content">
-    <router-outlet></router-outlet>
-  </div>
 
-  <nav class="bottom-nav">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-      <span class="icon">🏠</span>
-      <span>Main</span>
-    </a>
-    <a routerLink="/referrals" routerLinkActive="active">
-      <span class="icon">👥</span>
-      <span>Friends</span>
-    </a>
-    <a routerLink="/events" routerLinkActive="active">
-      <span class="icon">🏆</span>
-      <span>Events</span>
-    </a>
-    <a routerLink="/about" routerLinkActive="active">
-      <span class="icon">ℹ️</span>
-      <span>About</span>
-    </a>
-  </nav>
 </div>

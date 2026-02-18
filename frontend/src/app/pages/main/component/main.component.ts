@@ -1,27 +1,26 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { IncomeComponent } from '../../history/income/income.component';
-import { ExpenceComponent } from '../../history/expence/expence.component';
-import { SavingComponent } from '../../history/saving/saving.component';
+ import { Component } from '@angular/core';
+ import { CommonModule } from '@angular/common';
+ import { IncomeComponent } from '../../history/income/income.component';
+ import { ExpenceComponent } from '../../history/expence/expence.component';
+ import { SavingComponent } from '../../history/saving/saving.component';
+ 
+type MainTab = 'income' | 'expense' | 'saving' | null;
 
-@Component({
-  selector: 'app-main',
-  standalone: true,
-  imports: [
-    CommonModule, 
-    IncomeComponent, 
-    ExpenceComponent, 
-    SavingComponent
-  ],
-  templateUrl: './main.component.html',
-  styleUrl: './main.component.scss'
-})
-export class MainComponent {
-  // Відстежуємо, яка вкладка зараз активна (розгорнута)
-  activeTab: string | null = null;
+ @Component({
+   selector: 'app-main',
+   standalone: true,
+   imports: [CommonModule, IncomeComponent, ExpenceComponent, SavingComponent],
+   templateUrl: './main.component.html',
+   styleUrl: './main.component.scss'
+ })
+ export class MainComponent {
+  activeTab: MainTab = null;
 
-  setActiveTab(tab: string): void {
-    // Якщо клікаємо по вже активній — згортаємо (null), інакше — відкриваємо нову
-    this.activeTab = (this.activeTab === tab) ? null : tab;
+  setActiveTab(tab: Exclude<MainTab, null>): void {
+    this.activeTab = this.activeTab === tab ? null : tab;
   }
+ 
+  isHidden(tab: Exclude<MainTab, null>): boolean {
+    return this.activeTab !== null && this.activeTab !== tab;
+   }
 }

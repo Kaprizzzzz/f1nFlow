@@ -1,20 +1,23 @@
-<div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
-  <div class="main-circle">
-    <span class="label">Витрати</span>
-    <span class="val">{{ totalSpent }} F1N</span>
-  </div>
 
-  <div class="sub-circles" *ngIf="isFullView">
-    <div class="sub-item" (click)="selectCategory('Home', $event)">🏠</div>
-    <div class="sub-item" (click)="selectCategory('Alcohol', $event)">🍺</div>
-    <div class="sub-item" (click)="selectCategory('Taxi', $event)">🚕</div>
-  </div>
-</div>
+ <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
+   <div class="main-circle">
+    <span class="label">Expense</span>
+    <span class="value">{{ totalExpense }}</span>
+   </div>
+ 
+   <div class="sub-circles" *ngIf="isFullView">
+    <button type="button" class="sub-item" (click)="selectCategory('Home', $event)">Home</button>
+    <button type="button" class="sub-item" (click)="selectCategory('Transport', $event)">Transport</button>
+    <button type="button" class="sub-item" (click)="selectCategory('Food', $event)">Food</button>
+   </div>
+ </div>
+ 
+ <div class="modal-overlay" *ngIf="isModalOpen" (click)="isModalOpen = false">
+   <div class="modal-card" (click)="$event.stopPropagation()">
+    <h3>Add expense: {{ selectedCategory }}</h3>
+     <input type="number" [(ngModel)]="amount" placeholder="0.00" autofocus>
+    <button type="button" class="save-btn" (click)="saveData()">Save</button>
+   </div>
 
-<div class="modal-overlay" *ngIf="isModalOpen" (click)="isModalOpen = false">
-  <div class="modal-card" (click)="$event.stopPropagation()">
-    <h3>Add {{ selectedCategory }}</h3>
-    <input type="number" [(ngModel)]="amount" placeholder="0.00" autofocus>
-    <button class="save-btn" (click)="saveData()">Save</button>
-  </div>
+
 </div>

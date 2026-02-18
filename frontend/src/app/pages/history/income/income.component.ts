@@ -1,42 +1,51 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Додано для ngModel
-import { BalanceService } from '../balance.service';
-
-@Component({
-  selector: 'app-income',
-  standalone: true,
-  imports: [CommonModule, FormsModule], // Обов'язково додаємо FormsModule сюди
-  templateUrl: './income.component.html',
-  styleUrl: './income.component.scss'
-})
-export class IncomeComponent {
-  @Input() isFullView: boolean = false;
-  @Output() onSelect = new EventEmitter<void>();
-
-  // Властивості для шаблону
-  isModalOpen = false;
-  amount: number | null = null;
-
-  constructor(private balanceService: BalanceService) {}
-
-  addIncome(amount: number, category: string) {
-    this.balanceService.addTransaction(amount, category, 'plus');
+ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+ import { CommonModule } from '@angular/common';
+ import { FormsModule } from '@angular/forms';
+ import { BalanceService } from '../balance.service';
+ import { map } from 'rxjs/operators';
+ 
+ @Component({
+   selector: 'app-income',
+   standalone: true,
+   imports: [CommonModule, FormsModule],
+   templateUrl: './income.component.html',
+   styleUrl: './income.component.scss'
+ })
+export class IncomeComponent implements OnInit {
+  @Input() isFullView = false;
+   @Output() onSelect = new EventEmitter<void>();
+ 
+  totalIncome = 0;
+   isModalOpen = false;
+   amount: number | null = null;
+ 
+   constructor(private balanceService: BalanceService) {}
+ 
+  ngOnInit(): void {
+    this.balanceService.transactions$.pipe(
+      map((txs) => txs.filter((tx) => tx.type === 'plus').reduce((acc, tx) => acc + tx.amount, 0))
+    ).subscribe((sum) => this.totalIncome = sum);
   }
 
-  openCustomModal() {
-    this.isModalOpen = true;
-  }
-
-  saveData() {
-    if (this.amount && this.amount > 0) {
-      this.balanceService.addTransaction(this.amount, 'Custom Income', 'plus');
-      this.isModalOpen = false;
-      this.amount = null;
-    }
-  }
-
-  handleCircleClick() {
+  handleCircleClick(): void {
     this.onSelect.emit();
   }
+
+  addIncome(amount: number, category: string, event: Event): void {
+    event.stopPropagation();
+     this.balanceService.addTransaction(amount, category, 'plus');
+   }
+ 
+  openCustomModal(event: Event): void {
+    event.stopPropagation();
+     this.isModalOpen = true;
+   }
+ 
+  saveData(): void {
+     if (this.amount && this.amount > 0) {
+      this.balanceService.addTransaction(this.amount, 'Custom income', 'plus');
+       this.amount = null;
+      this.isModalOpen = false;
+     }
+   }
 }

@@ -4,7 +4,7 @@
      <span class="value">{{ totalExpense }}</span>
   </div>
 
-  <div class="sub-circles" *ngIf="isFullView">
+  <div class="sub-circles" *ngIf="isFullView" (click)="$event.stopPropagation()">
     <div class="sub-item" *ngFor="let category of categories">
       <button type="button" class="category-btn" (click)="selectCategory(category, $event)">{{ category }}</button>
       <div class="row-actions">

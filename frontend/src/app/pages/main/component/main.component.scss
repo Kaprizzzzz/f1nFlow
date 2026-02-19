@@ -27,25 +27,25 @@
    }
 
   .income-pos {
-    top: 8px;
+    top: 24px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 3;
    }
 
   .expense-pos {
-    top: 234px;
-    left: 18px;
+    top: 254px;
+    left: calc(50% - 185px);
     z-index: 4;
   }
 
   .saving-pos {
-    top: 248px;
-    right: 22px;
+    top: 254px;
+    left: calc(50% + 5px);
     z-index: 2;
    }
    .news-pos {
-    top: 410px;
+    top: 396px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1;

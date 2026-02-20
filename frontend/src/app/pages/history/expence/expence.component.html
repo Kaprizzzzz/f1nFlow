@@ -1,5 +1,5 @@
- <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
-   <div class="main-circle">
+ <div class="circle-wrapper" [class.active]="isFullView">
+   <div class="main-circle" (click)="handleCircleClick()">
     <span class="label">Expense</span>
     <span class="value">{{ totalExpense }}</span>
    </div>

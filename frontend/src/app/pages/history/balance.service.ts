@@ -1,60 +1,54 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-
-export interface Transaction {
-  id: number;
-  amount: number;
-  category: string;
-  type: 'plus' | 'minus';
-  date: Date;
-  label?: string;
-}
-
-export interface CategoryItem {
-  name: string;
-  amount: number;
-}
-
-@Injectable({ providedIn: 'root' })
-export class BalanceService {
-  private transactions: Transaction[] = [];
-  private balanceSubject = new BehaviorSubject<number>(0);
-   private nextTransactionId = 1;
+ import { Injectable } from '@angular/core';
+ import { BehaviorSubject } from 'rxjs';
  
-  private incomeCategoriesSubject = new BehaviorSubject<CategoryItem[]>([
-    { name: 'Salary', amount: 1000 },
-    { name: 'Bonus', amount: 250 }
-  ]);
-  private expenseCategoriesSubject = new BehaviorSubject<CategoryItem[]>([
-    { name: 'Home', amount: 400 },
-    { name: 'Transport', amount: 120 },
-    { name: 'Food', amount: 300 }
-  ]);
+ export interface Transaction {
+   id: number;
+   amount: number;
+   category: string;
+   type: 'plus' | 'minus';
+   date: Date;
+   label?: string;
+ }
+ 
+ export interface CategoryItem {
+   name: string;
+   amount: number;
+ }
+ 
+ @Injectable({ providedIn: 'root' })
+ export class BalanceService {
+   private transactions: Transaction[] = [];
+   private balanceSubject = new BehaviorSubject<number>(0);
+    private nextTransactionId = 1;
+  
+  private incomeCategoriesSubject = new BehaviorSubject<CategoryItem[]>([]);
+  private expenseCategoriesSubject = new BehaviorSubject<CategoryItem[]>([]);
+ 
+   balance$ = this.balanceSubject.asObservable();
+   transactions$ = new BehaviorSubject<Transaction[]>([]);
+    incomeCategories$ = this.incomeCategoriesSubject.asObservable();
+    expenseCategories$ = this.expenseCategoriesSubject.asObservable();
+  
+    addTransaction(amount: number, category: string, type: 'plus' | 'minus'): void {
+      const normalizedAmount = Number(amount);
+  
+      if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
+        return;
+      }
+  
+      const newTx: Transaction = {
+        id: this.nextTransactionId++,
+        amount: normalizedAmount,
+        category,
+        type,
+        date: new Date(),
+        label: category
+      };
+ 
+     this.transactions = [...this.transactions, newTx];
+      this.syncBalanceAndTransactions();
+    }
 
-  balance$ = this.balanceSubject.asObservable();
-  transactions$ = new BehaviorSubject<Transaction[]>([]);
-   incomeCategories$ = this.incomeCategoriesSubject.asObservable();
-   expenseCategories$ = this.expenseCategoriesSubject.asObservable();
- 
-   addTransaction(amount: number, category: string, type: 'plus' | 'minus'): void {
-     const normalizedAmount = Number(amount);
- 
-     if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
-       return;
-     }
- 
-     const newTx: Transaction = {
-       id: this.nextTransactionId++,
-       amount: normalizedAmount,
-       category,
-       type,
-       date: new Date(),
-       label: category
-     };
-
-    this.transactions = [...this.transactions, newTx];
-     this.syncBalanceAndTransactions();
-   }
  
    removeTransaction(transactionId: number): void {
      const nextTransactions = this.transactions.filter((item) => item.id !== transactionId);

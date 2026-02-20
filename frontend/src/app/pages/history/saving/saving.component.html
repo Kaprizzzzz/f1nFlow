@@ -1,10 +1,10 @@
-<div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
-   <div class="main-circle" [class.negative]="savings < 0">
+<div class="circle-wrapper" [class.active]="isFullView">
+   <div class="main-circle" [class.negative]="savings < 0" (click)="handleCircleClick()">
      <span class="label">Savings</span>
      <span class="value">{{ savings }}</span>
   </div>
 
-  <div class="history-list" *ngIf="isFullView">
+  <div class="history-list" *ngIf="isFullView" (click)="$event.stopPropagation()">
      <h4>Income & Expense history</h4>
  
     <div class="history-row" *ngFor="let item of history">

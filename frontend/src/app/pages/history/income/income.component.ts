@@ -41,10 +41,10 @@ type EditMode = 'name' | 'amount' | null;
  
    ngOnInit(): void {
      this.subscriptions.add(
-       this.balanceService.transactions$
-         .pipe(map((txs) => txs.filter((tx) => tx.type === 'plus').reduce((acc, tx) => acc + tx.amount, 0)))
-         .subscribe((sum) => (this.totalIncome = sum))
-     );
+      this.balanceService.incomeCategories$
+        .pipe(map((categories) => categories.reduce((acc, item) => acc + item.amount, 0)))
+        .subscribe((sum) => (this.totalIncome = sum))
+    );
  
      this.subscriptions.add(
        this.balanceService.incomeCategories$.subscribe((categories) => {

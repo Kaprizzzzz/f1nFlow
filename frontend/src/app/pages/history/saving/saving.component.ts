@@ -1,6 +1,7 @@
- import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
- import { CommonModule } from '@angular/common';
- import { BalanceService, Transaction } from '../balance.service';
+ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { BalanceService, Transaction } from '../balance.service';
+import { combineLatest, Subscription } from 'rxjs';
  
  @Component({
    selector: 'app-saving',
@@ -9,29 +10,34 @@
    templateUrl: './saving.component.html',
    styleUrl: './saving.component.scss'
  })
- export class SavingComponent implements OnInit {
+ export class SavingComponent implements OnInit, OnDestroy {
   @Input() isFullView = false;
    @Output() onSelect = new EventEmitter<void>();
  
   savings = 0;
    history: Transaction[] = [];
- 
+   private subscriptions = new Subscription();
    constructor(private balanceService: BalanceService) {}
- 
-  ngOnInit(): void {
-    this.balanceService.transactions$.subscribe((transactions) => {
-      this.history = transactions;
 
-      const income = transactions
-        .filter((tx) => tx.type === 'plus')
-        .reduce((acc, tx) => acc + tx.amount, 0);
- 
-      const expense = transactions
-        .filter((tx) => tx.type === 'minus')
-        .reduce((acc, tx) => acc + tx.amount, 0);
-      this.savings = income - expense;
-    });
+  ngOnInit(): void {
+    this.subscriptions.add(
+      this.balanceService.transactions$.subscribe((transactions) => {
+        this.history = transactions;
+      })
+    );
+      this.subscriptions.add(
+      combineLatest([this.balanceService.incomeCategories$, this.balanceService.expenseCategories$]).subscribe(
+        ([incomeCategories, expenseCategories]) => {
+          const income = incomeCategories.reduce((acc, item) => acc + item.amount, 0);
+          const expense = expenseCategories.reduce((acc, item) => acc + item.amount, 0);
+          this.savings = income - expense;
+        }
+      )
+    );
    }
+    ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
   handleCircleClick(): void {
     this.onSelect.emit();
    }

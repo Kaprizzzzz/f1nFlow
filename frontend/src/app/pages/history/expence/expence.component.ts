@@ -41,8 +41,8 @@ type EditMode = 'name' | 'amount' | null;
  
    ngOnInit(): void {
     this.subscriptions.add(
-       this.balanceService.transactions$
-         .pipe(map((txs) => txs.filter((tx) => tx.type === 'minus').reduce((acc, tx) => acc + tx.amount, 0)))
+       this.balanceService.expenseCategories$
+         .pipe(map((categories) => categories.reduce((acc, item) => acc + item.amount, 0)))
          .subscribe((sum) => (this.totalExpense = sum))
      );
  

@@ -1,100 +1,108 @@
-$expense-glow: #ffb060;
-
-.circle-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  .main-circle {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 50% 18%, #ffd27f 0%, #f2a24f 16%, #9f5b18 50%, #341700 100%);
-    border: 2px solid rgba($expense-glow, 0.9);
-    box-shadow: 0 0 25px rgba($expense-glow, 0.5), inset 0 -20px 32px rgba(0, 0, 0, 0.45);
-    color: #fff;
+ $expense-glow: #ffb060;
+ 
+ .circle-wrapper {
+   position: relative;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+ 
+   .main-circle {
+     width: 180px;
+     height: 180px;
+     border-radius: 50%;
+     background: radial-gradient(circle at 50% 18%, #ffd27f 0%, #f2a24f 16%, #9f5b18 50%, #341700 100%);
+     border: 2px solid rgba($expense-glow, 0.9);
+     box-shadow: 0 0 25px rgba($expense-glow, 0.5), inset 0 -20px 32px rgba(0, 0, 0, 0.45);
+     color: #fff;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+    transform: scale(1);
+    transition: transform 0.35s ease;
+ 
+     .label {
+       font-size: 22px;
+       opacity: 0.95;
+     }
+ 
+     .value {
+       font-size: 48px;
+       font-weight: 600;
+       line-height: 1;
+       margin-top: 8px;
+     }
+   }
+ 
+   &.active {
+     .main-circle {
+      transform: scale(1.56);
+ 
+       .label { font-size: 32px; }
+       .value { font-size: 66px; }
+     }
+   }
+ }
+ 
+ .sub-circles {
+   margin-top: 18px;
+   width: 320px;
+   display: grid;
+   grid-template-columns: 1fr;
+   gap: 8px;
+ 
+   .sub-item {
+     background: rgba(45, 24, 7, 0.84);
+     border: 1px solid rgba($expense-glow, 0.7);
+    
+     border-radius: 16px;
+     padding: 8px;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     gap: 8px;
+   }
+ .category-btn {
+     background: transparent;
+     color: #ffedda;
+     border: 0;
+     text-align: left;
+     cursor: pointer;
+     font-size: 14px;
+     flex: 1;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.35s ease;
-
-    .label {
-      font-size: 22px;
-      opacity: 0.95;
-    }
-
-    .value {
-      font-size: 48px;
-      font-weight: 600;
-      line-height: 1;
-      margin-top: 8px;
-    }
-  }
-
-  &.active {
-    .main-circle {
-      width: 280px;
-      height: 280px;
-
-      .label { font-size: 32px; }
-      .value { font-size: 66px; }
-    }
-  }
-}
-
-.sub-circles {
-  margin-top: 18px;
-  width: 320px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-
-  .sub-item {
-    background: rgba(45, 24, 7, 0.84);
-    border: 1px solid rgba($expense-glow, 0.7);
-   
-    border-radius: 16px;
-    padding: 8px;
-    display: flex;
-    align-items: center;
     justify-content: space-between;
     gap: 8px;
-  }
-.category-btn {
-    background: transparent;
-    color: #ffedda;
-    border: 0;
-    text-align: left;
-    cursor: pointer;
-    font-size: 14px;
-    flex: 1;
-  }
 
-  .row-actions {
-    display: flex;
-    gap: 6px;
-  }
-
-  .icon-btn,
-  .small-btn {
-    border: 1px solid rgba($expense-glow, 0.7);
-    border-radius: 10px;
-    background: rgba(65, 32, 5, 0.88);
-    color: #ffedda;
-    cursor: pointer;
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-
-  .icon-btn.danger {
-    border-color: rgba(255, 134, 134, 0.65);
-    background: rgba(87, 22, 34, 0.85);
-  }
-
-  .add-row,
-  .edit-row {
+    .category-amount {
+      opacity: 0.9;
+      font-weight: 600;
+    }
+   }
+ 
+   .row-actions {
+     display: flex;
+     gap: 6px;
+   }
+ 
+   .icon-btn,
+   .small-btn {
+     border: 1px solid rgba($expense-glow, 0.7);
+     border-radius: 10px;
+     background: rgba(65, 32, 5, 0.88);
+     color: #ffedda;
+     cursor: pointer;
+     padding: 6px 10px;
+     font-size: 12px;
+   }
+ 
+   .icon-btn.danger {
+     border-color: rgba(255, 134, 134, 0.65);
+     background: rgba(87, 22, 34, 0.85);
+   }
+ 
+   .add-row,
+   .edit-row {
     background: rgba(27, 13, 4, 0.9);
     border: 1px solid rgba($expense-glow, 0.45);
     border-radius: 16px;

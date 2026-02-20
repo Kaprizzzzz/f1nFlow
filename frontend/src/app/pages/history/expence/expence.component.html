@@ -1,35 +1,53 @@
-<div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
-  <div class="main-circle">
-     <span class="label">Expense</span>
-     <span class="value">{{ totalExpense }}</span>
-  </div>
-
-  <div class="sub-circles" *ngIf="isFullView" (click)="$event.stopPropagation()">
-    <div class="sub-item" *ngFor="let category of categories">
-      <button type="button" class="category-btn" (click)="selectCategory(category, $event)">{{ category }}</button>
-      <div class="row-actions">
-        <button type="button" class="icon-btn" (click)="startEdit(category, $event)">✏️</button>
-        <button type="button" class="icon-btn danger" (click)="deleteCategory(category, $event)">🗑️</button>
-      </div>
-    </div>
+ <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
+   <div class="main-circle">
+    <span class="label">Expense</span>
+    <span class="value">{{ totalExpense }}</span>
+   </div>
  
-    <div class="edit-row" *ngIf="editModeCategory">
-      <input type="text" [(ngModel)]="editedCategoryName" placeholder="New category name" />
+   <div class="sub-circles" *ngIf="isFullView" (click)="$event.stopPropagation()">
+     <div class="sub-item" *ngFor="let category of categories">
+      <button type="button" class="category-btn" (click)="selectCategory(category, $event)">
+        <span>{{ category.name }}</span>
+        <span class="category-amount">{{ category.amount }}</span>
+      </button>
+       <div class="row-actions">
+        <button type="button" class="icon-btn" (click)="openEditName(category, $event)">Name</button>
+        <button type="button" class="icon-btn" (click)="openEditAmount(category, $event)">Amount</button>
+        <button type="button" class="icon-btn danger" (click)="deleteCategory(category.name, $event)">🗑️</button>
+       </div>
+     </div>
+
+    <div class="edit-row" *ngIf="editModeCategory && editMode === 'name'">
+       <input type="text" [(ngModel)]="editedCategoryName" placeholder="New category name" />
+       <button type="button" class="small-btn" (click)="saveEdit($event)">Save</button>
+       <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
+     </div>
+
+    <div class="edit-row" *ngIf="editModeCategory && editMode === 'amount'">
+      <input type="number" [(ngModel)]="editedCategoryAmount" placeholder="Category amount" inputmode="decimal" />
       <button type="button" class="small-btn" (click)="saveEdit($event)">Save</button>
       <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
     </div>
+
+     <div class="add-row">
+      <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
+      <button type="button" class="small-btn" (click)="addCategory($event)">Save name</button>
+     </div>
+   </div>
+ </div>
  
-    <div class="add-row">
-      <input type="text" [(ngModel)]="newCategoryName" placeholder="Add new expense category" />
-      <button type="button" class="small-btn" (click)="addCategory($event)">Add</button>
-    </div>
-  </div>
+ <div class="modal-overlay" *ngIf="isModalOpen" (click)="isModalOpen = false">
+   <div class="modal-card" (click)="$event.stopPropagation()">
+     <h3>Add expense: {{ selectedCategory }}</h3>
+     <input type="number" [(ngModel)]="amount" placeholder="0.00" inputmode="decimal" />
+     <button type="button" class="save-btn" (click)="saveData()">Save</button>
+   </div>
 </div>
 
-<div class="modal-overlay" *ngIf="isModalOpen" (click)="isModalOpen = false">
+<div class="modal-overlay" *ngIf="isCreateAmountModalOpen" (click)="closeCreateAmountModal()">
   <div class="modal-card" (click)="$event.stopPropagation()">
-    <h3>Add expense: {{ selectedCategory }}</h3>
-    <input type="number" [(ngModel)]="amount" placeholder="0.00" inputmode="decimal" />
-    <button type="button" class="save-btn" (click)="saveData()">Save</button>
+    <h3>Set amount for: {{ pendingCreatedCategory }}</h3>
+    <input type="number" [(ngModel)]="pendingCreatedAmount" placeholder="0.00" inputmode="decimal" />
+    <button type="button" class="save-btn" (click)="saveCreatedCategoryAmount()">Save amount</button>
   </div>
- </div>
+</div>

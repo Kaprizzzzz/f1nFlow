@@ -1,98 +1,106 @@
-
-$income-glow: #62b5ff;
+ $income-glow: #62b5ff;
+  
+  .circle-wrapper {
+   position: relative;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
  
- .circle-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  .main-circle {
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 50% 15%, #89d0ff 0%, #4f91e6 17%, #123e88 50%, #050f2f 100%);
-    border: 2px solid rgba($income-glow, 0.9);
-    box-shadow: 0 0 30px rgba($income-glow, 0.45), inset 0 -24px 34px rgba(0, 0, 0, 0.45);
-    color: #fff;
-     display: flex;
-     flex-direction: column;
-     justify-content: center;
-     align-items: center;
-    transition: all 0.35s ease;
- 
-    .label {
-      font-size: 24px;
-      opacity: 0.92;
-    }
-
-    .value {
-      font-size: 54px;
-      font-weight: 600;
-      line-height: 1;
-      margin-top: 8px;
-    }
-   }
- 
-   &.active {
-     .main-circle {
-      width: 280px;
-      height: 280px;
+   .main-circle {
+     width: 220px;
+     height: 220px;
+     border-radius: 50%;
+     background: radial-gradient(circle at 50% 15%, #89d0ff 0%, #4f91e6 17%, #123e88 50%, #050f2f 100%);
+     border: 2px solid rgba($income-glow, 0.9);
+     box-shadow: 0 0 30px rgba($income-glow, 0.45), inset 0 -24px 34px rgba(0, 0, 0, 0.45);
+     color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    transform: scale(1);
+    transition: transform 0.35s ease;
+  
+     .label {
+       font-size: 24px;
+       opacity: 0.92;
      }
-   }
- }
  
- .sub-circles {
-  margin-top: 18px;
-  width: 320px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
- 
-   .sub-item {
-    background: rgba(14, 25, 45, 0.85);
-     border: 1px solid rgba($income-glow, 0.6);
-    color: #e6f2ff;
-    border-radius: 16px;
-    padding: 8px;
+     .value {
+       font-size: 54px;
+       font-weight: 600;
+       line-height: 1;
+       margin-top: 8px;
+     }
+    }
+  
+    &.active {
+      .main-circle {
+      transform: scale(1.27);
+      }
+    }
+  }
+  
+  .sub-circles {
+   margin-top: 18px;
+   width: 320px;
+   display: grid;
+   grid-template-columns: 1fr;
+   gap: 8px;
+  
+    .sub-item {
+     background: rgba(14, 25, 45, 0.85);
+      border: 1px solid rgba($income-glow, 0.6);
+     color: #e6f2ff;
+     border-radius: 16px;
+     padding: 8px;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     gap: 8px;
+    }
+    .category-btn {
+     background: transparent;
+     color: #e6f2ff;
+     border: 0;
+     text-align: left;
+     cursor: pointer;
+     font-size: 14px;
+     flex: 1;
     display: flex;
-    align-items: center;
     justify-content: space-between;
     gap: 8px;
+
+    .category-amount {
+      opacity: 0.9;
+      font-weight: 600;
+    }
+    }
+    .row-actions {
+     display: flex;
+     gap: 6px;
    }
-   .category-btn {
-    background: transparent;
-    color: #e6f2ff;
-    border: 0;
-    text-align: left;
-    cursor: pointer;
-    font-size: 14px;
-    flex: 1;
+ 
+   .icon-btn,
+   .small-btn {
+     border: 1px solid rgba($income-glow, 0.65);
+     border-radius: 10px;
+     background: rgba(16, 36, 74, 0.85);
+     color: #deefff;
+     cursor: pointer;
+     padding: 6px 10px;
+     font-size: 12px;
    }
-   .row-actions {
-    display: flex;
-    gap: 6px;
-  }
+ 
+   .icon-btn.danger {
+     border-color: rgba(255, 134, 134, 0.65);
+     background: rgba(87, 22, 34, 0.85);
+   }
+ 
+   .add-row,
+   .edit-row {
+     background: rgba(8, 17, 34, 0.9);
 
-  .icon-btn,
-  .small-btn {
-    border: 1px solid rgba($income-glow, 0.65);
-    border-radius: 10px;
-    background: rgba(16, 36, 74, 0.85);
-    color: #deefff;
-    cursor: pointer;
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-
-  .icon-btn.danger {
-    border-color: rgba(255, 134, 134, 0.65);
-    background: rgba(87, 22, 34, 0.85);
-  }
-
-  .add-row,
-  .edit-row {
-    background: rgba(8, 17, 34, 0.9);
     border: 1px solid rgba($income-glow, 0.4);
     border-radius: 16px;
     padding: 8px;

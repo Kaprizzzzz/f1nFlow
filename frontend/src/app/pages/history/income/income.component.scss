@@ -9,141 +9,136 @@ $income-glow: #62b5ff;
   .main-circle {
     width: 220px;
     height: 220px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 50% 15%, #89d0ff 0%, #4f91e6 17%, #123e88 50%, #050f2f 100%);
-    border: 2px solid rgba($income-glow, 0.9);
-    box-shadow: 0 0 30px rgba($income-glow, 0.45), inset 0 -24px 34px rgba(0, 0, 0, 0.45);
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-     transform: scale(1);
-     transition: transform 0.35s ease;
-    z-index: 2;
-
-    .label { font-size: 24px; opacity: 0.92; }
-    .value { font-size: 50px; font-weight: 600; line-height: 1; margin-top: 8px; }
-   }
-  
-
-  &.active .main-circle {
-    transform: scale(1.27);
-
-    .value { font-size: 46px; }
-  }
-}
-
-.orbit {
-  position: absolute;
-  top: 24px;
-  left: 50%;
-  width: 320px;
-  height: 320px;
-  transform: translateX(-50%);
-  pointer-events: none;
-
-  .mini-circle {
-    --angle: calc((360deg / var(--count)) * var(--i));
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 1px solid rgba($income-glow, 0.7);
-    background: rgba(8, 17, 34, 0.95);
-    color: #fff;
-    transform: rotate(var(--angle)) translateY(-150px) rotate(calc(var(--angle) * -1));
-    font-size: 22px;
-    cursor: pointer;
-    pointer-events: auto;
-   }
+    $income-glow: #62b5ff;
+     border-radius: 50%;
+     background: radial-gradient(circle at 50% 15%, #89d0ff 0%, #4f91e6 17%, #123e88 50%, #050f2f 100%);
+     border: 2px solid rgba($income-glow, 0.9);
+     box-shadow: 0 0 30px rgba($income-glow, 0.45), inset 0 -24px 34px rgba(0, 0, 0, 0.45);
+     color: #fff;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+      transform: scale(1);
+      transition: transform 0.35s ease;
+     z-index: 2;
  
-  .mini-circle.selected {
-    box-shadow: 0 0 12px rgba($income-glow, 0.9);
-    border-color: #9dd3ff;
+     .label { font-size: 24px; opacity: 0.92; }
+     .value { font-size: 50px; font-weight: 600; line-height: 1; margin-top: 8px; }
+    }
+   
+ 
+   &.active .main-circle {
+     transform: scale(1.27);
+ 
+     .value { font-size: 46px; }
    }
  }
  
-.panel {
-  margin-top: 56px;
+.sticker-row {
   width: 330px;
-  display: grid;
-  gap: 8px;
- }
-
-.selected-card,
-.add-row,
-.edit-row {
-  background: rgba(8, 17, 34, 0.9);
-  border: 1px solid rgba($income-glow, 0.4);
-  border-radius: 16px;
-  padding: 10px;
-}
-
-.summary {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #e6f2ff;
-
-  .emoji { font-size: 24px; }
-  .name { font-size: 16px; font-weight: 600; }
-  .amount { font-size: 18px; font-weight: 700; }
-}
-
-.row-actions {
-  margin-top: 8px;
+  margin-bottom: 14px;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-}
-
-.icon-btn,
-.small-btn {
-  border: 1px solid rgba($income-glow, 0.65);
-  border-radius: 10px;
-  background: rgba(16, 36, 74, 0.85);
-  color: #deefff;
-  cursor: pointer;
-  padding: 6px 10px;
-  font-size: 12px;
-}
-
-.icon-btn.danger {
-  border-color: rgba(255, 134, 134, 0.65);
-  background: rgba(87, 22, 34, 0.85);
-}
-
-.add-row {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr auto auto;
+  justify-content: flex-start;
   gap: 8px;
-}
+ 
+   .mini-circle {
+     width: 48px;
+     height: 48px;
+     border-radius: 50%;
+     border: 1px solid rgba($income-glow, 0.7);
+     background: rgba(8, 17, 34, 0.95);
+     color: #fff;
+     font-size: 22px;
+     cursor: pointer;
+    }
+  
+   .mini-circle.selected {
+     box-shadow: 0 0 12px rgba($income-glow, 0.9);
+     border-color: #9dd3ff;
+    }
+  }
+  
+ .panel {
+  margin-top: 16px;
+   width: 330px;
+   display: grid;
+   gap: 8px;
+  }
+ 
+ .selected-card,
+ .add-row,
+ .edit-row {
+   background: rgba(8, 17, 34, 0.9);
+   border: 1px solid rgba($income-glow, 0.4);
+   border-radius: 16px;
+   padding: 10px;
+ }
+ 
+ .summary {
+   display: flex;
+   align-items: center;
+   gap: 10px;
+   color: #e6f2ff;
+ 
+   .emoji { font-size: 24px; }
+   .name { font-size: 16px; font-weight: 600; }
+   .amount { font-size: 18px; font-weight: 700; }
+ }
+ 
+ .row-actions {
+   margin-top: 8px;
+   display: flex;
+   flex-wrap: wrap;
+   gap: 6px;
+ }
+ 
+ .icon-btn,
+ .small-btn {
+   border: 1px solid rgba($income-glow, 0.65);
+   border-radius: 10px;
+   background: rgba(16, 36, 74, 0.85);
+   color: #deefff;
+   cursor: pointer;
+   padding: 6px 10px;
+   font-size: 12px;
+ }
+ 
+ .icon-btn.danger {
+   border-color: rgba(255, 134, 134, 0.65);
+   background: rgba(87, 22, 34, 0.85);
+ }
+ 
+ .add-row {
+   display: grid;
+  grid-template-columns: 1.4fr auto auto;
+   gap: 8px;
+ }
+ 
+ .edit-row {
+   display: grid;
+   grid-template-columns: 1fr auto auto;
+   gap: 8px;
+ }
+ 
+ input,
+ select {
+   border: 1px solid #456;
+   border-radius: 10px;
+   background: #040b1a;
+   color: #fff;
+   padding: 10px;
+   font-size: 14px;
+   min-width: 0;
+ }
+ 
+ .small-btn.ghost { background: transparent; }
+ 
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
 
-.edit-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 8px;
-}
-
-input,
-select {
-  border: 1px solid #456;
-  border-radius: 10px;
-  background: #040b1a;
-  color: #fff;
-  padding: 10px;
-  font-size: 14px;
-  min-width: 0;
-}
-
-.small-btn.ghost { background: transparent; }
-
- .modal-overlay {
-   position: fixed;
-   inset: 0;
    background: rgba(0, 0, 0, 0.62);
    display: flex;
    justify-content: center;

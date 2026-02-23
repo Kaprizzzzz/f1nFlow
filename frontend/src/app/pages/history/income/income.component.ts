@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { BalanceService, CategoryItem } from '../balance.service';
 import { map } from 'rxjs/operators';
 
- type EditMode = 'name' | 'amount' | null;
+type EditMode = 'name' | null;
  
 @Component({
   selector: 'app-income',
@@ -27,13 +27,11 @@ export class IncomeComponent implements OnInit, OnDestroy {
  
   categories: CategoryItem[] = [];
   newCategoryName = '';
-  newCategoryAmount: number | null = null;
   newCategoryIcon = this.emojiOptions[0];
  
   editModeCategory = '';
    editMode: EditMode = null;
   editedCategoryName = '';
-   editedCategoryAmount: number | null = null;
 
   private subscriptions = new Subscription();
 
@@ -89,15 +87,7 @@ export class IncomeComponent implements OnInit, OnDestroy {
    selectCategory(category: CategoryItem, event: Event): void {
     event.stopPropagation();
      this.selectedCategory = category.name;
-    this.isModalOpen = false;
-  }
-
-  openAddAmountModal(event: Event): void {
-    event.stopPropagation();
-    if (!this.selectedCategoryData) {
-      return;
-    }
-
+   
     this.amount = null;
     this.isModalOpen = true;
   }
@@ -119,13 +109,9 @@ export class IncomeComponent implements OnInit, OnDestroy {
  
     this.balanceService.addCategory('plus', normalizedName, this.newCategoryIcon);
  
-    if (this.newCategoryAmount !== null && this.newCategoryAmount >= 0) {
-      this.balanceService.updateCategoryAmount('plus', normalizedName, this.newCategoryAmount);
-     }
- 
+    
     this.selectedCategory = normalizedName;
     this.newCategoryName = '';
-    this.newCategoryAmount = null;
     this.newCategoryIcon = this.emojiOptions[0];
    }
  
@@ -134,16 +120,7 @@ export class IncomeComponent implements OnInit, OnDestroy {
      this.editModeCategory = category.name;
      this.editMode = 'name';
      this.editedCategoryName = category.name;
-     this.editedCategoryAmount = null;
    }
- 
-   openEditAmount(category: CategoryItem, event: Event): void {
-     event.stopPropagation();
-     this.editModeCategory = category.name;
-     this.editMode = 'amount';
-     this.editedCategoryAmount = category.amount;
-     this.editedCategoryName = '';
-  }
 
   saveEdit(event: Event): void {
     event.stopPropagation();
@@ -156,10 +133,6 @@ export class IncomeComponent implements OnInit, OnDestroy {
       if (this.selectedCategory === this.editModeCategory && this.editedCategoryName.trim()) {
         this.selectedCategory = this.editedCategoryName.trim();
       }
-     }
- 
-     if (this.editMode === 'amount' && this.editedCategoryAmount !== null && this.editedCategoryAmount >= 0) {
-       this.balanceService.updateCategoryAmount('plus', this.editModeCategory, this.editedCategoryAmount);
      }
  
      this.resetEditState();
@@ -179,6 +152,5 @@ export class IncomeComponent implements OnInit, OnDestroy {
      this.editModeCategory = '';
      this.editMode = null;
      this.editedCategoryName = '';
-     this.editedCategoryAmount = null;
    }
 }

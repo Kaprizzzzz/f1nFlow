@@ -4,14 +4,12 @@
     <span class="value">{{ displayValue }}</span>
   </div>
 
-  <div class="orbit" *ngIf="isFullView && categories.length" (click)="$event.stopPropagation()">
+   <div class="sticker-row" *ngIf="isFullView && categories.length" (click)="$event.stopPropagation()">
     <button
       *ngFor="let category of categories; let i = index"
       type="button"
       class="mini-circle"
       [class.selected]="category.name === selectedCategory"
-      [style.--i]="i"
-      [style.--count]="categories.length"
       (click)="selectCategory(category, $event)"
       [title]="category.name"
     >
@@ -29,9 +27,7 @@
         </div>
       </div>
       <div class="row-actions">
-        <button type="button" class="icon-btn" (click)="openAddAmountModal($event)">Add amount</button>
         <button type="button" class="icon-btn" (click)="openEditName(category, $event)">Name</button>
-        <button type="button" class="icon-btn" (click)="openEditAmount(category, $event)">Amount</button>
         <button type="button" class="icon-btn danger" (click)="deleteCategory(category.name, $event)">🗑️</button>
        </div>
      </div>
@@ -42,15 +38,8 @@
       <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
     </div>
 
-    <div class="edit-row" *ngIf="editModeCategory && editMode === 'amount'">
-      <input type="number" [(ngModel)]="editedCategoryAmount" placeholder="Category amount" inputmode="decimal" />
-      <button type="button" class="small-btn" (click)="saveEdit($event)">Save</button>
-      <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
-    </div>
-
      <div class="add-row">
       <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
-       <input type="number" [(ngModel)]="newCategoryAmount" placeholder="Start amount" inputmode="decimal" />
       <select [(ngModel)]="newCategoryIcon" aria-label="Category icon">
         <option *ngFor="let icon of emojiOptions" [ngValue]="icon">{{ icon }}</option>
       </select>

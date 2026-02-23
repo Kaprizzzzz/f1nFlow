@@ -27,7 +27,7 @@
      }
  
      .value {
-       font-size: 54px;
+       font-size: 50px;
        font-weight: 600;
        line-height: 1;
        margin-top: 8px;
@@ -37,7 +37,10 @@
     &.active {
       .main-circle {
       transform: scale(1.27);
+      .value {
+        font-size: 46px;
       }
+    }
     }
   }
   

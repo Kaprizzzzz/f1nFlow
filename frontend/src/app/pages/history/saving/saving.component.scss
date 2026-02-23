@@ -31,13 +31,15 @@ $saving-glow: #63ffd0;
     .label {
       font-size: 18px;
       opacity: 0.95;
+      transition: font-size 0.35s ease;
     }
 
     .value {
-      font-size: 40px;
+      font-size: 36px;
       font-weight: 600;
       line-height: 1;
       margin-top: 6px;
+      transition: font-size 0.35s ease;
     }
   }
 
@@ -45,14 +47,14 @@ $saving-glow: #63ffd0;
   &.active {
     .main-circle {
       transform: scale(1.72);
-      transform-origin: center top;
+      transform-origin: center;
 
       .label {
         font-size: 30px;
       }
 
       .value {
-        font-size: 62px;
+        font-size: 56px;
       }
     }
   }
@@ -67,6 +69,7 @@ $saving-glow: #63ffd0;
   border: 1px solid rgba($saving-glow, 0.45);
   max-height: 230px;
   overflow: auto;
+  transition: margin-top 0.35s ease;
 
   h4 {
     margin: 0 0 8px;
@@ -144,7 +147,7 @@ $saving-glow: #63ffd0;
     color: #9ed9c6;
     font-size: 13px;
   }
-  .circle-wrapper.active .history-list {
-  margin-top: 86px;
 }
+.circle-wrapper.active .history-list { 
+margin-top: 86px;
 }

@@ -22,12 +22,12 @@
     transition: transform 0.35s ease;
  
      .label {
-       font-size: 22px;
+       font-size: 19px;
        opacity: 0.95;
      }
  
      .value {
-       font-size: 44px;
+       font-size: 36px;
        font-weight: 600;
        line-height: 1;
        margin-top: 8px;
@@ -38,8 +38,8 @@
      .main-circle {
       transform: scale(1.56);
  
-       .label { font-size: 32px; }
-       .value { font-size: 60px; }
+       .label { font-size: 26px; }
+       .value { font-size: 48px; }
      }
    }
  }

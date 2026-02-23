@@ -1,0 +1,21 @@
+<div class="currency-picker" [class.open]="isOpen" (click)="onWrapperClick($event)">
+  <button
+    type="button"
+    class="currency-hex selected"
+    (click)="toggle()"
+    [attr.aria-expanded]="isOpen"
+    aria-label="Choose currency"
+  >
+    {{ selectedCurrency }}
+  </button>
+
+  <button
+    *ngFor="let currency of secondaryCurrencies"
+    type="button"
+    class="currency-hex option"
+    [class.visible]="isOpen"
+    (click)="pick(currency)"
+  >
+    {{ currency }}
+  </button>
+</div>

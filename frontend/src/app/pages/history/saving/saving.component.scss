@@ -29,13 +29,13 @@ $saving-glow: #63ffd0;
     }
 
     .label {
-      font-size: 18px;
+      font-size: 15px;
       opacity: 0.95;
       transition: font-size 0.35s ease;
     }
 
     .value {
-      font-size: 36px;
+      font-size: 28px;
       font-weight: 600;
       line-height: 1;
       margin-top: 6px;
@@ -50,11 +50,11 @@ $saving-glow: #63ffd0;
       transform-origin: center;
 
       .label {
-        font-size: 30px;
+        font-size: 22px;
       }
 
       .value {
-        font-size: 56px;
+        font-size: 40px;
       }
     }
   }

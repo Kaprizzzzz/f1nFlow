@@ -1,31 +1,38 @@
 <div class="circle-wrapper" [class.active]="isFullView">
-  <div class="main-circle" [class.negative]="savings < 0" (click)="handleCircleClick()">
-    <span class="label">Savings</span>
-    <span class="value">{{ savings }}</span>
-   </div>
+   <div class="main-circle" [class.negative]="savings < 0" (click)="handleCircleClick()">
+     <span class="label">Savings</span>
+     <span class="value">{{ savings }}</span>
+    </div>
+  
+    <div class="history-list" *ngIf="isFullView" (click)="$event.stopPropagation()">
+     <h4>Income / Expense / Difference history</h4>
  
-   <div class="history-list" *ngIf="isFullView" (click)="$event.stopPropagation()">
-    <h4>Income / Expense / Difference history</h4>
-
-    <div class="history-row" *ngFor="let item of historyRows">
-      <div class="history-main">
-        <span class="category">{{ item.category }}</span>
-        <span class="amount" [class.plus]="item.amountLabel.startsWith('+')" [class.minus]="item.amountLabel.startsWith('-')">
-          {{ item.amountLabel }}
-        </span>
-      </div>
-
-      <div class="totals-row">
-        <span>Income: {{ item.incomeTotal }}</span>
-        <span>Expense: {{ item.expenseTotal }}</span>
-        <span [class.positive-diff]="item.difference >= 0" [class.negative-diff]="item.difference < 0">
-          Δ {{ item.difference }}
-        </span>
-      </div>
-
-       <button type="button" class="delete-btn" (click)="removeTransaction(item.id, $event)">Delete</button>
-     </div>
+     <div class="history-row" *ngFor="let item of historyRows">
+       <div class="history-main">
+         <span class="category">{{ item.category }}</span>
+         <span class="amount" [class.plus]="item.amountLabel.startsWith('+')" [class.minus]="item.amountLabel.startsWith('-')">
+           {{ item.amountLabel }}
+         </span>
+       </div>
  
-    <p class="empty" *ngIf="historyRows.length === 0">No records yet.</p>
-   </div>
-</div>
+       <div class="totals-row">
+         <span>Income: {{ item.incomeTotal }}</span>
+         <span>Expense: {{ item.expenseTotal }}</span>
+         <span [class.positive-diff]="item.difference >= 0" [class.negative-diff]="item.difference < 0">
+           Δ {{ item.difference }}
+         </span>
+       </div>
+ 
+       <button
+        *ngIf="item.isRemovable"
+        type="button"
+        class="delete-btn"
+        (click)="removeTransaction(item.id, $event)"
+      >
+        Delete
+      </button>
+      </div>
+  
+     <p class="empty" *ngIf="historyRows.length === 0">No records yet.</p>
+    </div>
+ </div>

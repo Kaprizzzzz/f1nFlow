@@ -1,53 +1,68 @@
- <div class="circle-wrapper" [class.active]="isFullView">
-   <div class="main-circle" (click)="handleCircleClick()">
-     <span class="label">Income</span>
-     <span class="value">{{ totalIncome }}</span>
-   </div>
- 
-   <div class="sub-circles" *ngIf="isFullView" (click)="$event.stopPropagation()">
-     <div class="sub-item" *ngFor="let category of categories">
-      <button type="button" class="category-btn" (click)="selectCategory(category, $event)">
-        <span>{{ category.name }}</span>
-        <span class="category-amount">{{ category.amount }}</span>
-      </button>
-       <div class="row-actions">
-        <button type="button" class="icon-btn" (click)="openEditName(category, $event)">Name</button>
-        <button type="button" class="icon-btn" (click)="openEditAmount(category, $event)">Amount</button>
-        <button type="button" class="icon-btn danger" (click)="deleteCategory(category.name, $event)">🗑️</button>
-       </div>
-     </div>
- 
-    <div class="edit-row" *ngIf="editModeCategory && editMode === 'name'">
-       <input type="text" [(ngModel)]="editedCategoryName" placeholder="New category name" />
-       <button type="button" class="small-btn" (click)="saveEdit($event)">Save</button>
-       <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
-     </div>
- 
-    <div class="edit-row" *ngIf="editModeCategory && editMode === 'amount'">
-      <input type="number" [(ngModel)]="editedCategoryAmount" placeholder="Category amount" inputmode="decimal" />
+<div class="circle-wrapper" [class.active]="isFullView">
+  <div class="main-circle" (click)="handleCircleClick()">
+    <span class="label">{{ displayLabel }}</span>
+    <span class="value">{{ displayValue }}</span>
+  </div>
+
+  <div class="orbit" *ngIf="isFullView && categories.length" (click)="$event.stopPropagation()">
+    <button
+      *ngFor="let category of categories; let i = index"
+      type="button"
+      class="mini-circle"
+      [class.selected]="category.name === selectedCategory"
+      [style.--i]="i"
+      [style.--count]="categories.length"
+      (click)="selectCategory(category, $event)"
+      [title]="category.name"
+    >
+      {{ category.icon || '📁' }}
+    </button>
+  </div>
+
+  <div class="panel" *ngIf="isFullView" (click)="$event.stopPropagation()">
+    <div class="selected-card" *ngIf="selectedCategoryData as category">
+      <div class="summary">
+        <span class="emoji">{{ category.icon || '📁' }}</span>
+        <div>
+          <div class="name">{{ category.name }}</div>
+          <div class="amount">{{ category.amount }}</div>
+        </div>
+      </div>
+      <div class="row-actions">
+        <button type="button" class="icon-btn" (click)="openAddAmountModal($event)">Add amount</button>
+         <button type="button" class="icon-btn" (click)="openEditName(category, $event)">Name</button>
+         <button type="button" class="icon-btn" (click)="openEditAmount(category, $event)">Amount</button>
+         <button type="button" class="icon-btn danger" (click)="deleteCategory(category.name, $event)">🗑️</button>
+      </div>
+    </div>
+
+     <div class="edit-row" *ngIf="editModeCategory && editMode === 'name'">
+      <input type="text" [(ngModel)]="editedCategoryName" placeholder="New category name" />
       <button type="button" class="small-btn" (click)="saveEdit($event)">Save</button>
       <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
     </div>
 
-     <div class="add-row">
-      <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
-      <button type="button" class="small-btn" (click)="addCategory($event)">Save name</button>
+     <div class="edit-row" *ngIf="editModeCategory && editMode === 'amount'">
+       <input type="number" [(ngModel)]="editedCategoryAmount" placeholder="Category amount" inputmode="decimal" />
+       <button type="button" class="small-btn" (click)="saveEdit($event)">Save</button>
+       <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
      </div>
-   </div>
+ 
+    <div class="add-row">
+       <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
+      <input type="number" [(ngModel)]="newCategoryAmount" placeholder="Start amount" inputmode="decimal" />
+      <select [(ngModel)]="newCategoryIcon" aria-label="Category icon">
+        <option *ngFor="let icon of emojiOptions" [ngValue]="icon">{{ icon }}</option>
+      </select>
+      <button type="button" class="small-btn" (click)="addCategory($event)">Save</button>
+    </div>
+  </div>
  </div>
  
 <div class="modal-overlay" *ngIf="isModalOpen" (click)="isModalOpen = false">
-  <div class="modal-card" (click)="$event.stopPropagation()">
-     <h3>Add income: {{ selectedCategory }}</h3>
-     <input type="number" [(ngModel)]="amount" placeholder="0.00" inputmode="decimal" />
+   <div class="modal-card" (click)="$event.stopPropagation()">
+    <h3>Add income: {{ selectedCategory }}</h3>
+    <input type="number" [(ngModel)]="amount" placeholder="0.00" inputmode="decimal" />
     <button type="button" class="save-btn" (click)="saveData()">Save</button>
    </div>
-</div>
-
-<div class="modal-overlay" *ngIf="isCreateAmountModalOpen" (click)="closeCreateAmountModal()">
-  <div class="modal-card" (click)="$event.stopPropagation()">
-    <h3>Set amount for: {{ pendingCreatedCategory }}</h3>
-    <input type="number" [(ngModel)]="pendingCreatedAmount" placeholder="0.00" inputmode="decimal" />
-    <button type="button" class="save-btn" (click)="saveCreatedCategoryAmount()">Save amount</button>
-  </div>
-</div>
+ </div>

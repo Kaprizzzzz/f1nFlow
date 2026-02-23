@@ -1,161 +1,184 @@
- import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
- import { CommonModule } from '@angular/common';
- import { FormsModule } from '@angular/forms';
- import { Subscription } from 'rxjs';
- import { BalanceService, CategoryItem } from '../balance.service';
- import { map } from 'rxjs/operators';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { BalanceService, CategoryItem } from '../balance.service';
+import { map } from 'rxjs/operators';
+
+ type EditMode = 'name' | 'amount' | null;
  
-type EditMode = 'name' | 'amount' | null;
+@Component({
+  selector: 'app-income',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './income.component.html',
+  styleUrl: './income.component.scss'
+})
+export class IncomeComponent implements OnInit, OnDestroy {
+   @Input() isFullView = false;
+   @Output() onSelect = new EventEmitter<void>();
+ 
+  readonly emojiOptions = ['💼', '🏦', '💸', '🎯', '📈', '✨'];
 
- @Component({
-   selector: 'app-income',
-   standalone: true,
-   imports: [CommonModule, FormsModule],
-   templateUrl: './income.component.html',
-   styleUrl: './income.component.scss'
- })
- export class IncomeComponent implements OnInit, OnDestroy {
-  @Input() isFullView = false;
-  @Output() onSelect = new EventEmitter<void>();
-
-   totalIncome = 0;
-  isModalOpen = false;
-   amount: number | null = null;
-   selectedCategory = '';
+  totalIncome = 0;
+   isModalOpen = false;
+  amount: number | null = null;
+  selectedCategory = '';
  
   categories: CategoryItem[] = [];
-   newCategoryName = '';
+  newCategoryName = '';
+  newCategoryAmount: number | null = null;
+  newCategoryIcon = this.emojiOptions[0];
+ 
+  editModeCategory = '';
+   editMode: EditMode = null;
+  editedCategoryName = '';
+   editedCategoryAmount: number | null = null;
 
-  isCreateAmountModalOpen = false;
-  pendingCreatedCategory = '';
-  pendingCreatedAmount: number | null = null;
+  private subscriptions = new Subscription();
 
-   editModeCategory = '';
-  editMode: EditMode = null;
-   editedCategoryName = '';
-  editedCategoryAmount: number | null = null;
- 
-   private subscriptions = new Subscription();
- 
-   constructor(private balanceService: BalanceService) {}
- 
-   ngOnInit(): void {
-     this.subscriptions.add(
-      this.balanceService.incomeCategories$
-        .pipe(map((categories) => categories.reduce((acc, item) => acc + item.amount, 0)))
-        .subscribe((sum) => (this.totalIncome = sum))
-    );
- 
-     this.subscriptions.add(
-       this.balanceService.incomeCategories$.subscribe((categories) => {
-         this.categories = categories;
- 
-        if (this.editModeCategory && !categories.some((item) => item.name === this.editModeCategory)) {
-          this.resetEditState();
-         }
-       })
+  constructor(private balanceService: BalanceService) {}
+
+  ngOnInit(): void {
+    this.subscriptions.add(
+       this.balanceService.incomeCategories$
+         .pipe(map((categories) => categories.reduce((acc, item) => acc + item.amount, 0)))
+         .subscribe((sum) => (this.totalIncome = sum))
      );
-   }
- 
-   ngOnDestroy(): void {
-     this.subscriptions.unsubscribe();
-   }
- 
-   handleCircleClick(): void {
-     this.onSelect.emit();
-   }
- 
-  selectCategory(category: CategoryItem, event: Event): void {
-     event.stopPropagation();
-    this.selectedCategory = category.name;
-    this.amount = category.amount;
-     this.isModalOpen = true;
-   }
 
-   saveData(): void {
-    if (this.amount && this.amount > 0 && this.selectedCategory) {
-       this.balanceService.addTransaction(this.amount, this.selectedCategory, 'plus');
-       this.amount = null;
-       this.isModalOpen = false;
-    }
+    this.subscriptions.add(
+      this.balanceService.incomeCategories$.subscribe((categories) => {
+        this.categories = categories;
+
+        if (this.selectedCategory && !categories.some((item) => item.name === this.selectedCategory)) {
+          this.selectedCategory = '';
+          this.isModalOpen = false;
+        }
+
+        if (!this.selectedCategory && categories.length > 0 && this.isFullView) {
+          this.selectedCategory = categories[0].name;
+        }
+
+         if (this.editModeCategory && !categories.some((item) => item.name === this.editModeCategory)) {
+           this.resetEditState();
+        }
+      })
+    );
   }
 
-  addCategory(event: Event): void {
-     event.stopPropagation();
-    const normalizedName = this.newCategoryName.trim();
-    if (!normalizedName) {
-      return;
-    }
-
-    this.balanceService.addCategory('plus', normalizedName);
-     this.newCategoryName = '';
-    this.pendingCreatedCategory = normalizedName;
-    this.pendingCreatedAmount = null;
-    this.isCreateAmountModalOpen = true;
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
-  saveCreatedCategoryAmount(): void {
-    if (!this.pendingCreatedCategory || this.pendingCreatedAmount === null || this.pendingCreatedAmount < 0) {
-      return;
-    }
-
-    this.balanceService.updateCategoryAmount('plus', this.pendingCreatedCategory, this.pendingCreatedAmount);
-    this.closeCreateAmountModal();
+  get selectedCategoryData(): CategoryItem | undefined {
+    return this.categories.find((item) => item.name === this.selectedCategory);
   }
 
-  closeCreateAmountModal(): void {
-    this.isCreateAmountModalOpen = false;
-    this.pendingCreatedCategory = '';
-    this.pendingCreatedAmount = null;
-   }
- 
-  openEditName(category: CategoryItem, event: Event): void {
-     event.stopPropagation();
-    this.editModeCategory = category.name;
-    this.editMode = 'name';
-    this.editedCategoryName = category.name;
-    this.editedCategoryAmount = null;
+  get displayLabel(): string {
+    return this.isFullView && this.selectedCategoryData ? this.selectedCategoryData.name : 'Income';
   }
 
-  openEditAmount(category: CategoryItem, event: Event): void {
+  get displayValue(): number {
+    return this.isFullView && this.selectedCategoryData ? this.selectedCategoryData.amount : this.totalIncome;
+  }
+
+  handleCircleClick(): void {
+    this.onSelect.emit();
+  }
+
+   selectCategory(category: CategoryItem, event: Event): void {
     event.stopPropagation();
-    this.editModeCategory = category.name;
-    this.editMode = 'amount';
-    this.editedCategoryAmount = category.amount;
-    this.editedCategoryName = '';
+     this.selectedCategory = category.name;
+    this.isModalOpen = false;
+  }
+
+  openAddAmountModal(event: Event): void {
+    event.stopPropagation();
+    if (!this.selectedCategoryData) {
+      return;
+    }
+
+    this.amount = null;
+    this.isModalOpen = true;
+  }
+ 
+  saveData(): void {
+     if (this.amount && this.amount > 0 && this.selectedCategory) {
+      this.balanceService.addTransaction(this.amount, this.selectedCategory, 'plus');
+      this.amount = null;
+      this.isModalOpen = false;
+     }
    }
  
-   saveEdit(event: Event): void {
-     event.stopPropagation();
-    if (!this.editModeCategory || !this.editMode) {
+   addCategory(event: Event): void {
+    event.stopPropagation();
+     const normalizedName = this.newCategoryName.trim();
+     if (!normalizedName) {
        return;
      }
  
-    if (this.editMode === 'name') {
-      this.balanceService.renameCategory('plus', this.editModeCategory, this.editedCategoryName);
-    }
-
-    if (this.editMode === 'amount' && this.editedCategoryAmount !== null && this.editedCategoryAmount >= 0) {
-      this.balanceService.updateCategoryAmount('plus', this.editModeCategory, this.editedCategoryAmount);
-    }
-
-    this.resetEditState();
+    this.balanceService.addCategory('plus', normalizedName, this.newCategoryIcon);
+ 
+    if (this.newCategoryAmount !== null && this.newCategoryAmount >= 0) {
+      this.balanceService.updateCategoryAmount('plus', normalizedName, this.newCategoryAmount);
+     }
+ 
+    this.selectedCategory = normalizedName;
+    this.newCategoryName = '';
+    this.newCategoryAmount = null;
+    this.newCategoryIcon = this.emojiOptions[0];
    }
  
-   cancelEdit(event: Event): void {
-     event.stopPropagation();
-    this.resetEditState();
+   openEditName(category: CategoryItem, event: Event): void {
+    event.stopPropagation();
+     this.editModeCategory = category.name;
+     this.editMode = 'name';
+     this.editedCategoryName = category.name;
+     this.editedCategoryAmount = null;
    }
  
-   deleteCategory(category: string, event: Event): void {
+   openEditAmount(category: CategoryItem, event: Event): void {
      event.stopPropagation();
-     this.balanceService.deleteCategory('plus', category);
-   }
-
-  private resetEditState(): void {
-    this.editModeCategory = '';
-    this.editMode = null;
-    this.editedCategoryName = '';
-    this.editedCategoryAmount = null;
+     this.editModeCategory = category.name;
+     this.editMode = 'amount';
+     this.editedCategoryAmount = category.amount;
+     this.editedCategoryName = '';
   }
- }
+
+  saveEdit(event: Event): void {
+    event.stopPropagation();
+     if (!this.editModeCategory || !this.editMode) {
+      return;
+    }
+
+     if (this.editMode === 'name') {
+       this.balanceService.renameCategory('plus', this.editModeCategory, this.editedCategoryName);
+      if (this.selectedCategory === this.editModeCategory && this.editedCategoryName.trim()) {
+        this.selectedCategory = this.editedCategoryName.trim();
+      }
+     }
+ 
+     if (this.editMode === 'amount' && this.editedCategoryAmount !== null && this.editedCategoryAmount >= 0) {
+       this.balanceService.updateCategoryAmount('plus', this.editModeCategory, this.editedCategoryAmount);
+     }
+ 
+     this.resetEditState();
+  }
+
+  cancelEdit(event: Event): void {
+    event.stopPropagation();
+     this.resetEditState();
+  }
+
+  deleteCategory(category: string, event: Event): void {
+    event.stopPropagation();
+    this.balanceService.deleteCategory('plus', category);
+  }
+ 
+   private resetEditState(): void {
+     this.editModeCategory = '';
+     this.editMode = null;
+     this.editedCategoryName = '';
+     this.editedCategoryAmount = null;
+   }
+}

@@ -14,6 +14,7 @@ export interface Transaction {
 export interface CategoryItem {
   name: string;
   amount: number;
+  icon?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -71,7 +72,7 @@ export class BalanceService {
     this.syncBalanceAndTransactions();
   }
 
-  addCategory(type: 'plus' | 'minus', categoryName: string): void {
+  addCategory(type: 'plus' | 'minus', categoryName: string, icon = '📁'): void {
     const normalized = categoryName.trim();
     if (!normalized) {
       return;
@@ -82,7 +83,7 @@ export class BalanceService {
       return;
     }
 
-     this.setCategoriesByType(type, [...list, { name: normalized, amount: 0 }]);
+     this.setCategoriesByType(type, [...list, { name: normalized, amount: 0, icon }]);
   }
 
   renameCategory(type: 'plus' | 'minus', oldName: string, newName: string): void {
@@ -204,8 +205,8 @@ export class BalanceService {
         ? Math.max(1, Number(parsed.nextTransactionId))
         : this.transactions.reduce((max, tx) => Math.max(max, tx.id), 0) + 1;
 
-      this.incomeCategoriesSubject.next(parsed.incomeCategories ?? []);
-      this.expenseCategoriesSubject.next(parsed.expenseCategories ?? []);
+      this.incomeCategoriesSubject.next(this.normalizeCategories(parsed.incomeCategories ?? []));
+      this.expenseCategoriesSubject.next(this.normalizeCategories(parsed.expenseCategories ?? []));
     } catch {
       localStorage.removeItem(this.storageKey);
     }
@@ -238,4 +239,11 @@ export class BalanceService {
      this.transactions$.next([...this.transactions]);
     this.persistState();
    }
+   private normalizeCategories(categories: CategoryItem[]): CategoryItem[] {
+    return categories.map((item) => ({
+      name: item.name,
+      amount: Number.isFinite(item.amount) ? item.amount : 0,
+      icon: item.icon || '📁'
+    }));
+  }
 }

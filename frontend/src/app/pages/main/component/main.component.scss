@@ -10,8 +10,12 @@
     display: flex;
    justify-content: center;
    align-items: flex-start;
-   padding: 12px 8px 0;
+ padding: 12px 8px 0;
    overflow: hidden;
+
+  &.has-active {
+    overflow-y: auto;
+  }
  }
  
  .circles-layout {
@@ -58,13 +62,13 @@
    transform: scale(0.6);
  }
  
- .sphere-wrapper.is-active {
-   z-index: 20 !important;
-   top: 16px !important;
-   left: 50% !important;
-   right: auto !important;
-   transform: translateX(-50%) !important;
- }
+.sphere-wrapper.is-active {
+  z-index: 20 !important;
+  top: 88px !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+}
  
  @media (max-width: 560px) {
    .circles-layout {

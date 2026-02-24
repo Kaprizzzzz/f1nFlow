@@ -66,6 +66,10 @@ $income-glow: #62b5ff;
     font-size: 22px;
     cursor: grab;
     transform: translate(-50%, -50%);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    z-index: 6;
   }
 
   .mini-circle:active {

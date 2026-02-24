@@ -33,6 +33,8 @@ export class IncomeComponent implements OnInit, OnDestroy {
   panelMode: PanelMode = null;
   editedCategoryName = '';
   dragCategoryIndex: number | null = null;
+  pointerDragIndex: number | null = null;
+  pointerHoverIndex: number | null = null;
 
   private subscriptions = new Subscription();
 
@@ -138,6 +140,49 @@ export class IncomeComponent implements OnInit, OnDestroy {
     this.newCategoryIcon = this.emojiOptions[0];
   }
 
+  onMiniPointerDown(index: number, event: PointerEvent): void {
+    this.pointerDragIndex = index;
+    this.pointerHoverIndex = index;
+
+    const circle = event.currentTarget as HTMLElement | null;
+    circle?.setPointerCapture(event.pointerId);
+
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  onMiniPointerMove(event: PointerEvent): void {
+    if (this.pointerDragIndex === null) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const hovered = document.elementFromPoint(event.clientX, event.clientY) as HTMLElement | null;
+    const target = hovered?.closest('[data-category-index]') as HTMLElement | null;
+    const targetIndexRaw = target?.dataset['categoryIndex'];
+
+    if (targetIndexRaw !== undefined) {
+      this.pointerHoverIndex = Number(targetIndexRaw);
+    }
+  }
+
+  onMiniPointerUp(event: PointerEvent): void {
+    if (this.pointerDragIndex === null) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (this.pointerHoverIndex !== null && this.pointerHoverIndex !== this.pointerDragIndex) {
+      this.balanceService.swapCategories('plus', this.pointerDragIndex, this.pointerHoverIndex);
+    }
+
+    this.pointerDragIndex = null;
+    this.pointerHoverIndex = null;
+  }
+
   startDrag(index: number, event: DragEvent): void {
     this.dragCategoryIndex = index;
     if (event.dataTransfer) {
@@ -148,6 +193,7 @@ export class IncomeComponent implements OnInit, OnDestroy {
 
   allowDrop(event: DragEvent): void {
     event.preventDefault();
+    event.stopPropagation();
   }
 
   dropOn(index: number, event: DragEvent): void {
@@ -164,6 +210,8 @@ export class IncomeComponent implements OnInit, OnDestroy {
 
     this.balanceService.swapCategories('plus', sourceIndex, index);
     this.dragCategoryIndex = null;
+    this.pointerDragIndex = null;
+    this.pointerHoverIndex = null;
   }
 
   openEditName(category: CategoryItem, event: Event): void {

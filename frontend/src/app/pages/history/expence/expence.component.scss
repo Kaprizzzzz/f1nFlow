@@ -54,7 +54,11 @@ $expense-glow: #ffb060;
     color: #fff;
     font-size: 20px;
     cursor: grab;
-    transform: translate(-50%, -50%); // Центрування кожної іконки
+    transform: translate(-50%, -50%);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    z-index: 6; // Центрування кожної іконки
     transition: all 0.3s ease;
   }
 

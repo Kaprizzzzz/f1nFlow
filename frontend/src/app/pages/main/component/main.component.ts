@@ -46,6 +46,8 @@ export class MainComponent {
     sphereHeight: number;
   } | null = null;
 
+  private previousBodyTouchAction = '';
+
   setActiveTab(tab: SphereTab): void {
     // Не відкриваємо вкладку, якщо ми в режимі перетягування
     if (this.isEditMode) {
@@ -92,6 +94,7 @@ export class MainComponent {
     }
 
     event.preventDefault();
+    event.stopPropagation();
 
     const sphereRect = sphere.getBoundingClientRect();
     
@@ -107,6 +110,8 @@ export class MainComponent {
 
     // Захоплюємо вказівник, щоб рух відстежувався навіть поза межами елемента
     sphere.setPointerCapture(event.pointerId);
+    this.previousBodyTouchAction = document.body.style.touchAction;
+    document.body.style.touchAction = 'none';
   }
 
   onDragMove(event: PointerEvent): void {
@@ -143,6 +148,7 @@ export class MainComponent {
 
   stopDrag(): void {
     this.dragState = null;
+    document.body.style.touchAction = this.previousBodyTouchAction;
   }
 
   isHidden(tab: SphereTab): boolean {

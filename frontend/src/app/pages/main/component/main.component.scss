@@ -84,7 +84,7 @@
 
   .sphere-wrapper {
     position: absolute;
-    transition: top 0.22s ease, left 0.22s ease, transform 0.45s ease, opacity 0.35s ease;
+    transition: top 0.28s ease-out, left 0.28s ease-out, transform 0.62s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.42s ease;
     will-change: transform, top, left, opacity;
     pointer-events: none;
 
@@ -117,6 +117,22 @@
   left: 50% !important;
   right: auto !important;
   transform: translateX(-50%) !important;
+}
+
+.dashboard-container.has-active .sphere-wrapper.is-active {
+  animation: active-sphere-pop 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes active-sphere-pop {
+  0% {
+    transform: translateX(-50%) scale(0.9);
+  }
+  65% {
+    transform: translateX(-50%) scale(1.03);
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
 }
 
 @media (max-width: 560px) {

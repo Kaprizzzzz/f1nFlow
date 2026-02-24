@@ -5,8 +5,8 @@ import { Subscription } from 'rxjs';
 import { BalanceService, CategoryItem } from '../balance.service';
 import { map } from 'rxjs/operators';
 
- type EditMode = 'name' | null;
- 
+type PanelMode = 'amount' | 'name' | null;
+
 @Component({
   selector: 'app-expence',
   standalone: true,
@@ -15,24 +15,23 @@ import { map } from 'rxjs/operators';
   styleUrl: './expence.component.scss'
 })
 export class ExpenceComponent implements OnInit, OnDestroy {
-   @Input() isFullView = false;
-   @Output() onSelect = new EventEmitter<void>();
- 
+  @Input() isFullView = false;
+  @Output() onSelect = new EventEmitter<void>();
+
   readonly emojiOptions = ['🍔', '🛍️', '🚗', '🏠', '🎁', '🧾'];
 
   totalExpense = 0;
-  isModalOpen = false;
   amount: number | null = null;
   selectedCategory = '';
- 
+
   categories: CategoryItem[] = [];
   newCategoryName = '';
   newCategoryIcon = this.emojiOptions[0];
- 
+
   editModeCategory = '';
-   editMode: EditMode = null;
+  panelMode: PanelMode = null;
   editedCategoryName = '';
-  
+
   private subscriptions = new Subscription();
 
   constructor(private balanceService: BalanceService) {}
@@ -44,21 +43,21 @@ export class ExpenceComponent implements OnInit, OnDestroy {
         .subscribe((sum) => (this.totalExpense = sum))
     );
 
-     this.subscriptions.add(
+    this.subscriptions.add(
       this.balanceService.expenseCategories$.subscribe((categories) => {
         this.categories = categories;
 
         if (this.selectedCategory && !categories.some((item) => item.name === this.selectedCategory)) {
           this.selectedCategory = '';
-          this.isModalOpen = false;
+          this.panelMode = null;
         }
 
         if (!this.selectedCategory && categories.length > 0 && this.isFullView) {
           this.selectedCategory = categories[0].name;
         }
 
-         if (this.editModeCategory && !categories.some((item) => item.name === this.editModeCategory)) {
-           this.resetEditState();
+        if (this.editModeCategory && !categories.some((item) => item.name === this.editModeCategory)) {
+          this.resetEditState();
         }
       })
     );
@@ -84,72 +83,92 @@ export class ExpenceComponent implements OnInit, OnDestroy {
     this.onSelect.emit();
   }
 
-   selectCategory(category: CategoryItem, event: Event): void {
-     event.stopPropagation();
-     this.selectedCategory = category.name;
-     this.amount = null;
-     this.isModalOpen = true;
+  selectCategory(category: CategoryItem, event: Event): void {
+    event.stopPropagation();
+    this.selectedCategory = category.name;
+  }
+
+  /**
+   * Обчислює позицію іконки на дузі навколо основного кола
+   */
+  getMiniCircleStyle(index: number, total: number): Record<string, string> {
+    const singleItemArcAngle = 270; // Кут для одиночного елемента (зверху)
+    const startAngle = 205; // Початок дуги
+    const endAngle = 335;   // Кінець дуги
+    
+    const angle = total <= 1 
+      ? singleItemArcAngle 
+      : startAngle + ((endAngle - startAngle) * index) / (total - 1);
+    
+    const radians = (angle * Math.PI) / 180;
+    const radius = 172; // Відстань від центру основного кола
+
+    return {
+      left: `${Math.cos(radians) * radius}px`,
+      top: `${Math.sin(radians) * radius}px`
+    };
+  }
+
+  toggleAmountPanel(category: CategoryItem, event: Event): void {
+    event.stopPropagation();
+    const isSameCategory = this.selectedCategory === category.name;
+    this.selectedCategory = category.name;
+    this.amount = null;
+    this.panelMode = isSameCategory && this.panelMode === 'amount' ? null : 'amount';
   }
 
   saveData(): void {
     if (this.amount && this.amount > 0 && this.selectedCategory) {
       this.balanceService.addTransaction(this.amount, this.selectedCategory, 'minus');
       this.amount = null;
-      this.isModalOpen = false;
-     }
-   }
- 
-   addCategory(event: Event): void {
+      this.panelMode = null;
+    }
+  }
+
+  addCategory(event: Event): void {
     event.stopPropagation();
-     const normalizedName = this.newCategoryName.trim();
-     if (!normalizedName) {
-       return;
-     }
- 
+    const normalizedName = this.newCategoryName.trim();
+    if (!normalizedName) return;
+
     this.balanceService.addCategory('minus', normalizedName, this.newCategoryIcon);
- 
     this.selectedCategory = normalizedName;
     this.newCategoryName = '';
     this.newCategoryIcon = this.emojiOptions[0];
-   }
- 
-   openEditName(category: CategoryItem, event: Event): void {
+  }
+
+  openEditName(category: CategoryItem, event: Event): void {
     event.stopPropagation();
-     this.editModeCategory = category.name;
-     this.editMode = 'name';
-     this.editedCategoryName = category.name;
-   }
- 
+    const isSameCategory = this.editModeCategory === category.name;
+    this.editModeCategory = category.name;
+    this.panelMode = isSameCategory && this.panelMode === 'name' ? null : 'name';
+    this.editedCategoryName = category.name;
+  }
 
   saveEdit(event: Event): void {
     event.stopPropagation();
-     if (!this.editModeCategory || !this.editMode) {
-      return;
-    }
+    if (!this.editModeCategory || this.panelMode !== 'name') return;
 
-     if (this.editMode === 'name') {
-       this.balanceService.renameCategory('minus', this.editModeCategory, this.editedCategoryName);
-      if (this.selectedCategory === this.editModeCategory && this.editedCategoryName.trim()) {
-        this.selectedCategory = this.editedCategoryName.trim();
-      }
-     }
- 
-     this.resetEditState();
+    this.balanceService.renameCategory('minus', this.editModeCategory, this.editedCategoryName);
+    if (this.selectedCategory === this.editModeCategory && this.editedCategoryName.trim()) {
+      this.selectedCategory = this.editedCategoryName.trim();
+    }
+    this.resetEditState();
   }
 
   cancelEdit(event: Event): void {
     event.stopPropagation();
-     this.resetEditState();
+    this.resetEditState();
   }
 
   deleteCategory(category: string, event: Event): void {
     event.stopPropagation();
     this.balanceService.deleteCategory('minus', category);
   }
- 
-   private resetEditState(): void {
-     this.editModeCategory = '';
-     this.editMode = null;
-     this.editedCategoryName = '';
+
+  private resetEditState(): void {
+    this.editModeCategory = '';
+    this.panelMode = null;
+    this.editedCategoryName = '';
+    this.amount = null;
   }
 }

@@ -5,6 +5,7 @@ $expense-glow: #ffb060;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: 70px; // Додано відступ зверху для іконок
 
   .main-circle {
     width: 180px;
@@ -18,8 +19,8 @@ $expense-glow: #ffb060;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-     transform: scale(1);
-     transition: transform 0.35s ease;
+    transform: scale(1);
+    transition: transform 0.35s ease;
     z-index: 2;
 
     .label { font-size: 22px; opacity: 0.95; }
@@ -28,21 +29,21 @@ $expense-glow: #ffb060;
 
   &.active .main-circle {
     transform: scale(1.56);
-
     .label { font-size: 32px; }
     .value { font-size: 60px; }
   }
 }
 
 .sticker-row {
-  width: 330px;
-  margin-bottom: 14px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 8px;
+  position: absolute;
+  top: 150px; // Центр відносно якого будуть "орбіти"
+  left: 50%;
+  width: 0;
+  height: 0;
+  z-index: 4;
 
   .mini-circle {
+    position: absolute;
     width: 46px;
     height: 46px;
     border-radius: 50%;
@@ -51,24 +52,27 @@ $expense-glow: #ffb060;
     color: #fff;
     font-size: 20px;
     cursor: pointer;
-   }
- 
+    transform: translate(-50%, -50%); // Центрування кожної іконки
+    transition: all 0.3s ease;
+  }
+
   .mini-circle.selected {
     box-shadow: 0 0 12px rgba($expense-glow, 0.9);
     border-color: #ffd29f;
-   }
- }
- 
+  }
+}
+
 .panel {
   margin-top: 16px;
   width: 330px;
   display: grid;
   gap: 8px;
- }
- 
+}
+
 .selected-card,
 .add-row,
-.edit-row {
+.edit-row,
+.amount-row {
   background: rgba(27, 13, 4, 0.9);
   border: 1px solid rgba($expense-glow, 0.45);
   border-radius: 16px;
@@ -80,7 +84,6 @@ $expense-glow: #ffb060;
   align-items: center;
   gap: 10px;
   color: #ffedda;
-
   .emoji { font-size: 24px; }
   .name { font-size: 16px; font-weight: 600; }
   .amount { font-size: 18px; font-weight: 700; }
@@ -121,6 +124,12 @@ $expense-glow: #ffb060;
   gap: 8px;
 }
 
+.amount-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
 input,
 select {
   width: 100%;
@@ -130,42 +139,6 @@ select {
   color: #fff;
   padding: 10px;
   font-size: 14px;
-  min-width: 0;
 }
 
 .small-btn.ghost { background: transparent; }
- 
- .modal-overlay {
-   position: fixed;
-   inset: 0;
-   background: rgba(0, 0, 0, 0.62);
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   z-index: 50;
- }
- 
- .modal-card {
-   width: min(360px, calc(100vw - 30px));
-   padding: 18px;
-   border-radius: 16px;
-   background: #2b1707;
-   border: 1px solid rgba($expense-glow, 0.5);
- 
-  h3 { margin: 0 0 12px; color: #fff; }
- 
-   input {
-     margin-bottom: 10px;
-     font-size: 16px;
-   }
- 
-   .save-btn {
-     width: 100%;
-     border: 0;
-     border-radius: 10px;
-     padding: 10px;
-     font-weight: 600;
-     background: #ffc17a;
-     color: #2a1302;
-   }
- }

@@ -90,6 +90,11 @@
 
   &.editing .sphere-wrapper {
     cursor: grab;
+    touch-action: none;
+  }
+
+  &.editing {
+    touch-action: none;
   }
 }
 

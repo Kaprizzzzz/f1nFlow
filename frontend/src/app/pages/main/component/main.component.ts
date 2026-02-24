@@ -112,6 +112,8 @@ export class MainComponent {
       return;
     }
 
+    event.preventDefault();
+    
     const layout = this.layoutRef?.nativeElement;
     if (!layout) {
       return;

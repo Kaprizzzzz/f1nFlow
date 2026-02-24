@@ -147,6 +147,27 @@ export class BalanceService {
     this.syncBalanceAndTransactions();
   }
 
+  swapCategories(type: 'plus' | 'minus', firstIndex: number, secondIndex: number): void {
+    if (firstIndex === secondIndex) {
+      return;
+    }
+
+    const list = this.getCategoriesByType(type);
+    const isOutOfBounds =
+      firstIndex < 0 ||
+      secondIndex < 0 ||
+      firstIndex >= list.length ||
+      secondIndex >= list.length;
+
+    if (isOutOfBounds) {
+      return;
+    }
+
+    const nextList = [...list];
+    [nextList[firstIndex], nextList[secondIndex]] = [nextList[secondIndex], nextList[firstIndex]];
+    this.setCategoriesByType(type, nextList);
+  }
+  
    private getCategoriesByType(type: 'plus' | 'minus'): CategoryItem[] {
      return type === 'plus' ? this.incomeCategoriesSubject.value : this.expenseCategoriesSubject.value;
   }

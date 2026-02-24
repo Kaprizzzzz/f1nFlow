@@ -13,6 +13,10 @@
         (click)="selectCategory(category, $event)"
         [ngStyle]="getMiniCircleStyle(i, categories.length)"
         [title]="category.name"
+        draggable="true"
+        (dragstart)="startDrag(i, $event)"
+        (dragover)="allowDrop($event)"
+        (drop)="dropOn(i, $event)"
       >
         {{ category.icon || '📁' }}
       </button>
@@ -46,7 +50,7 @@
         <button type="button" class="small-btn" (click)="saveData()">Save</button>
       </div>
 
-      <div class="add-row">
+      <div class="add-row" *ngIf="!selectedCategoryData">
          <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
         <select [(ngModel)]="newCategoryIcon" aria-label="Category icon">
           <option *ngFor="let icon of emojiOptions" [ngValue]="icon">{{ icon }}</option>

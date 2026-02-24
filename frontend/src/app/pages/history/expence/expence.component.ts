@@ -32,6 +32,7 @@ export class ExpenceComponent implements OnInit, OnDestroy {
   editModeCategory = '';
   panelMode: PanelMode = null;
   editedCategoryName = '';
+  dragCategoryIndex: number | null = null;
 
   private subscriptions = new Subscription();
 
@@ -51,10 +52,6 @@ export class ExpenceComponent implements OnInit, OnDestroy {
         if (this.selectedCategory && !categories.some((item) => item.name === this.selectedCategory)) {
           this.selectedCategory = '';
           this.panelMode = null;
-        }
-
-        if (!this.selectedCategory && categories.length > 0 && this.isFullView) {
-          this.selectedCategory = categories[0].name;
         }
 
         if (this.editModeCategory && !categories.some((item) => item.name === this.editModeCategory)) {
@@ -81,6 +78,11 @@ export class ExpenceComponent implements OnInit, OnDestroy {
   }
 
   handleCircleClick(): void {
+    if (this.isFullView && this.selectedCategory) {
+      this.selectedCategory = '';
+      this.resetEditState();
+      return;
+    }
     this.onSelect.emit();
   }
 
@@ -136,12 +138,40 @@ export class ExpenceComponent implements OnInit, OnDestroy {
   addCategory(event: Event): void {
     event.stopPropagation();
     const normalizedName = this.newCategoryName.trim();
-    if (!normalizedName) return;
+    if (!normalizedName || this.selectedCategory) return;
 
     this.balanceService.addCategory('minus', normalizedName, this.newCategoryIcon);
-    this.selectedCategory = normalizedName;
     this.newCategoryName = '';
     this.newCategoryIcon = this.emojiOptions[0];
+  }
+
+  
+  startDrag(index: number, event: DragEvent): void {
+    this.dragCategoryIndex = index;
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', String(index));
+    }
+  }
+
+  allowDrop(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  dropOn(index: number, event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const sourceIndexRaw = event.dataTransfer?.getData('text/plain');
+    const sourceIndex = sourceIndexRaw ? Number(sourceIndexRaw) : this.dragCategoryIndex;
+
+    if (sourceIndex === null || !Number.isInteger(sourceIndex)) {
+      this.dragCategoryIndex = null;
+      return;
+    }
+
+    this.balanceService.swapCategories('minus', sourceIndex, index);
+    this.dragCategoryIndex = null;
   }
 
   openEditName(category: CategoryItem, event: Event): void {
@@ -171,6 +201,8 @@ export class ExpenceComponent implements OnInit, OnDestroy {
   deleteCategory(category: string, event: Event): void {
     event.stopPropagation();
     this.balanceService.deleteCategory('minus', category);
+    this.selectedCategory = '';
+    this.resetEditState();
   }
 
   private resetEditState(): void {

@@ -14,6 +14,7 @@
   overflow: hidden;
   overscroll-behavior: none;
   position: relative;
+  -webkit-app-region: no-drag;
 
   &.has-active {
     overflow-y: auto;
@@ -39,6 +40,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  -webkit-app-region: no-drag;
 
   &.active {
     box-shadow: 0 0 22px rgba(107, 164, 255, 0.45);
@@ -65,6 +67,7 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  -webkit-app-region: no-drag;
 
   &.secondary {
     border-color: rgba(255, 179, 122, 0.8);
@@ -77,6 +80,7 @@
   width: 390px;
   height: 100%;
   max-height: 640px;
+  -webkit-app-region: no-drag;
 
   .sphere-wrapper {
     position: absolute;
@@ -86,6 +90,7 @@
 
     > * {
       pointer-events: auto;
+      -webkit-app-region: no-drag;
     }
   }
 

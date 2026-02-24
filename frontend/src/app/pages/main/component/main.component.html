@@ -1,9 +1,30 @@
  <div class="dashboard-container" [class.has-active]="activeTab !== null">
-   <div class="circles-layout">
+  <button
+    type="button"
+    class="edit-hex"
+    [class.active]="isEditMode"
+    (click)="toggleEditMode()"
+    [attr.aria-pressed]="isEditMode"
+    aria-label="Toggle edit mode"
+  >
+    ✎
+  </button>
+
+  <div
+    #layoutRef
+    class="circles-layout"
+    [class.editing]="isEditMode"
+    (pointermove)="onDragMove($event)"
+    (pointerup)="stopDrag()"
+    (pointercancel)="stopDrag()"
+    (pointerleave)="stopDrag()"
+  >
     <div
-      class="sphere-wrapper income-pos"
+      class="sphere-wrapper"
       [class.is-active]="activeTab === 'income'"
       [class.is-hidden]="isHidden('income')"
+      [ngStyle]="getSphereStyle('income')"
+      (pointerdown)="onDragStart($event, 'income')"
     >
       <app-income
         [isFullView]="activeTab === 'income'"
@@ -13,9 +34,11 @@
      </div>
  
     <div
-      class="sphere-wrapper expense-pos"
+      class="sphere-wrapper"
       [class.is-active]="activeTab === 'expense'"
       [class.is-hidden]="isHidden('expense')"
+      [ngStyle]="getSphereStyle('expense')"
+      (pointerdown)="onDragStart($event, 'expense')"
     >
       <app-expence
         [isFullView]="activeTab === 'expense'"
@@ -25,9 +48,11 @@
      </div>
  
     <div
-      class="sphere-wrapper saving-pos"
+      class="sphere-wrapper"
       [class.is-active]="activeTab === 'saving'"
       [class.is-hidden]="isHidden('saving')"
+      [ngStyle]="getSphereStyle('saving')"
+      (pointerdown)="onDragStart($event, 'saving')"
     >
       <app-saving
         [isFullView]="activeTab === 'saving'"
@@ -35,9 +60,11 @@
       ></app-saving>
       </div>
     <div
-      class="sphere-wrapper news-pos"
+      class="sphere-wrapper"
       [class.is-active]="activeTab === 'news'"
       [class.is-hidden]="isHidden('news')"
+      [ngStyle]="getSphereStyle('news')"
+      (pointerdown)="onDragStart($event, 'news')"
     >
       <app-news
         [isFullView]="activeTab === 'news'"

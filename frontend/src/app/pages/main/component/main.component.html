@@ -7,6 +7,7 @@
     >
       <app-income
         [isFullView]="activeTab === 'income'"
+        [showCategoryPanel]="activeTab === 'income' || activeTab === 'expense'"
         (onSelect)="setActiveTab('income')"
       ></app-income>
      </div>
@@ -18,6 +19,7 @@
     >
       <app-expence
         [isFullView]="activeTab === 'expense'"
+        [showCategoryPanel]="activeTab === 'income' || activeTab === 'expense'"
         (onSelect)="setActiveTab('expense')"
       ></app-expence>
      </div>

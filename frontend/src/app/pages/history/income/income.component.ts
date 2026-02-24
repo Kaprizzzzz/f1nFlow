@@ -16,6 +16,7 @@ type PanelMode = 'amount' | 'name' | null;
 })
 export class IncomeComponent implements OnInit, OnDestroy {
   @Input() isFullView = false;
+  @Input() showCategoryPanel = false;
   @Output() onSelect = new EventEmitter<void>();
 
   readonly emojiOptions = ['💼', '🏦', '💸', '🎯', '📈', '✨'];
@@ -85,7 +86,14 @@ export class IncomeComponent implements OnInit, OnDestroy {
 
   selectCategory(category: CategoryItem, event: Event): void {
     event.stopPropagation();
+    if (this.selectedCategory === category.name) {
+      this.resetEditState();
+      this.selectedCategory = '';
+      return;
+    }
     this.selectedCategory = category.name;
+    this.panelMode = null;
+    this.amount = null;
   }
 
   getMiniCircleStyle(index: number, total: number): Record<string, string> {

@@ -73,7 +73,7 @@ $income-glow: #62b5ff;
 }
 
 .panel {
-  margin-top: 16px;
+  margin-top: 56px;
   width: 330px;
   display: grid;
   gap: 8px;
@@ -87,6 +87,13 @@ $income-glow: #62b5ff;
   border: 1px solid rgba($income-glow, 0.4);
   border-radius: 16px;
   padding: 10px;
+}
+
+.selected-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .summary {
@@ -109,10 +116,10 @@ $income-glow: #62b5ff;
 }
 
 .row-actions {
-  margin-top: 8px;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
+  margin-left: auto;
 }
 
 .icon-btn,

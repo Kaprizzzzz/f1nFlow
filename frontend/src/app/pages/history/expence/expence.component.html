@@ -18,7 +18,14 @@
     </button>
   </div>
 
-  <div class="panel" *ngIf="isFullView" (click)="$event.stopPropagation()">
+  <div class="panel" *ngIf="isFullView && showCategoryPanel" (click)="$event.stopPropagation()">
+    <div class="add-row add-row--always-visible">
+      <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
+      <select [(ngModel)]="newCategoryIcon" aria-label="Category icon">
+        <option *ngFor="let icon of emojiOptions" [ngValue]="icon">{{ icon }}</option>
+      </select>
+      <button type="button" class="small-btn" (click)="addCategory($event)">Save</button>
+    </div>
     <div class="selected-card" *ngIf="selectedCategoryData as category">
       <div class="summary">
         <span class="emoji">{{ category.icon || '📁' }}</span>
@@ -45,12 +52,5 @@
       <button type="button" class="small-btn" (click)="saveData()">Save</button>
     </div>
 
-    <div class="add-row">
-      <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
-      <select [(ngModel)]="newCategoryIcon" aria-label="Category icon">
-        <option *ngFor="let icon of emojiOptions" [ngValue]="icon">{{ icon }}</option>
-      </select>
-      <button type="button" class="small-btn" (click)="addCategory($event)">Save</button>
-    </div>
   </div>
 </div>

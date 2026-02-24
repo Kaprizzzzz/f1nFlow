@@ -13,6 +13,13 @@ type SpherePosition = {
   top: number;
 };
 
+const DEFAULT_SPHERE_POSITIONS: Record<SphereTab, SpherePosition> = {
+  income: { top: 20, left: 85 },
+  expense: { top: 266, left: -5 },
+  saving: { top: 266, left: 215 },
+  news: { top: 452, left: 118 }
+};
+
 @Component({
   selector: 'app-main',
   standalone: true,
@@ -27,13 +34,8 @@ export class MainComponent {
   activeTab: MainTab = null;
   isEditMode = false;
 
-  // Початкові координати для сфер
-  spherePositions: Record<SphereTab, SpherePosition> = {
-    income: { top: 20, left: 85 },
-    expense: { top: 266, left: -5 },
-    saving: { top: 266, left: 215 },
-    news: { top: 452, left: 118 }
-  };
+  spherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
+  private savedSpherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
 
   private dragState: {
     tab: SphereTab;
@@ -52,10 +54,28 @@ export class MainComponent {
   }
 
   toggleEditMode(): void {
-    this.isEditMode = !this.isEditMode;
-    if (!this.isEditMode) {
+    if (this.isEditMode) {
+      this.isEditMode = false;
       this.stopDrag();
+      this.spherePositions = this.clonePositions(this.savedSpherePositions);
+      return;
     }
+    this.activeTab = null;
+    this.isEditMode = true;
+    this.spherePositions = this.clonePositions(this.savedSpherePositions);
+  }
+
+  saveLayout(): void {
+    this.savedSpherePositions = this.clonePositions(this.spherePositions);
+    this.isEditMode = false;
+    this.stopDrag();
+  }
+
+  resetToDefaultLayout(): void {
+    this.savedSpherePositions = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
+    this.spherePositions = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
+    this.isEditMode = false;
+    this.stopDrag();
   }
 
   onDragStart(event: PointerEvent, tab: SphereTab): void {
@@ -131,5 +151,13 @@ export class MainComponent {
 
   private clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);
+  }
+  private clonePositions(positions: Record<SphereTab, SpherePosition>): Record<SphereTab, SpherePosition> {
+    return {
+      income: { ...positions.income },
+      expense: { ...positions.expense },
+      saving: { ...positions.saving },
+      news: { ...positions.news }
+    };
   }
 }

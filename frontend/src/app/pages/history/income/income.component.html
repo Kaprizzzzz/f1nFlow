@@ -1,7 +1,7 @@
 <div class="circle-wrapper" [class.active]="isFullView">
     <div class="main-circle" (click)="handleCircleClick()">
       <span class="label">{{ displayLabel }}</span>
-      <span class="value">{{ displayValue }}</span>
+      <span class="value">{{ displayValue | number:'1.2-2' }}</span>
     </div>
   
    <div class="sticker-row" *ngIf="isFullView && categories.length" (click)="$event.stopPropagation()">
@@ -28,7 +28,7 @@
           <span class="emoji">{{ category.icon || '📁' }}</span>
           <div>
             <div class="name">{{ category.name }}</div>
-            <div class="amount">{{ category.amount }}</div>
+            <div class="amount">{{ category.amount | number:'1.2-2' }}</div>
           </div>
         </div>
         
@@ -46,7 +46,7 @@
       </div>
 
       <div class="amount-row" *ngIf="selectedCategoryData && panelMode === 'amount'">
-        <input type="number" [(ngModel)]="amount" placeholder="0.00" inputmode="decimal" />
+        <input type="number" [(ngModel)]="amount" placeholder="0.00" inputmode="decimal" min="0.01" step="0.01" />
         <button type="button" class="small-btn" (click)="saveData()">Save</button>
       </div>
 

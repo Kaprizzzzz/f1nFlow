@@ -1,7 +1,7 @@
 <div class="circle-wrapper" [class.active]="isFullView">
    <div class="main-circle" [class.negative]="savings < 0" (click)="handleCircleClick()">
      <span class="label">Savings</span>
-     <span class="value">{{ savings }}</span>
+     <span class="value">{{ savings | number:'1.2-2' }}</span>
     </div>
   
     <div class="history-list" *ngIf="isFullView" (click)="$event.stopPropagation()">
@@ -16,10 +16,10 @@
        </div>
  
        <div class="totals-row">
-         <span>Income: {{ item.incomeTotal }}</span>
-         <span>Expense: {{ item.expenseTotal }}</span>
+         <span>Income: {{ item.incomeTotal | number:'1.2-2' }}</span>
+         <span>Expense: {{ item.expenseTotal | number:'1.2-2' }}</span>
          <span [class.positive-diff]="item.difference >= 0" [class.negative-diff]="item.difference < 0">
-           Δ {{ item.difference }}
+          Δ {{ item.difference | number:'1.2-2' }}
          </span>
        </div>
  

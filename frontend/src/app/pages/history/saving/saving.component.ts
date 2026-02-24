@@ -79,7 +79,7 @@ import { combineLatest, Subscription } from 'rxjs';
          expenseTotal += item.amount;
        }
  
-       const amountLabel = `${item.type === 'plus' ? '+' : '-'}${item.amount}`;
+       const amountLabel = `${item.type === 'plus' ? '+' : '-'}${this.formatAmount(item.amount)}`;
  
        return {
          id: item.id,
@@ -114,7 +114,7 @@ import { combineLatest, Subscription } from 'rxjs';
         incomeTotal,
         expenseTotal,
         difference: incomeTotal - expenseTotal,
-        amountLabel: `+${item.amount}`,
+        amountLabel: `+${this.formatAmount(item.amount)}`,
         isRemovable: false
       });
     }
@@ -131,11 +131,14 @@ import { combineLatest, Subscription } from 'rxjs';
         incomeTotal,
         expenseTotal,
         difference: incomeTotal - expenseTotal,
-        amountLabel: `-${item.amount}`,
+        amountLabel: `-${this.formatAmount(item.amount)}`,
         isRemovable: false
       });
     }
 
     return rows;
+  }
+  private formatAmount(value: number): string {
+    return value.toFixed(2);
   }
 }

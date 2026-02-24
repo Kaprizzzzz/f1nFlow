@@ -12,6 +12,7 @@
   align-items: flex-start;
   padding: 12px 8px 0;
   overflow: hidden;
+  overscroll-behavior: none;
   position: relative;
 
   &.has-active {
@@ -79,7 +80,7 @@
 
   .sphere-wrapper {
     position: absolute;
-    transition: top 0.45s ease, left 0.45s ease, transform 0.45s ease, opacity 0.35s ease;
+    transition: top 0.22s ease, left 0.22s ease, transform 0.45s ease, opacity 0.35s ease;
     will-change: transform, top, left, opacity;
     pointer-events: none;
 
@@ -91,6 +92,7 @@
   &.editing .sphere-wrapper {
     cursor: grab;
     touch-action: none;
+    transition: none;
   }
 
   &.editing {

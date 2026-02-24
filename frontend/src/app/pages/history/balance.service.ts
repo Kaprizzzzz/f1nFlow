@@ -41,7 +41,7 @@ export class BalanceService {
   }
 
   addTransaction(amount: number, category: string, type: 'plus' | 'minus'): void {
-    const normalizedAmount = Number(amount);
+    const normalizedAmount = this.roundToCents(Number(amount));
 
     if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
       return;
@@ -118,7 +118,7 @@ export class BalanceService {
   }
 
    updateCategoryAmount(type: 'plus' | 'minus', categoryName: string, amount: number): void {
-     const normalizedAmount = Number(amount);
+     const normalizedAmount = this.roundToCents(Number(amount));
      if (!Number.isFinite(normalizedAmount) || normalizedAmount < 0) {
        return;
      }
@@ -126,7 +126,7 @@ export class BalanceService {
      const targetLower = categoryName.toLowerCase();
      const list = this.getCategoriesByType(type);
      const nextList = list.map((item) =>
-       item.name.toLowerCase() === targetLower ? { ...item, amount: normalizedAmount } : item
+       item.name.toLowerCase() === targetLower ? { ...item, amount: this.roundToCents(normalizedAmount) } : item
      );
  
      this.setCategoriesByType(type, nextList);
@@ -167,7 +167,7 @@ export class BalanceService {
     [nextList[firstIndex], nextList[secondIndex]] = [nextList[secondIndex], nextList[firstIndex]];
     this.setCategoriesByType(type, nextList);
   }
-  
+
    private getCategoriesByType(type: 'plus' | 'minus'): CategoryItem[] {
      return type === 'plus' ? this.incomeCategoriesSubject.value : this.expenseCategoriesSubject.value;
   }
@@ -254,16 +254,19 @@ export class BalanceService {
         (acc, tx) => (tx.type === 'plus' ? acc + tx.amount : acc - tx.amount),
         0
       );
-      this.balanceSubject.next(newBalance);
+      this.balanceSubject.next(this.roundToCents(newBalance));
     }
 
      this.transactions$.next([...this.transactions]);
     this.persistState();
    }
+   private roundToCents(value: number): number {
+    return Number(value.toFixed(2));
+  }
    private normalizeCategories(categories: CategoryItem[]): CategoryItem[] {
     return categories.map((item) => ({
       name: item.name,
-      amount: Number.isFinite(item.amount) ? item.amount : 0,
+      amount: Number.isFinite(item.amount) ? this.roundToCents(item.amount) : 0,
       icon: item.icon || '📁'
     }));
   }

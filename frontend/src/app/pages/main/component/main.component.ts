@@ -39,6 +39,7 @@ export class MainComponent {
 
   private dragState: {
     tab: SphereTab;
+    pointerId: number;
     pointerOffsetX: number;
     pointerOffsetY: number;
     sphereWidth: number;
@@ -97,6 +98,7 @@ export class MainComponent {
     // Запам'ятовуємо, де саме всередині сфери ми схопилися (offset)
     this.dragState = {
       tab,
+      pointerId: event.pointerId,
       pointerOffsetX: event.clientX - sphereRect.left,
       pointerOffsetY: event.clientY - sphereRect.top,
       sphereWidth: sphereRect.width,
@@ -112,8 +114,12 @@ export class MainComponent {
       return;
     }
 
+    if (event.pointerId !== this.dragState.pointerId) {
+      return;
+    }
+
     event.preventDefault();
-    
+
     const layout = this.layoutRef?.nativeElement;
     if (!layout) {
       return;

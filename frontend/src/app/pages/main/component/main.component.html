@@ -1,82 +1,90 @@
  <div class="dashboard-container" [class.has-active]="activeTab !== null">
   <button
-    type="button"
-    class="edit-hex"
-    [class.active]="isEditMode"
-    (click)="toggleEditMode()"
-    [attr.aria-pressed]="isEditMode"
-    aria-label="Toggle edit mode"
-  >
-    ✎
-  </button>
-
-  @if (isEditMode) {
-    <div class="edit-actions" aria-label="Edit actions">
-      <button type="button" class="action-btn" (click)="saveLayout()">Зберегти</button>
-      <button type="button" class="action-btn secondary" (click)="resetToDefaultLayout()">Дефолт</button>
-    </div>
-  }
-
-  <div
-    #layoutRef
-    class="circles-layout"
-    [class.editing]="isEditMode"
-    (pointermove)="onDragMove($event)"
-    (pointerup)="stopDrag()"
-    (pointercancel)="stopDrag()"
-    (pointerleave)="stopDrag()"
-  >
-    <div
-      class="sphere-wrapper"
-      [class.is-active]="activeTab === 'income'"
-      [class.is-hidden]="isHidden('income')"
-      [ngStyle]="getSphereStyle('income')"
-      (pointerdown)="onDragStart($event, 'income')"
-    >
-      <app-income
-        [isFullView]="activeTab === 'income'"
-        [showCategoryPanel]="activeTab === 'income' || activeTab === 'expense'"
-        (onSelect)="setActiveTab('income')"
-      ></app-income>
-     </div>
+     type="button"
+     class="edit-hex"
+     [class.active]="isEditMode"
+     (click)="toggleEditMode()"
+     [attr.aria-pressed]="isEditMode"
+     aria-label="Toggle edit mode"
+   >
+     ✎
+   </button>
  
-    <div
-      class="sphere-wrapper"
-      [class.is-active]="activeTab === 'expense'"
-      [class.is-hidden]="isHidden('expense')"
-      [ngStyle]="getSphereStyle('expense')"
-      (pointerdown)="onDragStart($event, 'expense')"
-    >
-      <app-expence
-        [isFullView]="activeTab === 'expense'"
-        [showCategoryPanel]="activeTab === 'income' || activeTab === 'expense'"
-        (onSelect)="setActiveTab('expense')"
-      ></app-expence>
+   @if (isEditMode) {
+     <div class="edit-actions" aria-label="Edit actions">
+       <button type="button" class="action-btn" (click)="saveLayout()">Зберегти</button>
+       <button type="button" class="action-btn secondary" (click)="resetToDefaultLayout()">Дефолт</button>
      </div>
+   }
  
-    <div
-      class="sphere-wrapper"
-      [class.is-active]="activeTab === 'saving'"
-      [class.is-hidden]="isHidden('saving')"
-      [ngStyle]="getSphereStyle('saving')"
-      (pointerdown)="onDragStart($event, 'saving')"
-    >
-      <app-saving
-        [isFullView]="activeTab === 'saving'"
-        (onSelect)="setActiveTab('saving')"
-      ></app-saving>
+   <div
+     #layoutRef
+     class="circles-layout"
+     [class.editing]="isEditMode"
+     (pointermove)="onDragMove($event)"
+     (pointerup)="stopDrag()"
+     (pointercancel)="stopDrag()"
+     (pointerleave)="stopDrag()"
+   >
+     <div
+      #sphereRef
+       class="sphere-wrapper"
+      data-tab="income"
+       [class.is-active]="activeTab === 'income'"
+       [class.is-hidden]="isHidden('income')"
+       [ngStyle]="getSphereStyle('income')"
+       (pointerdown)="onDragStart($event, 'income')"
+     >
+       <app-income
+         [isFullView]="activeTab === 'income'"
+         [showCategoryPanel]="activeTab === 'income' || activeTab === 'expense'"
+         (onSelect)="setActiveTab('income')"
+       ></app-income>
       </div>
-    <div
-      class="sphere-wrapper"
-      [class.is-active]="activeTab === 'news'"
-      [class.is-hidden]="isHidden('news')"
-      [ngStyle]="getSphereStyle('news')"
-      (pointerdown)="onDragStart($event, 'news')"
-    >
-      <app-news
-        [isFullView]="activeTab === 'news'"
-        (onSelect)="setActiveTab('news')"
-      ></app-news>
-    </div>
-  </div>
-</div>
+  
+     <div
+      #sphereRef
+       class="sphere-wrapper"
+      data-tab="expense"
+       [class.is-active]="activeTab === 'expense'"
+       [class.is-hidden]="isHidden('expense')"
+       [ngStyle]="getSphereStyle('expense')"
+       (pointerdown)="onDragStart($event, 'expense')"
+     >
+       <app-expence
+         [isFullView]="activeTab === 'expense'"
+         [showCategoryPanel]="activeTab === 'income' || activeTab === 'expense'"
+         (onSelect)="setActiveTab('expense')"
+       ></app-expence>
+      </div>
+  
+     <div
+      #sphereRef
+       class="sphere-wrapper"
+      data-tab="saving"
+       [class.is-active]="activeTab === 'saving'"
+       [class.is-hidden]="isHidden('saving')"
+       [ngStyle]="getSphereStyle('saving')"
+       (pointerdown)="onDragStart($event, 'saving')"
+     >
+       <app-saving
+         [isFullView]="activeTab === 'saving'"
+         (onSelect)="setActiveTab('saving')"
+       ></app-saving>
+       </div>
+     <div
+      #sphereRef
+       class="sphere-wrapper"
+      data-tab="news"
+       [class.is-active]="activeTab === 'news'"
+       [class.is-hidden]="isHidden('news')"
+       [ngStyle]="getSphereStyle('news')"
+       (pointerdown)="onDragStart($event, 'news')"
+     >
+       <app-news
+         [isFullView]="activeTab === 'news'"
+         (onSelect)="setActiveTab('news')"
+       ></app-news>
+     </div>
+   </div>
+ </div>

@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ExpenceComponent } from '../../history/expence/expence.component';
 import { IncomeComponent } from '../../history/income/income.component';
@@ -30,6 +30,9 @@ const DEFAULT_SPHERE_POSITIONS: Record<SphereTab, SpherePosition> = {
 export class MainComponent {
   @ViewChild('layoutRef')
   private layoutRef?: ElementRef<HTMLElement>;
+
+   @ViewChildren('sphereRef')
+  private sphereRefs?: QueryList<ElementRef<HTMLElement>>;
 
   activeTab: MainTab = null;
   isEditMode = false;
@@ -65,7 +68,8 @@ export class MainComponent {
     }
     this.activeTab = null;
     this.isEditMode = true;
-    this.spherePositions = this.clonePositions(this.savedSpherePositions);
+    this.stopDrag();
+    this.spawnSpheresAtBottom();
   }
 
   saveLayout(): void {
@@ -166,6 +170,54 @@ export class MainComponent {
   private clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);
   }
+
+  private spawnSpheresAtBottom(): void {
+    const raf = globalThis.requestAnimationFrame ?? ((callback: FrameRequestCallback) => setTimeout(() => callback(0), 0));
+
+    raf(() => {
+      const layout = this.layoutRef?.nativeElement;
+      const sphereElements = this.sphereRefs?.toArray().map((item) => item.nativeElement) ?? [];
+
+      if (!layout || sphereElements.length === 0) {
+        return;
+      }
+
+      const tabsOrder: SphereTab[] = ['income', 'expense', 'saving', 'news'];
+      const sidePadding = 12;
+      const gap = 12;
+      const maxWidth = layout.clientWidth;
+      const maxHeight = layout.clientHeight;
+
+      let currentLeft = sidePadding;
+      let currentBottom = maxHeight - sidePadding;
+      let rowHeight = 0;
+
+      for (const tab of tabsOrder) {
+        const element = sphereElements.find((item) => item.dataset['tab'] === tab);
+        if (!element) {
+          continue;
+        }
+
+        const sphereWidth = element.offsetWidth;
+        const sphereHeight = element.offsetHeight;
+
+        if (currentLeft + sphereWidth > maxWidth - sidePadding && currentLeft > sidePadding) {
+          currentLeft = sidePadding;
+          currentBottom -= rowHeight + gap;
+          rowHeight = 0;
+        }
+
+        const top = this.clamp(currentBottom - sphereHeight, 0, Math.max(0, maxHeight - sphereHeight));
+        const left = this.clamp(currentLeft, 0, Math.max(0, maxWidth - sphereWidth));
+
+        this.spherePositions[tab] = { top, left };
+
+        currentLeft += sphereWidth + gap;
+        rowHeight = Math.max(rowHeight, sphereHeight);
+      }
+    });
+  }
+
   private clonePositions(positions: Record<SphereTab, SpherePosition>): Record<SphereTab, SpherePosition> {
     return {
       income: { ...positions.income },

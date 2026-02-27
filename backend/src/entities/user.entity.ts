@@ -1,24 +1,56 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { Transaction } from './transaction.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from 'typeorm';
+ import { Transaction } from './transaction.entity';
+ 
+export type SphereLayout = Record<'income' | 'expense' | 'saving' | 'news', { left: number; top: number }>;
 
-@Entity()
-export class User {
-  @PrimaryGeneratedColumn('uuid') // Справжній UUID
-  id: string;
-
-  @Column({ unique: true }) // Telegram ID має бути унікальним
-  telegramId: string;
-
-  @Column({ nullable: true })
-  userName: string;
-
+ @Entity()
+ export class User {
+  @PrimaryGeneratedColumn('uuid')
+   id: string;
+ 
   @Column({ unique: true })
-  referralCode: string;
+   telegramId: string;
+ 
+   @Column({ nullable: true })
+   userName: string;
+ 
+   @Column({ unique: true })
+   referralCode: string;
+ 
+   @Column({ nullable: true })
+   referredBy: string;
+ 
+  @Column({ default: 'EUR' })
+  currency: string;
 
-  @Column({ nullable: true })
-  referredBy: string;
+  @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
+  incomeCategories: Array<{ name: string; amount: number; icon?: string }>;
 
-  // Зв'язок: один користувач має багато транзакцій
-  @OneToMany(() => Transaction, (transaction) => transaction.user)
-  transactions: Transaction[];
+  @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
+  expenseCategories: Array<{ name: string; amount: number; icon?: string }>;
+
+  @Column({ type: 'jsonb', nullable: true })
+  sphereLayout: SphereLayout | null;
+
+  @Column({ default: false })
+  isOnline: boolean;
+
+  @CreateDateColumn()
+  firstSeenAt: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastSeenAt: Date | null;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToMany(() => Transaction, (transaction) => transaction.user, { cascade: true })
+   transactions: Transaction[];
 }

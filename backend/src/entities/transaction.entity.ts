@@ -1,27 +1,40 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne } from 'typeorm';
-import { User } from './user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn
+} from 'typeorm';
+ import { User } from './user.entity';
+ 
+ @Entity()
+ export class Transaction {
+   @PrimaryGeneratedColumn('uuid')
+   id: string;
+ 
+  @Column('decimal', { precision: 10, scale: 2 })
+   amount: number;
+ 
+  @Column({ type: 'varchar' })
+  type: 'plus' | 'minus';
+ 
+   @Column()
+   category: string;
+ 
+  @Column({ nullable: true })
+  label?: string;
 
-@Entity()
-export class Transaction {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @Column({ type: 'timestamp' })
+  date: Date;
 
-  @Column('decimal', { precision: 10, scale: 2 }) // Для грошей краще decimal
-  amount: number;
-
-  @Column({
-    type: 'enum',
-    enum: ['income', 'expense', 'saving'], // Згідно з твоїми кругами на макеті
-    default: 'expense'
-  })
-  type: string;
-
+  @CreateDateColumn()
+   createdAt: Date;
+ 
   @Column()
-  category: string;
+  userId: string;
 
-  @CreateDateColumn() // Автоматично ставить дату створення
-  createdAt: Date;
-
-  @ManyToOne(() => User, (user) => user.transactions)
-  user: User;
+  @ManyToOne(() => User, (user) => user.transactions, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+   user: User;
 }

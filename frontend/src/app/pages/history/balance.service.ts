@@ -1,273 +1,325 @@
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject } from 'rxjs';
+ import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+ import { isPlatformBrowser } from '@angular/common';
+ import { BehaviorSubject } from 'rxjs';
+ import { SessionService } from '../user/service/user.service';
+ 
+ export interface Transaction {
+   id: string;
+   amount: number;
+   category: string;
+   type: 'plus' | 'minus';
+   date: Date;
+   label?: string;
+ }
+ 
+ export interface CategoryItem {
+   name: string;
+   amount: number;
+   icon?: string;
+ }
+ 
+export type SphereTab = 'income' | 'expense' | 'saving' | 'news';
+export type SphereLayout = Record<SphereTab, { left: number; top: number }>;
 
-export interface Transaction {
-  id: number;
-  amount: number;
-  category: string;
-  type: 'plus' | 'minus';
-  date: Date;
-  label?: string;
-}
-
-export interface CategoryItem {
-  name: string;
-  amount: number;
-  icon?: string;
-}
-
-@Injectable({ providedIn: 'root' })
-export class BalanceService {
-  private readonly storageKey = 'f1nflow-balance-state';
-  private readonly isBrowser: boolean;
-
-  private transactions: Transaction[] = [];
-  private balanceSubject = new BehaviorSubject<number>(0);
-  private nextTransactionId = 1;
-
+ @Injectable({ providedIn: 'root' })
+ export class BalanceService {
+   private readonly storageKey = 'f1nflow-balance-state';
+   private readonly isBrowser: boolean;
+ 
+   private transactions: Transaction[] = [];
+   private balanceSubject = new BehaviorSubject<number>(0);
    private incomeCategoriesSubject = new BehaviorSubject<CategoryItem[]>([]);
    private expenseCategoriesSubject = new BehaviorSubject<CategoryItem[]>([]);
-
-  balance$ = this.balanceSubject.asObservable();
-  transactions$ = new BehaviorSubject<Transaction[]>([]);
-  incomeCategories$ = this.incomeCategoriesSubject.asObservable();
-  expenseCategories$ = this.expenseCategoriesSubject.asObservable();
-
-  constructor(@Inject(PLATFORM_ID) platformId: Object) {
-    this.isBrowser = isPlatformBrowser(platformId);
-    this.restoreState();
-    this.syncBalanceAndTransactions();
-  }
-
-  addTransaction(amount: number, category: string, type: 'plus' | 'minus'): void {
-    const normalizedAmount = this.roundToCents(Number(amount));
-
-    if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
-      return;
-    }
-
-    const newTx: Transaction = {
-      id: this.nextTransactionId++,
-      amount: normalizedAmount,
-      category,
-      type,
-      date: new Date(),
-      label: category
-    };
-
-    this.transactions = [...this.transactions, newTx];
-    this.adjustCategoryAmount(type, category, normalizedAmount);
-    this.syncBalanceAndTransactions();
-  }
-
-  removeTransaction(transactionId: number): void {
-    const removedTransaction = this.transactions.find((item) => item.id === transactionId);
-    if (!removedTransaction) {
-      return;
-     }
+   private currencySubject = new BehaviorSubject<'EUR' | 'USD' | 'UAH'>('EUR');
+   private sphereLayoutSubject = new BehaviorSubject<SphereLayout | null>(null);
  
-    this.transactions = this.transactions.filter((item) => item.id !== transactionId);
-    this.adjustCategoryAmount(removedTransaction.type, removedTransaction.category, -removedTransaction.amount);
-    this.syncBalanceAndTransactions();
-  }
-
-  addCategory(type: 'plus' | 'minus', categoryName: string, icon = '📁'): void {
-    const normalized = categoryName.trim();
-    if (!normalized) {
-      return;
-    }
-
-    const list = this.getCategoriesByType(type);
-     if (list.some((item) => item.name.toLowerCase() === normalized.toLowerCase())) {
-      return;
-    }
-
-     this.setCategoriesByType(type, [...list, { name: normalized, amount: 0, icon }]);
-  }
-
-  renameCategory(type: 'plus' | 'minus', oldName: string, newName: string): void {
-    const normalized = newName.trim();
-    if (!normalized || oldName === normalized) {
-      return;
-    }
-
-    const list = this.getCategoriesByType(type);
-    const oldLower = oldName.toLowerCase();
-
-     if (!list.some((item) => item.name.toLowerCase() === oldLower)) {
-      return;
-    }
-
-     if (list.some((item) => item.name.toLowerCase() === normalized.toLowerCase())) {
-      return;
-    }
-
-     const nextList = list.map((item) =>
-       item.name.toLowerCase() === oldLower ? { ...item, name: normalized } : item
-     );
-    this.setCategoriesByType(type, nextList);
-
-    this.transactions = this.transactions.map((tx) => {
-      if (tx.type === type && tx.category.toLowerCase() === oldLower) {
-        return { ...tx, category: normalized, label: normalized };
-      }
-      return tx;
-    });
+   private isHydrating = false;
+ 
+   balance$ = this.balanceSubject.asObservable();
+   transactions$ = new BehaviorSubject<Transaction[]>([]);
+   incomeCategories$ = this.incomeCategoriesSubject.asObservable();
+   expenseCategories$ = this.expenseCategoriesSubject.asObservable();
+   currency$ = this.currencySubject.asObservable();
+   sphereLayout$ = this.sphereLayoutSubject.asObservable();
+ 
+   constructor(
+    @Inject(PLATFORM_ID) platformId: Object,
+    private sessionService: SessionService
+  ) {
+     this.isBrowser = isPlatformBrowser(platformId);
+     this.restoreState();
     this.syncBalanceAndTransactions(false);
-  }
 
-   updateCategoryAmount(type: 'plus' | 'minus', categoryName: string, amount: number): void {
+    this.sessionService.user$.subscribe((user) => {
+      if (!user) {
+        return;
+      }
+
+      this.sessionService.fetchState(user.telegramId).subscribe({
+        next: (payload) => {
+          this.isHydrating = true;
+          this.transactions = (payload.transactions ?? []).map(
+            (tx: Omit<Transaction, 'date'> & { date: string }) => ({
+              ...tx,
+              date: new Date(tx.date)
+            })
+          );
+          this.incomeCategoriesSubject.next(this.normalizeCategories(payload.user.incomeCategories ?? []));
+          this.expenseCategoriesSubject.next(this.normalizeCategories(payload.user.expenseCategories ?? []));
+          this.currencySubject.next((payload.user.currency as 'EUR' | 'USD' | 'UAH') || 'EUR');
+          this.sphereLayoutSubject.next(payload.user.sphereLayout ?? null);
+          this.syncBalanceAndTransactions(false);
+          this.isHydrating = false;
+        },
+        error: () => {
+          this.isHydrating = false;
+        }
+      });
+    });
+   }
+ 
+   addTransaction(amount: number, category: string, type: 'plus' | 'minus'): void {
      const normalizedAmount = this.roundToCents(Number(amount));
-     if (!Number.isFinite(normalizedAmount) || normalizedAmount < 0) {
+ 
+     if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
        return;
      }
  
+     const newTx: Transaction = {
+      id: crypto.randomUUID(),
+       amount: normalizedAmount,
+       category,
+       type,
+       date: new Date(),
+       label: category
+     };
+ 
+     this.transactions = [...this.transactions, newTx];
+     this.adjustCategoryAmount(type, category, normalizedAmount);
+     this.syncBalanceAndTransactions();
+   }
+ 
+  removeTransaction(transactionId: string): void {
+     const removedTransaction = this.transactions.find((item) => item.id === transactionId);
+     if (!removedTransaction) {
+       return;
+    }
+
+     this.transactions = this.transactions.filter((item) => item.id !== transactionId);
+     this.adjustCategoryAmount(removedTransaction.type, removedTransaction.category, -removedTransaction.amount);
+     this.syncBalanceAndTransactions();
+   }
+ 
+  setCurrency(currency: 'EUR' | 'USD' | 'UAH'): void {
+    this.currencySubject.next(currency);
+    this.persistState();
+  }
+
+  setSphereLayout(layout: SphereLayout): void {
+    this.sphereLayoutSubject.next(layout);
+    this.persistState();
+  }
+
+  getSphereLayout(): SphereLayout | null {
+    return this.sphereLayoutSubject.value;
+  }
+
+   addCategory(type: 'plus' | 'minus', categoryName: string, icon = '📁'): void {
+     const normalized = categoryName.trim();
+     if (!normalized) {
+       return;
+     }
+ 
+     const list = this.getCategoriesByType(type);
+    if (list.some((item) => item.name.toLowerCase() === normalized.toLowerCase())) {
+       return;
+     }
+ 
+    this.setCategoriesByType(type, [...list, { name: normalized, amount: 0, icon }]);
+   }
+ 
+   renameCategory(type: 'plus' | 'minus', oldName: string, newName: string): void {
+     const normalized = newName.trim();
+     if (!normalized || oldName === normalized) {
+       return;
+     }
+ 
+     const list = this.getCategoriesByType(type);
+     const oldLower = oldName.toLowerCase();
+ 
+    if (!list.some((item) => item.name.toLowerCase() === oldLower)) {
+       return;
+     }
+ 
+    if (list.some((item) => item.name.toLowerCase() === normalized.toLowerCase())) {
+       return;
+     }
+ 
+    const nextList = list.map((item) =>
+      item.name.toLowerCase() === oldLower ? { ...item, name: normalized } : item
+    );
+     this.setCategoriesByType(type, nextList);
+ 
+     this.transactions = this.transactions.map((tx) => {
+       if (tx.type === type && tx.category.toLowerCase() === oldLower) {
+         return { ...tx, category: normalized, label: normalized };
+       }
+       return tx;
+     });
+     this.syncBalanceAndTransactions(false);
+   }
+ 
+   deleteCategory(type: 'plus' | 'minus', categoryName: string): void {
      const targetLower = categoryName.toLowerCase();
      const list = this.getCategoriesByType(type);
-     const nextList = list.map((item) =>
-       item.name.toLowerCase() === targetLower ? { ...item, amount: this.roundToCents(normalizedAmount) } : item
+    const nextList = list.filter((item) => item.name.toLowerCase() !== targetLower);
+     if (nextList.length === list.length) {
+       return;
+     }
+ 
+     this.setCategoriesByType(type, nextList);
+     this.transactions = this.transactions.filter(
+       (tx) => !(tx.type === type && tx.category.toLowerCase() === targetLower)
      );
+     this.syncBalanceAndTransactions();
+   }
+ 
+   swapCategories(type: 'plus' | 'minus', firstIndex: number, secondIndex: number): void {
+     if (firstIndex === secondIndex) {
+       return;
+     }
+ 
+     const list = this.getCategoriesByType(type);
+     const isOutOfBounds =
+       firstIndex < 0 ||
+       secondIndex < 0 ||
+       firstIndex >= list.length ||
+       secondIndex >= list.length;
+ 
+     if (isOutOfBounds) {
+       return;
+     }
+ 
+     const nextList = [...list];
+     [nextList[firstIndex], nextList[secondIndex]] = [nextList[secondIndex], nextList[firstIndex]];
+     this.setCategoriesByType(type, nextList);
+   }
+ 
+  private getCategoriesByType(type: 'plus' | 'minus'): CategoryItem[] {
+    return type === 'plus' ? this.incomeCategoriesSubject.value : this.expenseCategoriesSubject.value;
+   }
+ 
+  private setCategoriesByType(type: 'plus' | 'minus', categories: CategoryItem[]): void {
+     if (type === 'plus') {
+       this.incomeCategoriesSubject.next(categories);
+       this.persistState();
+       return;
+     }
+ 
+     this.expenseCategoriesSubject.next(categories);
+     this.persistState();
+   }
+ 
+   private adjustCategoryAmount(type: 'plus' | 'minus', categoryName: string, delta: number): void {
+     const targetLower = categoryName.toLowerCase();
+     const list = this.getCategoriesByType(type);
+ 
+     const nextList = list.map((item) => {
+       if (item.name.toLowerCase() !== targetLower) {
+         return item;
+       }
+ 
+       const nextAmount = Math.max(0, item.amount + delta);
+       return { ...item, amount: Number(nextAmount.toFixed(2)) };
+     });
  
      this.setCategoriesByType(type, nextList);
    }
  
-  deleteCategory(type: 'plus' | 'minus', categoryName: string): void {
-    const targetLower = categoryName.toLowerCase();
-    const list = this.getCategoriesByType(type);
-     const nextList = list.filter((item) => item.name.toLowerCase() !== targetLower);
-    if (nextList.length === list.length) {
-      return;
-    }
-
-    this.setCategoriesByType(type, nextList);
-    this.transactions = this.transactions.filter(
-      (tx) => !(tx.type === type && tx.category.toLowerCase() === targetLower)
-    );
-    this.syncBalanceAndTransactions();
-  }
-
-  swapCategories(type: 'plus' | 'minus', firstIndex: number, secondIndex: number): void {
-    if (firstIndex === secondIndex) {
-      return;
-    }
-
-    const list = this.getCategoriesByType(type);
-    const isOutOfBounds =
-      firstIndex < 0 ||
-      secondIndex < 0 ||
-      firstIndex >= list.length ||
-      secondIndex >= list.length;
-
-    if (isOutOfBounds) {
-      return;
-    }
-
-    const nextList = [...list];
-    [nextList[firstIndex], nextList[secondIndex]] = [nextList[secondIndex], nextList[firstIndex]];
-    this.setCategoriesByType(type, nextList);
-  }
-
-   private getCategoriesByType(type: 'plus' | 'minus'): CategoryItem[] {
-     return type === 'plus' ? this.incomeCategoriesSubject.value : this.expenseCategoriesSubject.value;
-  }
-
-   private setCategoriesByType(type: 'plus' | 'minus', categories: CategoryItem[]): void {
-    if (type === 'plus') {
-      this.incomeCategoriesSubject.next(categories);
-      this.persistState();
-      return;
-    }
-
-    this.expenseCategoriesSubject.next(categories);
-    this.persistState();
-  }
-
-  private adjustCategoryAmount(type: 'plus' | 'minus', categoryName: string, delta: number): void {
-    const targetLower = categoryName.toLowerCase();
-    const list = this.getCategoriesByType(type);
-
-    const nextList = list.map((item) => {
-      if (item.name.toLowerCase() !== targetLower) {
-        return item;
-      }
-
-      const nextAmount = Math.max(0, item.amount + delta);
-      return { ...item, amount: Number(nextAmount.toFixed(2)) };
-    });
-
-    this.setCategoriesByType(type, nextList);
-  }
-
-  private restoreState(): void {
-    if (!this.isBrowser) {
-      return;
-    }
-
-    const rawState = localStorage.getItem(this.storageKey);
-    if (!rawState) {
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(rawState) as {
-        transactions?: Array<Omit<Transaction, 'date'> & { date: string }>;
-        nextTransactionId?: number;
-        incomeCategories?: CategoryItem[];
-        expenseCategories?: CategoryItem[];
-      };
-
-      this.transactions = (parsed.transactions ?? []).map((tx) => ({
-        ...tx,
-        date: new Date(tx.date)
-      }));
-
-      this.nextTransactionId = Number.isFinite(parsed.nextTransactionId)
-        ? Math.max(1, Number(parsed.nextTransactionId))
-        : this.transactions.reduce((max, tx) => Math.max(max, tx.id), 0) + 1;
-
-      this.incomeCategoriesSubject.next(this.normalizeCategories(parsed.incomeCategories ?? []));
-      this.expenseCategoriesSubject.next(this.normalizeCategories(parsed.expenseCategories ?? []));
-    } catch {
-      localStorage.removeItem(this.storageKey);
-    }
-  }
-
-  private persistState(): void {
-    if (!this.isBrowser) {
-      return;
-    }
-
-    const payload = {
-      transactions: this.transactions,
-      nextTransactionId: this.nextTransactionId,
-      incomeCategories: this.incomeCategoriesSubject.value,
-      expenseCategories: this.expenseCategoriesSubject.value
-    };
-
-    localStorage.setItem(this.storageKey, JSON.stringify(payload));
-  }
-
-  private syncBalanceAndTransactions(recalculateBalance = true): void {
-    if (recalculateBalance) {
-      const newBalance = this.transactions.reduce(
-        (acc, tx) => (tx.type === 'plus' ? acc + tx.amount : acc - tx.amount),
-        0
-      );
-      this.balanceSubject.next(this.roundToCents(newBalance));
-    }
-
-     this.transactions$.next([...this.transactions]);
-    this.persistState();
+   private restoreState(): void {
+     if (!this.isBrowser) {
+       return;
+     }
+ 
+     const rawState = localStorage.getItem(this.storageKey);
+     if (!rawState) {
+       return;
+     }
+ 
+     try {
+       const parsed = JSON.parse(rawState) as {
+         transactions?: Array<Omit<Transaction, 'date'> & { date: string }>;
+         incomeCategories?: CategoryItem[];
+         expenseCategories?: CategoryItem[];
+        currency?: 'EUR' | 'USD' | 'UAH';
+        sphereLayout?: SphereLayout;
+       };
+ 
+       this.transactions = (parsed.transactions ?? []).map((tx) => ({
+         ...tx,
+         date: new Date(tx.date)
+       }));
+ 
+       this.incomeCategoriesSubject.next(this.normalizeCategories(parsed.incomeCategories ?? []));
+       this.expenseCategoriesSubject.next(this.normalizeCategories(parsed.expenseCategories ?? []));
+      this.currencySubject.next(parsed.currency ?? 'EUR');
+      this.sphereLayoutSubject.next(parsed.sphereLayout ?? null);
+     } catch {
+       localStorage.removeItem(this.storageKey);
+     }
    }
-   private roundToCents(value: number): number {
-    return Number(value.toFixed(2));
+ 
+   private persistState(): void {
+    if (!this.isBrowser || this.isHydrating) {
+       return;
+     }
+ 
+     const payload = {
+       transactions: this.transactions,
+       incomeCategories: this.incomeCategoriesSubject.value,
+      expenseCategories: this.expenseCategoriesSubject.value,
+      currency: this.currencySubject.value,
+      sphereLayout: this.sphereLayoutSubject.value
+     };
+ 
+     localStorage.setItem(this.storageKey, JSON.stringify(payload));
+
+    const currentUser = this.sessionService.userSnapshot;
+    if (!currentUser) {
+      return;
+    }
+
+    this.sessionService.saveState(currentUser.telegramId, {
+      ...payload,
+      transactions: this.transactions.map((item) => ({
+        ...item,
+        date: item.date.toISOString()
+      }))
+    });
+   }
+ 
+   private syncBalanceAndTransactions(recalculateBalance = true): void {
+     if (recalculateBalance) {
+       const newBalance = this.transactions.reduce(
+         (acc, tx) => (tx.type === 'plus' ? acc + tx.amount : acc - tx.amount),
+         0
+       );
+       this.balanceSubject.next(this.roundToCents(newBalance));
+     }
+ 
+    this.transactions$.next([...this.transactions]);
+     this.persistState();
   }
-   private normalizeCategories(categories: CategoryItem[]): CategoryItem[] {
-    return categories.map((item) => ({
-      name: item.name,
-      amount: Number.isFinite(item.amount) ? this.roundToCents(item.amount) : 0,
-      icon: item.icon || '📁'
-    }));
-  }
-}
+
+  private roundToCents(value: number): number {
+     return Number(value.toFixed(2));
+   }
+
+  private normalizeCategories(categories: CategoryItem[]): CategoryItem[] {
+     return categories.map((item) => ({
+       name: item.name,
+       amount: Number.isFinite(item.amount) ? this.roundToCents(item.amount) : 0,
+       icon: item.icon || '📁'
+     }));
+   }
+ }

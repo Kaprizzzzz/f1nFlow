@@ -4,7 +4,7 @@ import { BalanceService, CategoryItem, Transaction } from '../balance.service';
 import { combineLatest, Subscription } from 'rxjs';
  
  interface SavingsHistoryRow {
-   id: number;
+   id: string | number;
    category: string;
    incomeTotal: number;
    expenseTotal: number;
@@ -55,9 +55,9 @@ import { combineLatest, Subscription } from 'rxjs';
     this.onSelect.emit();
    }
  
-   removeTransaction(transactionId: number, event: Event): void {
+   removeTransaction(transactionId: string | number, event: Event): void {
     event.stopPropagation();
-    this.balanceService.removeTransaction(transactionId);
+    this.balanceService.removeTransaction(String(transactionId));
   }
 
   private buildSavingsHistory(

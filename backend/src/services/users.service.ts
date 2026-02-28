@@ -1,4 +1,4 @@
- import { Injectable, NotFoundException } from '@nestjs/common';
+ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
  import { InjectRepository } from '@nestjs/typeorm';
  import { Repository } from 'typeorm';
  import { User } from '../entities/user.entity';
@@ -18,6 +18,11 @@ interface SaveStatePayload {
   }>;
 }
  
+interface EnsureUserPayload {
+  telegramId: string;
+  userName?: string;
+}  
+
  @Injectable()
  export class UsersService {
    constructor(
@@ -28,6 +33,9 @@ interface SaveStatePayload {
    ) {}
  
    async findOrCreateUser(telegramId: string, userName: string): Promise<User> {
+    if (telegramId === 'server-render') {
+      throw new BadRequestException('Cannot create user for server-render profile');
+    }
      let user = await this.usersRepository.findOne({ where: { telegramId } });
  
      if (!user) {
@@ -48,18 +56,19 @@ interface SaveStatePayload {
   }
 
   async getUserState(telegramId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { telegramId },
+    const user = await this.ensureUser({ telegramId });
+    const hydratedUser = await this.usersRepository.findOne({
+      where: { id: user.id },
       relations: { transactions: true }
     });
 
-    if (!user) {
+    if (!hydratedUser) {
       throw new NotFoundException('User not found');
     }
 
     return {
-      user,
-      transactions: user.transactions
+      user: hydratedUser,
+      transactions: hydratedUser.transactions
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
         .map((item) => ({
           id: item.id,
@@ -73,11 +82,7 @@ interface SaveStatePayload {
   }
 
   async saveUserState(telegramId: string, payload: SaveStatePayload) {
-    const user = await this.usersRepository.findOne({ where: { telegramId } });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.ensureUser({ telegramId });
 
     user.currency = payload.currency ?? user.currency;
     user.incomeCategories = payload.incomeCategories ?? user.incomeCategories ?? [];
@@ -108,14 +113,31 @@ interface SaveStatePayload {
   }
 
   async updatePresence(telegramId: string, isOnline: boolean) {
-    const user = await this.usersRepository.findOne({ where: { telegramId } });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-     }
+    const user = await this.ensureUser({ telegramId });
 
     user.isOnline = isOnline;
     user.lastSeenAt = new Date();
     return this.usersRepository.save(user);
    }
-}
+   private async ensureUser({ telegramId, userName }: EnsureUserPayload): Promise<User> {
+    const existing = await this.usersRepository.findOne({ where: { telegramId } });
+    if (existing) {
+      if (userName && existing.userName !== userName) {
+        existing.userName = userName;
+        return this.usersRepository.save(existing);
+      }
+      return existing;
+    }
+
+    return this.usersRepository.save(
+      this.usersRepository.create({
+        telegramId,
+        userName: userName || `Guest ${telegramId.slice(-4)}`,
+        referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
+        lastSeenAt: new Date(),
+        isOnline: true
+      })
+    );
+  }
+} 
+

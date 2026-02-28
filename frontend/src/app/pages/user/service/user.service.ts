@@ -8,13 +8,17 @@
   userName: string;
 }
  
-declare global {
-  interface Window {
-    Telegram?: {
-      WebApp?: {
-        initDataUnsafe?: {
-          user?: { id?: number | string; username?: string; first_name?: string };
-        };
+type TelegramWebAppUser = {
+  id?: number | string;
+  username?: string;
+  first_name?: string;
+};
+
+type TelegramWindow = Window & {
+  Telegram?: {
+    WebApp?: {
+      initDataUnsafe?: {
+        user?: TelegramWebAppUser;
       };
     };
   }
@@ -39,6 +43,7 @@ export class SessionService {
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
     this.apiUrl = this.resolveApiUrl();
+    console.info(`[SessionService] API URL: ${this.apiUrl}`);
     this.login().subscribe();
   }
 
@@ -83,7 +88,15 @@ export class SessionService {
     }
 
     const fromStorage = localStorage.getItem('f1nflow-api-url');
-    return fromStorage || 'http://localhost:3000';
+    const resolved = fromStorage || 'http://localhost:3000';
+
+    if (!fromStorage) {
+      console.warn(
+        '[SessionService] localStorage key "f1nflow-api-url" is not set. Using default API URL http://localhost:3000'
+      );
+    }
+
+    return resolved;
   }
 
   private resolveProfile(): UserProfile {
@@ -91,7 +104,7 @@ export class SessionService {
       return { telegramId: 'server-render', userName: 'Guest' };
     }
 
-    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const tgUser = (window as TelegramWindow).Telegram?.WebApp?.initDataUnsafe?.user;
 
     if (tgUser?.id) {
       return {

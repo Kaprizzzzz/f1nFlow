@@ -1,9 +1,9 @@
  import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
- import { isPlatformBrowser } from '@angular/common';
- import { HttpClient } from '@angular/common/http';
- import { BehaviorSubject, catchError, EMPTY, Observable, tap } from 'rxjs';
- 
- interface UserProfile {
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, catchError, EMPTY, Observable, tap } from 'rxjs';
+
+interface UserProfile {
   telegramId: string;
   userName: string;
 }
@@ -39,7 +39,7 @@ export class SessionService {
 
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) platformId: Object
+    @Inject(PLATFORM_ID) platformId: object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
     this.apiUrl = this.resolveApiUrl();
@@ -84,7 +84,7 @@ export class SessionService {
 
   private resolveApiUrl(): string {
     if (!this.isBrowser) {
-      return 'http://localhost:3000';
+      return 'http://localhost:3001';
     }
 
     const fromStorageRaw = localStorage.getItem('f1nflow-api-url');
@@ -93,21 +93,21 @@ export class SessionService {
     if (fromStorageRaw && fromStorageRaw !== fromStorage) {
       console.warn('[SessionService] Trimmed spaces from localStorage key "f1nflow-api-url"');
     }
-    const resolved = fromStorage || 'http://localhost:3000';
+    const resolved = fromStorage || '/api';
     const normalized = resolved.endsWith('/') ? resolved.slice(0, -1) : resolved;
 
 
     if (!fromStorage) {
-      console.warn(
-        '[SessionService] localStorage key "f1nflow-api-url" is not set. Using default API URL http://localhost:3000'
+      console.warn('[SessionService] localStorage key "f1nflow-api-url" is not set. Using default API URL /api'
       );
     }
     try {
-      const parsed = new URL(normalized);
-      return parsed.origin;
+      const parsed = new URL(normalized, window.location.origin);
+      const path = parsed.pathname === '/' ? '' : parsed.pathname.replace(/\/$/, '');
+      return `${parsed.origin}${path}`;
     } catch {
-      console.error(`[SessionService] Invalid API URL in localStorage: "${fromStorageRaw}". Falling back to http://localhost:3000`);
-      return 'http://localhost:3000';
+      console.error(`[SessionService] Invalid API URL in localStorage: "${fromStorageRaw}". Falling back to /api`);
+      return `${window.location.origin}/api`;
     }
   }
 

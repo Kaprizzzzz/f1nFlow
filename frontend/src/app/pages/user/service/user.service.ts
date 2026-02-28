@@ -26,7 +26,6 @@ type TelegramWindow = Window & {
 
 @Injectable({ providedIn: 'root' })
 export class SessionService {
-  private readonly apiUrl: string;
   private readonly isBrowser: boolean;
   private readonly fallbackIdKey = 'f1nflow-fallback-telegram-id';
 
@@ -42,16 +41,20 @@ export class SessionService {
     @Inject(PLATFORM_ID) platformId: object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
-    this.apiUrl = this.resolveApiUrl();
-    console.info(`[SessionService] API URL: ${this.apiUrl}`);
-    this.login().subscribe();
+    if (this.isBrowser) {
+      console.info(`[SessionService] API URL: ${this.resolveApiUrl()}`);
+      this.login().subscribe();
+    }
   }
 
   login(): Observable<any> {
+    if (!this.isBrowser) {
+      return EMPTY;
+    }
     const profile = this.resolveProfile();
     this.userSubject.next(profile);
 
-    return this.http.post(`${this.apiUrl}/users/login`, profile).pipe(
+    return this.http.post(`${this.resolveApiUrl()}/users/login`, profile).pipe(
       tap(() => {
         this.sendPresence(true);
         if (this.isBrowser) {
@@ -63,12 +66,15 @@ export class SessionService {
   }
 
   fetchState(telegramId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${telegramId}/state`);
+    return this.http.get(`${this.resolveApiUrl()}/users/${telegramId}/state`);
   }
 
   saveState(telegramId: string, payload: unknown): void {
-    this.http.put(`${this.apiUrl}/users/${telegramId}/state`, payload).pipe(catchError(() => EMPTY)).subscribe();
-  }
+    this.http
+      .put(`${this.resolveApiUrl()}/users/${telegramId}/state`, payload)
+      .pipe(catchError(() => EMPTY))
+      .subscribe();
+   }
 
   sendPresence(isOnline: boolean): void {
     const user = this.userSnapshot;
@@ -77,15 +83,12 @@ export class SessionService {
     }
 
     this.http
-      .patch(`${this.apiUrl}/users/${user.telegramId}/presence`, { isOnline })
+      .patch(`${this.resolveApiUrl()}/users/${user.telegramId}/presence`, { isOnline })
       .pipe(catchError(() => EMPTY))
       .subscribe();
   }
 
   private resolveApiUrl(): string {
-    if (!this.isBrowser) {
-      return 'http://localhost:3001';
-    }
 
     const fromStorageRaw = localStorage.getItem('f1nflow-api-url');
     const fromStorage = fromStorageRaw?.trim();
@@ -112,16 +115,13 @@ export class SessionService {
   }
 
   private resolveProfile(): UserProfile {
-    if (!this.isBrowser) {
-      return { telegramId: 'server-render', userName: 'Guest' };
-    }
 
     const tgUser = (window as TelegramWindow).Telegram?.WebApp?.initDataUnsafe?.user;
-
     if (tgUser?.id) {
+      const tgName = tgUser.username ? `@${tgUser.username}` : tgUser.first_name || `user-${tgUser.id}`;
       return {
         telegramId: String(tgUser.id),
-        userName: tgUser.username || tgUser.first_name || `user-${tgUser.id}`
+        userName: tgName
       };
     }
 

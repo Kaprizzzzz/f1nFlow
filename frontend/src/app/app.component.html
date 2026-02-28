@@ -2,11 +2,12 @@
  
 <div class="app-container" *ngIf="!showSplash">
   <div class="top-controls">
+     <div class="top-spacer" aria-hidden="true"></div>
     <div class="user-strip">
       <span>👤 {{ userName }}</span>
     </div>
  
-    <app-currency-picker></app-currency-picker>
+    <app-currency-picker class="currency-slot"></app-currency-picker>
   </div>
  
   <div class="content">

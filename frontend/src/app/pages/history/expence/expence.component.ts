@@ -137,6 +137,14 @@ export class ExpenceComponent implements OnInit, OnDestroy {
     }
   }
 
+  closeAmountPanel(event?: Event): void {
+    event?.stopPropagation();
+    this.amount = null;
+    if (this.panelMode === 'amount') {
+      this.panelMode = null;
+    }
+  }
+
   addCategory(event: Event): void {
     event.stopPropagation();
     const normalizedName = this.newCategoryName.trim();

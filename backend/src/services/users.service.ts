@@ -1,6 +1,6 @@
  import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
  import { InjectRepository } from '@nestjs/typeorm';
- import { Repository } from 'typeorm';
+ import { QueryFailedError, Repository } from 'typeorm';
  import { User } from '../entities/user.entity';
  import { Transaction } from '../entities/transaction.entity';
 
@@ -39,20 +39,14 @@ interface EnsureUserPayload {
      let user = await this.usersRepository.findOne({ where: { telegramId } });
  
      if (!user) {
-       user = this.usersRepository.create({
-         telegramId,
-         userName,
-         referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
-        lastSeenAt: new Date(),
-        isOnline: true
-       });
+       user = await this.createUserSafely(telegramId, userName);
     } else {
       user.userName = userName || user.userName;
       user.isOnline = true;
       user.lastSeenAt = new Date();
+      user = await this.usersRepository.save(user);
     }
-
-    return this.usersRepository.save(user);
+    return user;
   }
 
   async getUserState(telegramId: string) {
@@ -119,6 +113,31 @@ interface EnsureUserPayload {
     user.lastSeenAt = new Date();
     return this.usersRepository.save(user);
    }
+
+   private async createUserSafely(telegramId: string, userName?: string): Promise<User> {
+    try {
+      return await this.usersRepository.save(
+        this.usersRepository.create({
+          telegramId,
+          userName: userName || `Guest ${telegramId.slice(-4)}`,
+          referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
+          lastSeenAt: new Date(),
+          isOnline: true
+        })
+      );
+    } catch (error) {
+      if (!(error instanceof QueryFailedError) || (error as { code?: string }).code !== '23505') {
+        throw error;
+      }
+
+      const existing = await this.usersRepository.findOne({ where: { telegramId } });
+      if (!existing) {
+        throw error;
+      }
+      return existing;
+    }
+  }
+
    private async ensureUser({ telegramId, userName }: EnsureUserPayload): Promise<User> {
     const existing = await this.usersRepository.findOne({ where: { telegramId } });
     if (existing) {
@@ -129,15 +148,7 @@ interface EnsureUserPayload {
       return existing;
     }
 
-    return this.usersRepository.save(
-      this.usersRepository.create({
-        telegramId,
-        userName: userName || `Guest ${telegramId.slice(-4)}`,
-        referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
-        lastSeenAt: new Date(),
-        isOnline: true
-      })
-    );
+    return this.createUserSafely(telegramId, userName);
   }
 } 
 

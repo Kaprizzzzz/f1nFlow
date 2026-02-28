@@ -87,16 +87,28 @@ export class SessionService {
       return 'http://localhost:3000';
     }
 
-    const fromStorage = localStorage.getItem('f1nflow-api-url');
+    const fromStorageRaw = localStorage.getItem('f1nflow-api-url');
+    const fromStorage = fromStorageRaw?.trim();
+
+    if (fromStorageRaw && fromStorageRaw !== fromStorage) {
+      console.warn('[SessionService] Trimmed spaces from localStorage key "f1nflow-api-url"');
+    }
     const resolved = fromStorage || 'http://localhost:3000';
+    const normalized = resolved.endsWith('/') ? resolved.slice(0, -1) : resolved;
+
 
     if (!fromStorage) {
       console.warn(
         '[SessionService] localStorage key "f1nflow-api-url" is not set. Using default API URL http://localhost:3000'
       );
     }
-
-    return resolved;
+    try {
+      const parsed = new URL(normalized);
+      return parsed.origin;
+    } catch {
+      console.error(`[SessionService] Invalid API URL in localStorage: "${fromStorageRaw}". Falling back to http://localhost:3000`);
+      return 'http://localhost:3000';
+    }
   }
 
   private resolveProfile(): UserProfile {

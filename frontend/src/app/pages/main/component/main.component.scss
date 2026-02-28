@@ -23,7 +23,7 @@
 
 .edit-hex {
   position: absolute;
-  top: 14px;
+  top: 8px;
   left: 14px;
   width: 64px;
   height: 72px;
@@ -51,27 +51,42 @@
 
 .edit-actions {
   position: absolute;
-  top: 16px;
-  left: 92px;
+  top: 84px;
+  left: 14px;
   z-index: 26;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 8px;
 }
 
-.action-btn {
-  border: 1px solid rgba(143, 187, 255, 0.8);
-  background: rgba(8, 18, 36, 0.94);
-  color: #e5efff;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 600;
+.action-hex {
+  width: 64px;
+  height: 72px;
+  border: 2px solid rgba(143, 187, 255, 0.88);
+  background: linear-gradient(180deg, rgba(11, 22, 42, 0.95) 0%, rgba(8, 14, 28, 0.95) 100%);
+  color: #dfeaff;
+  font-weight: 700;
+  font-size: 22px;
+  clip-path: polygon(50% 0%, 92% 25%, 92% 75%, 50% 100%, 8% 75%, 8% 25%);
   cursor: pointer;
+  transition: transform 0.25s ease, opacity 0.25s ease;
   -webkit-app-region: no-drag;
 
   &.secondary {
-    border-color: rgba(255, 179, 122, 0.8);
+    border-color: rgba(255, 179, 122, 0.86);
     color: #ffdcbf;
+  }
+  &.option {
+    transform: translateY(-8px) scale(0.88);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &.option.visible {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 

@@ -49,9 +49,24 @@
       <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
     </div>
 
-    <div class="amount-row" *ngIf="selectedCategoryData && panelMode === 'amount'">
-      <input type="number" [(ngModel)]="amount" placeholder="0.00" inputmode="decimal" min="0.01" step="0.01" />
-      <button type="button" class="small-btn" (click)="saveData()">Save</button>
+    <div class="add-row" *ngIf="!selectedCategoryData">
+      <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
+      <select [(ngModel)]="newCategoryIcon" aria-label="Category icon">
+        <option *ngFor="let icon of emojiOptions" [ngValue]="icon">{{ icon }}</option>
+      </select>
+      <button type="button" class="small-btn" (click)="addCategory($event)">Save</button>
+    </div>
+  </div>
+
+  <div class="amount-modal-backdrop" *ngIf="selectedCategoryData && panelMode === 'amount'" (click)="closeAmountPanel()">
+    <div class="amount-modal" (click)="$event.stopPropagation()">
+      <div class="amount-modal-title">{{ selectedCategoryData?.name }}</div>
+        <input type="number" [(ngModel)]="amount" placeholder="0.00" inputmode="decimal" min="0.01" step="0.01" />
+    
+    <div class="amount-modal-actions">
+        <button type="button" class="small-btn ghost" (click)="closeAmountPanel($event)">Cancel</button>
+        <button type="button" class="small-btn" (click)="saveData()">Save</button>
+      </div>
     </div>
   </div>
 </div>

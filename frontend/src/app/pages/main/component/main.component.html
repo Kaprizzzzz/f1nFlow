@@ -12,8 +12,8 @@
  
    @if (isEditMode) {
      <div class="edit-actions" aria-label="Edit actions">
-       <button type="button" class="action-btn" (click)="saveLayout()">Зберегти</button>
-       <button type="button" class="action-btn secondary" (click)="resetToDefaultLayout()">Дефолт</button>
+      <button type="button" class="action-hex option visible" (click)="saveLayout()" aria-label="Save layout">💾</button>
+       <button type="button" class="action-hex option visible secondary" (click)="resetToDefaultLayout()" aria-label="Reset layout">↺</button>
      </div>
    }
  

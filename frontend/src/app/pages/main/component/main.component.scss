@@ -22,10 +22,10 @@
 }
 
 .layout-controls {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 26;
+  position: fixed;
+  top: 8px;
+  left: calc(50% - min(430px, 100vw) / 2 + 12px);
+  z-index: 1001;
 }
 
 .edit-hex {

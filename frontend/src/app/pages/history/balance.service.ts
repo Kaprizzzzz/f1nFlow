@@ -21,6 +21,16 @@
 export type SphereTab = 'income' | 'expense' | 'saving' | 'news';
 export type SphereLayout = Record<SphereTab, { left: number; top: number }>;
 
+interface PersistedStatePayload {
+  transactions?: Array<Omit<Transaction, 'date'> & { date: string }>;
+  user?: {
+    incomeCategories?: CategoryItem[];
+    expenseCategories?: CategoryItem[];
+    currency?: 'EUR' | 'USD' | 'UAH';
+    sphereLayout?: SphereLayout | null;
+  };
+}
+
  @Injectable({ providedIn: 'root' })
  export class BalanceService {
    private readonly storageKey = 'f1nflow-balance-state';
@@ -57,17 +67,19 @@ export type SphereLayout = Record<SphereTab, { left: number; top: number }>;
 
       this.sessionService.fetchState(user.telegramId).subscribe({
         next: (payload) => {
+          const state = payload as PersistedStatePayload;
+
           this.isHydrating = true;
-          this.transactions = (payload.transactions ?? []).map(
+          this.transactions = (state.transactions ?? []).map(
             (tx: Omit<Transaction, 'date'> & { date: string }) => ({
               ...tx,
               date: new Date(tx.date)
             })
           );
-          this.incomeCategoriesSubject.next(this.normalizeCategories(payload.user.incomeCategories ?? []));
-          this.expenseCategoriesSubject.next(this.normalizeCategories(payload.user.expenseCategories ?? []));
-          this.currencySubject.next((payload.user.currency as 'EUR' | 'USD' | 'UAH') || 'EUR');
-          this.sphereLayoutSubject.next(payload.user.sphereLayout ?? null);
+          this.incomeCategoriesSubject.next(this.normalizeCategories(state.user?.incomeCategories ?? []));
+          this.expenseCategoriesSubject.next(this.normalizeCategories(state.user?.expenseCategories ?? []));
+          this.currencySubject.next(state.user?.currency ?? 'EUR');
+          this.sphereLayoutSubject.next(state.user?.sphereLayout ?? null);
           this.syncBalanceAndTransactions(false);
           this.isHydrating = false;
         },

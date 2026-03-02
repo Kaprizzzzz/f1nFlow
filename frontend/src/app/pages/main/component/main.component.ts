@@ -17,9 +17,10 @@ const DEFAULT_SPHERE_POSITIONS: SphereLayout = {
   news: { top: 336, left: 8 }
 };
 
-const SPHERE_TOP_GAP = 12;
-const SPHERE_BOTTOM_GAP = 24;
-const EDIT_MODE_BOTTOM_GAP = 118;
+const SPHERE_TOP_GAP = 0;
+// Визначає відступ куль від нижньої панелі роутингу (чим більше значення, тим вище кулі над меню).
+const ROUTING_PANEL_BOTTOM_OFFSET = 22;
+const EDIT_MODE_BOTTOM_GAP = ROUTING_PANEL_BOTTOM_OFFSET;
 
 @Component({
   selector: 'app-main',
@@ -158,7 +159,7 @@ export class MainComponent implements OnInit, OnDestroy {
     const nextTop = event.clientY - layoutRect.top - this.dragState.pointerOffsetY;
 
     const maxLeft = Math.max(0, layout.clientWidth - this.dragState.sphereWidth);
-    const maxTop = Math.max(0, layout.clientHeight - this.dragState.sphereHeight - SPHERE_BOTTOM_GAP);
+    const maxTop = Math.max(0, layout.clientHeight - this.dragState.sphereHeight - ROUTING_PANEL_BOTTOM_OFFSET);
     const minTop = SPHERE_TOP_GAP;
 
     this.spherePositions[this.dragState.tab] = {
@@ -195,11 +196,10 @@ export class MainComponent implements OnInit, OnDestroy {
     const sphereElement = this.sphereRefs
       ?.toArray()
       .map((item) => item.nativeElement)
-      .find((item) => item.dataset['tab'] === tab);
+      .find((item) => this.getSphereTab(item) === tab);
 
     const sphereHeight = sphereElement?.offsetHeight ?? 190;
-    const maxTop = Math.max(SPHERE_TOP_GAP, layout.clientHeight - sphereHeight - SPHERE_BOTTOM_GAP);
-
+    const maxTop = Math.max(SPHERE_TOP_GAP, layout.clientHeight - sphereHeight - ROUTING_PANEL_BOTTOM_OFFSET);
     return this.clamp(top, SPHERE_TOP_GAP, maxTop);
   }
 
@@ -227,7 +227,7 @@ export class MainComponent implements OnInit, OnDestroy {
       const centerShift = (tabsOrder.length - 1) / 2;
 
       for (const [index, tab] of tabsOrder.entries()) {
-        const element = sphereElements.find((item) => item.dataset['tab'] === tab);
+        const element = sphereElements.find((item) => this.getSphereTab(item) === tab);
         if (!element) {
           continue;
         }
@@ -237,7 +237,7 @@ export class MainComponent implements OnInit, OnDestroy {
         
         const maxTopAboveTaskbar = Math.max(
           SPHERE_TOP_GAP,
-          maxHeight - sphereHeight - Math.max(EDIT_MODE_BOTTOM_GAP, SPHERE_BOTTOM_GAP)
+          maxHeight - sphereHeight - Math.max(EDIT_MODE_BOTTOM_GAP, ROUTING_PANEL_BOTTOM_OFFSET)
         );
 
         const top = this.clamp(maxTopAboveTaskbar, SPHERE_TOP_GAP, maxTopAboveTaskbar);
@@ -247,6 +247,14 @@ export class MainComponent implements OnInit, OnDestroy {
         this.spherePositions[tab] = { top, left };
       }
     });
+  }
+
+  private getSphereTab(element: HTMLElement): SphereTab | null {
+    const dataTab = element.dataset?.['tab'] ?? element.getAttribute('data-tab');
+    if (dataTab === 'income' || dataTab === 'expense' || dataTab === 'saving' || dataTab === 'news') {
+      return dataTab;
+    }
+    return null;
   }
 
   private clonePositions(positions: Record<SphereTab, SpherePosition>): Record<SphereTab, SpherePosition> {

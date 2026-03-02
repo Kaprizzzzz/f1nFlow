@@ -25,7 +25,7 @@
   left: 12px;
   right: 12px;
   margin: 0;
-  min-height: 30px;
+  min-height: 72px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -34,27 +34,36 @@
 }
 .top-spacer {
   width: 64px;
-  min-height: 30px;
+  min-height: 72px;
 }
 .user-strip {
   position: absolute;
   left: 50%;
-  top: 0;
+  top: 18px;
   transform: translateX(-50%);
   margin: 0;
-  padding: 6px 10px;
-  border: 1px solid rgba(133, 172, 238, 0.35);
-  border-radius: 12px;
-  width: fit-content;
+  padding: 7px 14px;
+  border: 1px solid rgba(133, 172, 238, 0.45);
+  border-radius: 10px;
+  width: max-content;
   max-width: calc(100% - 170px);
   min-height: 30px;
   color: #d9e8ff;
   font-weight: 600;
   font-size: 13px;
-  background: rgba(10, 20, 39, 0.88);
+  letter-spacing: 0.2px;
+  background: linear-gradient(180deg, rgba(15, 27, 52, 0.96) 0%, rgba(8, 14, 28, 0.94) 100%);
+  box-shadow: 0 0 18px rgba(107, 164, 255, 0.2);
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  text-align: center;
+}
+
+.user-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .currency-slot {

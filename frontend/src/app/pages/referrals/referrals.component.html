@@ -1,1 +1,22 @@
-<p>referrals works!</p>
+<section class="transactions-screen">
+  <header class="screen-header">
+    <h2>Історія транзакцій</h2>
+    <p>Останні операції з вашого мініаппу</p>
+  </header>
+
+  <div class="transactions-list" *ngIf="transactions$ | async as transactions">
+    <article class="transaction-card" *ngFor="let tx of transactions; trackBy: trackById">
+      <div class="transaction-main">
+        <span class="transaction-category">{{ tx.category }}</span>
+        <span class="transaction-date">{{ tx.date | date:'dd.MM.yyyy HH:mm' }}</span>
+      </div>
+      <div class="transaction-amount" [class.plus]="tx.type === 'plus'" [class.minus]="tx.type === 'minus'">
+        {{ tx.type === 'plus' ? '+' : '-' }}{{ tx.amount | number:'1.2-2' }}
+      </div>
+    </article>
+
+    <p class="empty-state" *ngIf="transactions.length === 0">
+      Поки немає транзакцій. Додайте перший дохід або витрату на головній сторінці.
+    </p>
+  </div>
+</section>

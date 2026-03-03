@@ -135,7 +135,31 @@ export class SessionService {
     this.login().subscribe();
   }
 
+  private resolveApiUrlFromQuery(): string | null {
+    try {
+      const url = new URL(window.location.href);
+      const queryValue = url.searchParams.get('apiUrl')?.trim();
+      if (!queryValue) {
+        return null;
+      }
+
+      const parsed = new URL(queryValue, window.location.origin);
+      const path = parsed.pathname === '/' ? '' : parsed.pathname.replace(/\/$/, '');
+      const normalized = `${parsed.origin}${path}`;
+      localStorage.setItem(this.apiUrlStorageKey, normalized);
+      return normalized;
+    } catch {
+      return null;
+    }
+  }
+
+
   private resolveApiUrl(): string {
+    const fromQuery = this.resolveApiUrlFromQuery();
+    if (fromQuery) {
+      return fromQuery;
+    }
+    
     const fromStorageRaw = localStorage.getItem(this.apiUrlStorageKey);
     const fromStorage = fromStorageRaw?.trim();
 

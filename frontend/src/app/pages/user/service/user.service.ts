@@ -7,6 +7,7 @@ import { environment } from '../../../../environments/environment';
 interface UserProfile {
   telegramId: string;
   userName: string;
+  initData?: string;
 }
  
 type TelegramWebAppUser = {
@@ -18,6 +19,7 @@ type TelegramWebAppUser = {
 type TelegramWindow = Window & {
   Telegram?: {
     WebApp?: {
+      initData?: string;
       initDataUnsafe?: {
         user?: TelegramWebAppUser;
       };
@@ -65,7 +67,11 @@ export class SessionService {
     const profile = this.resolveProfile();
     this.userSubject.next(profile);
 
-    return this.http.post(`${this.getApiUrl()}/users/login`, profile).pipe(
+    return this.http.post(`${this.getApiUrl()}/users/login`, {
+      telegramId: profile.telegramId,
+      userName: profile.userName,
+      initData: profile.initData
+    }).pipe(
       tap(() => {
         this.sendPresence(true);
         if (!this.hasBeforeUnloadListener) {
@@ -156,13 +162,19 @@ export class SessionService {
     }
   }
 
+  private getTelegramInitData(): string | undefined {
+    const initData = ((window as TelegramWindow).Telegram?.WebApp?.initData || '').trim();
+    return initData || undefined;
+  }
+
   private resolveProfile(): UserProfile {
     const tgUser = (window as TelegramWindow).Telegram?.WebApp?.initDataUnsafe?.user;
     if (tgUser?.id) {
       const tgName = tgUser.username ? `@${tgUser.username}` : tgUser.first_name || `user-${tgUser.id}`;
       return {
         telegramId: String(tgUser.id),
-        userName: tgName
+        userName: tgName,
+        initData: this.getTelegramInitData()
       };
     }
 
@@ -172,6 +184,10 @@ export class SessionService {
       localStorage.setItem(this.fallbackIdKey, localId);
     }
  
-    return { telegramId: localId, userName: `Guest ${localId.slice(-4)}` };
+    return {
+      telegramId: localId,
+      userName: `Guest ${localId.slice(-4)}`,
+      initData: this.getTelegramInitData()
+    };
    }
 }

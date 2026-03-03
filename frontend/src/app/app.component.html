@@ -3,8 +3,10 @@
 <div class="app-container" *ngIf="!showSplash">
   <div class="top-controls">
      <div class="top-spacer" aria-hidden="true"></div>
-    <div class="user-strip">
-      <span>👤 {{ userName }}</span>
+    <div class="user-strip" aria-label="Telegram user nickname">
+      <span class="hex-cap" aria-hidden="true"></span>
+      <span class="user-label">{{ userName }}</span>
+      <span class="hex-cap" aria-hidden="true"></span>
     </div>
  
     <app-currency-picker class="currency-slot"></app-currency-picker>

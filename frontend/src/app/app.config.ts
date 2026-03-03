@@ -3,11 +3,12 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { httpDebugInterceptor } from './core/http-debug.interceptor';
+import { apiInterceptor } from './core/http/api.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(routes),
-    provideHttpClient(withInterceptors([httpDebugInterceptor]))
+    provideHttpClient(withInterceptors([apiInterceptor, httpDebugInterceptor]))
   ]
 };

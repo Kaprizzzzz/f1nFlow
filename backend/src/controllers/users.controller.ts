@@ -1,14 +1,39 @@
-import { Body, Controller, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Headers, Param, Patch, Post, Put } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
+import { TelegramInitDataService } from '../services/telegram-init-data.service';
+
+interface LoginPayload {
+  telegramId?: string;
+  userName?: string;
+  initData?: string;
+}
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+ constructor(
+    private readonly usersService: UsersService,
+    private readonly telegramInitDataService: TelegramInitDataService
+  ) {}
 
   @Post('login')
-  async login(@Body() data: { telegramId: string; userName: string }) {
-    return this.usersService.findOrCreateUser(data.telegramId, data.userName);
+  async login(
+    @Body() data: LoginPayload,
+    @Headers('authorization') authorization?: string,
+    @Headers('x-telegram-init-data') headerInitData?: string
+  ) {
+    const authInitData = authorization?.startsWith('tma ') ? authorization.slice(4) : undefined;
+    const parsedTelegramProfile = this.telegramInitDataService.parse(data?.initData || headerInitData || authInitData);
+
+    const telegramId = parsedTelegramProfile?.telegramId || data.telegramId;
+    const userName = parsedTelegramProfile?.userName || data.userName;
+
+    if (!telegramId) {
+      throw new BadRequestException('telegramId is required for login');
+    }
+
+    return this.usersService.findOrCreateUser(telegramId, userName || `Guest ${telegramId.slice(-4)}`);
   }
+
 
 
   @Get(':telegramId/state')

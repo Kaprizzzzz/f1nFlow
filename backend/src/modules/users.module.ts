@@ -4,10 +4,11 @@
  import { UsersController } from '../controllers/users.controller';
  import { User } from '../entities/user.entity';
  import { Transaction } from '../entities/transaction.entity';
+ import { TelegramInitDataService } from '../services/telegram-init-data.service';
  
  @Module({
   imports: [TypeOrmModule.forFeature([User, Transaction])],
-  providers: [UsersService],
+  providers: [UsersService, TelegramInitDataService],
   controllers: [UsersController],
   exports: [UsersService]
  })

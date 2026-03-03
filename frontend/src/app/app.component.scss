@@ -25,12 +25,13 @@
    left: 12px;
    right: 12px;
    margin: 0;
-   min-height: 72px;
+   min-height: 10px;
    display: flex;
    align-items: flex-start;
    justify-content: space-between;
    gap: 10px;
    z-index: 1200;
+   pointer-events: none;
  }
  .top-spacer {
    width: 64px;
@@ -78,6 +79,7 @@
  
  .currency-slot {
    margin-left: auto;
+   pointer-events: auto;
  }
  
  .content {

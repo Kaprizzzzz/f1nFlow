@@ -88,7 +88,10 @@ $income-glow: #62b5ff;
 
 .add-category-circle {
   left: 0;
-  top: -196px;
+  top: 196px;
+  width: 68px;
+  height: 68px;
+  font-size: 30px;
   border-style: dashed;
   font-weight: 700;
 }

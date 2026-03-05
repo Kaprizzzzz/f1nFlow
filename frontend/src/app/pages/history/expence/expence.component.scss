@@ -34,6 +34,9 @@ $expense-glow: #ffb060;
     .label { font-size: 32px; }
     .value { font-size: 60px; }
   }
+  &.active {
+    padding-top: 70px;
+  }
 }
 
 .sticker-row {

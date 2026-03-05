@@ -7,7 +7,7 @@ $income-glow: #62b5ff;
   align-items: center;
   width: max-content;
   max-width: none;
-  padding-top: 70px;
+  padding-top: 0;
 
   .main-circle {
     width: 220px;
@@ -44,6 +44,10 @@ $income-glow: #62b5ff;
     .value {
       font-size: 46px;
     }
+  }
+
+  &.active {
+    padding-top: 70px;
   }
 }
 

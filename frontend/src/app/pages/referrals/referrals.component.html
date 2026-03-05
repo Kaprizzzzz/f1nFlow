@@ -1,22 +1,34 @@
-<section class="transactions-screen">
+<section class="referrals-screen">
   <header class="screen-header">
-    <h2>Історія транзакцій</h2>
-    <p>Останні операції з вашого мініаппу</p>
+    <h2>Реферали</h2>
+    <p>Список людей, яких ви запросили, та Топ-100 за кількістю рефералів.</p>
   </header>
 
-  <div class="transactions-list" *ngIf="transactions$ | async as transactions">
-    <article class="transaction-card" *ngFor="let tx of transactions; trackBy: trackById">
-      <div class="transaction-main">
-        <span class="transaction-category">{{ tx.category }}</span>
-        <span class="transaction-date">{{ tx.date | date:'dd.MM.yyyy HH:mm' }}</span>
-      </div>
-      <div class="transaction-amount" [class.plus]="tx.type === 'plus'" [class.minus]="tx.type === 'minus'">
-        {{ tx.type === 'plus' ? '+' : '-' }}{{ tx.amount | number:'1.2-2' }}
-      </div>
-    </article>
+   <section class="card-block">
+    <h3>Запрошені вами</h3>
+    <div class="list" *ngIf="invitedPeople.length; else emptyInvited">
+      <article class="list-item" *ngFor="let person of invitedPeople; trackBy: trackById">
+        <div>
+          <div class="name">{{ person.name }}</div>
+          <div class="meta">Приєднався: {{ person.joinedAt | date:'dd.MM.yyyy' }}</div>
+        </div>
+        <div class="count">{{ person.referralsCount }}</div>
+      </article>
+    </div>
+    <ng-template #emptyInvited>
+      <p class="empty-state">У вас поки немає запрошених рефералів.</p>
+    </ng-template>
+  </section>
 
-    <p class="empty-state" *ngIf="transactions.length === 0">
-      Поки немає транзакцій. Додайте перший дохід або витрату на головній сторінці.
-    </p>
-  </div>
+    <section class="card-block">
+    <h3>Топ-100 рефералів</h3>
+    <div class="list compact">
+      <article class="list-item" *ngFor="let person of topReferrers; let i = index; trackBy: trackById">
+        <div>
+          <div class="name">#{{ i + 1 }} {{ person.name }}</div>
+        </div>
+        <div class="count">{{ person.referralsCount }}</div>
+      </article>
+    </div>
+  </section>
 </section>

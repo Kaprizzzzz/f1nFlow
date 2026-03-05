@@ -4,9 +4,9 @@
       <span class="value">{{ displayValue | number:'1.2-2' }}</span>
     </div>
   
-   <div class="sticker-row" *ngIf="isFullView && categories.length" (click)="$event.stopPropagation()">
-      <button
-        *ngFor="let category of categories; let i = index"
+   <div class="sticker-row" *ngIf="isFullView" (click)="$event.stopPropagation()">
+    <button
+      *ngFor="let category of categories; let i = index"
         type="button"
         class="mini-circle"
         [class.selected]="category.name === selectedCategory"
@@ -25,6 +25,7 @@
       >
         {{ category.icon || '📁' }}
       </button>
+      <button type="button" class="mini-circle add-category-circle" (click)="openCreateCategory($event)">+</button>
     </div>
   
     <div class="panel" *ngIf="isFullView && showCategoryPanel" (click)="$event.stopPropagation()">
@@ -49,14 +50,6 @@
         <button type="button" class="small-btn" (click)="saveEdit($event)">Save</button>
         <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
       </div>
-
-      <div class="add-row" *ngIf="!selectedCategoryData">
-         <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
-        <select [(ngModel)]="newCategoryIcon" aria-label="Category icon">
-          <option *ngFor="let icon of emojiOptions" [ngValue]="icon">{{ icon }}</option>
-        </select>
-        <button type="button" class="small-btn" (click)="addCategory($event)">Save</button>
-      </div>
     </div>
 
      <div class="amount-modal-backdrop" *ngIf="selectedCategoryData && panelMode === 'amount'" (click)="closeAmountPanel()">
@@ -69,5 +62,17 @@
         </div>
       </div>
     </div>
-    
+     <div class="category-modal-backdrop" *ngIf="isCreateCategoryOpen" (click)="closeCreateCategory()">
+      <div class="category-modal" (click)="$event.stopPropagation()">
+        <div class="amount-modal-title">Create category</div>
+        <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
+        <select [(ngModel)]="newCategoryIcon" aria-label="Category icon">
+          <option *ngFor="let icon of emojiOptions" [ngValue]="icon">{{ icon }}</option>
+        </select>
+        <div class="amount-modal-actions">
+          <button type="button" class="small-btn ghost" (click)="closeCreateCategory($event)">Cancel</button>
+          <button type="button" class="small-btn" (click)="addCategory($event)">Save</button>
+        </div>
+      </div>
+    </div>
  </div>

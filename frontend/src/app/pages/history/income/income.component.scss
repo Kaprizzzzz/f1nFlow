@@ -86,8 +86,15 @@ $income-glow: #62b5ff;
   }
 }
 
+.add-category-circle {
+  left: 0;
+  top: -196px;
+  border-style: dashed;
+  font-weight: 700;
+}
+
 .panel {
-  margin-top: 56px;
+  margin-top: 72px;
   width: 330px;
   display: grid;
   gap: 8px;
@@ -199,6 +206,7 @@ select {
 
 .amount-modal {
   width: min(320px, 100%);
+  transform: translateY(-84px);
   background: rgba(8, 17, 34, 0.96);
   border: 1px solid rgba($income-glow, 0.6);
   border-radius: 16px;
@@ -218,4 +226,12 @@ select {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+.category-modal-backdrop {
+  @extend .amount-modal-backdrop;
+}
+
+.category-modal {
+  @extend .amount-modal;
 }

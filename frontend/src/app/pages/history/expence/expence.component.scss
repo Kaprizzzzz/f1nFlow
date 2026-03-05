@@ -72,6 +72,13 @@ $expense-glow: #ffb060;
   }
 }
 
+.add-category-circle {
+  left: 0;
+  top: -196px;
+  border-style: dashed;
+  font-weight: 700;
+}
+
 .panel {
   margin-top: 75px;
   width: 330px;
@@ -80,7 +87,6 @@ $expense-glow: #ffb060;
 }
 
 .selected-card,
-.add-row,
 .edit-row,
 .amount-row {
   background: rgba(27, 13, 4, 0.9);
@@ -129,12 +135,6 @@ $expense-glow: #ffb060;
   background: rgba(87, 22, 34, 0.85);
 }
 
-.add-row {
-  display: grid;
-  grid-template-columns: 1.4fr auto auto;
-  gap: 8px;
-}
-
 .edit-row {
   display: grid;
   grid-template-columns: 1fr auto auto;
@@ -173,6 +173,7 @@ select {
 
 .amount-modal {
   width: min(320px, 100%);
+  transform: translateY(-84px);
   background: rgba(27, 13, 4, 0.96);
   border: 1px solid rgba($expense-glow, 0.6);
   border-radius: 16px;
@@ -192,4 +193,12 @@ select {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+.category-modal-backdrop {
+  @extend .amount-modal-backdrop;
+}
+
+.category-modal {
+  @extend .amount-modal;
 }

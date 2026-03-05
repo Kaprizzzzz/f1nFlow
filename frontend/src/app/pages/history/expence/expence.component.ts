@@ -32,6 +32,7 @@ export class ExpenceComponent implements OnInit, OnDestroy {
   editModeCategory = '';
   panelMode: PanelMode = null;
   editedCategoryName = '';
+  isCreateCategoryOpen = false;
   dragCategoryIndex: number | null = null;
   pointerDragIndex: number | null = null;
   pointerHoverIndex: number | null = null;
@@ -148,11 +149,23 @@ export class ExpenceComponent implements OnInit, OnDestroy {
   addCategory(event: Event): void {
     event.stopPropagation();
     const normalizedName = this.newCategoryName.trim();
-    if (!normalizedName || this.selectedCategory) return;
+    if (!normalizedName) return;
 
     this.balanceService.addCategory('minus', normalizedName, this.newCategoryIcon);
     this.newCategoryName = '';
     this.newCategoryIcon = this.emojiOptions[0];
+     this.isCreateCategoryOpen = false;
+  }
+
+  openCreateCategory(event: Event): void {
+    event.stopPropagation();
+    this.isCreateCategoryOpen = true;
+    this.panelMode = null;
+  }
+
+  closeCreateCategory(event?: Event): void {
+    event?.stopPropagation();
+    this.isCreateCategoryOpen = false;
   }
 
   onMiniPointerDown(index: number, event: PointerEvent): void {

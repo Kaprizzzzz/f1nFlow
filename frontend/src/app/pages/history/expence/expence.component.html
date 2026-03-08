@@ -44,10 +44,16 @@
       </div>
     </div>
 
-    <div class="edit-row" *ngIf="editModeCategory && panelMode === 'name'">
+    </div>
+
+  <div class="amount-modal-backdrop" *ngIf="editModeCategory && panelMode === 'name'" (click)="cancelEdit($event)">
+    <div class="amount-modal" (click)="$event.stopPropagation()">
+      <div class="amount-modal-title">Edit category name</div>
       <input type="text" [(ngModel)]="editedCategoryName" placeholder="New category name" />
-      <button type="button" class="small-btn" (click)="saveEdit($event)">Save</button>
-      <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
+      <div class="amount-modal-actions">
+        <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
+        <button type="button" class="small-btn" (click)="saveEdit($event)">Save</button>
+      </div>
     </div>
   </div>
 

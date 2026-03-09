@@ -166,8 +166,11 @@
 }
 
 .content,
-.top-controls,
 .bottom-nav {
   position: relative;
   z-index: 1;
+}
+
+.top-controls {
+  z-index: 1200;
 }

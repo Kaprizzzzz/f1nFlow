@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ExpenceComponent } from '../../history/expence/expence.component';
@@ -77,6 +77,25 @@ export class MainComponent implements OnInit, OnDestroy {
       return;
     }
     this.activeTab = this.activeTab === tab ? null : tab;
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeActiveTabOnOutsideClick(event: MouseEvent): void {
+    if (this.isEditMode || this.activeTab === null) {
+      return;
+    }
+
+    const target = event.target as HTMLElement | null;
+    if (!target) {
+      return;
+    }
+
+    const clickedSphere = target.closest('.sphere-wrapper') as HTMLElement | null;
+    if (clickedSphere?.dataset['tab'] === this.activeTab) {
+      return;
+    }
+
+    this.activeTab = null;
   }
 
   toggleEditMode(): void {

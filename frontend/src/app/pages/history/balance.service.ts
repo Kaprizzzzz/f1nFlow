@@ -133,18 +133,16 @@ interface PersistedStatePayload {
 
     try {
       const conversionRate = await this.fetchConversionRate(currentCurrency, currency);
-      if (!conversionRate) {
-        return;
-      }
+      const safeRate = conversionRate ?? 1;
 
       this.transactions = this.transactions.map((transaction) => ({
         ...transaction,
-        amount: this.roundToCents(transaction.amount * conversionRate)
+        amount: this.roundToCents(transaction.amount * safeRate)
       }));
 
-      this.incomeCategoriesSubject.next(this.scaleCategories(this.incomeCategoriesSubject.value, conversionRate));
-      this.expenseCategoriesSubject.next(this.scaleCategories(this.expenseCategoriesSubject.value, conversionRate));
-      this.balanceSubject.next(this.roundToCents(this.balanceSubject.value * conversionRate));
+      this.incomeCategoriesSubject.next(this.scaleCategories(this.incomeCategoriesSubject.value, safeRate));
+      this.expenseCategoriesSubject.next(this.scaleCategories(this.expenseCategoriesSubject.value, safeRate));
+      this.balanceSubject.next(this.roundToCents(this.balanceSubject.value * safeRate));
       this.currencySubject.next(currency);
       this.syncBalanceAndTransactions(false);
     } finally {
@@ -366,6 +364,21 @@ interface PersistedStatePayload {
     }));
   }
 
+  private getFallbackRate(
+    fromCurrency: 'EUR' | 'USD' | 'UAH',
+    toCurrency: 'EUR' | 'USD' | 'UAH'
+  ): number {
+    const ratesInUsd: Record<'EUR' | 'USD' | 'UAH', number> = {
+      USD: 1,
+      EUR: 1.09,
+      UAH: 1 / 41
+    };
+
+    const fromInUsd = ratesInUsd[fromCurrency];
+    const toInUsd = ratesInUsd[toCurrency];
+    return fromInUsd / toInUsd;
+  }
+
   private async fetchConversionRate(
     fromCurrency: 'EUR' | 'USD' | 'UAH',
     toCurrency: 'EUR' | 'USD' | 'UAH'
@@ -382,17 +395,17 @@ interface PersistedStatePayload {
     try {
       const response = await fetch(endpoint.toString());
       if (!response.ok) {
-        return null;
+        return this.getFallbackRate(fromCurrency, toCurrency);
       }
 
       const payload = (await response.json()) as { result?: number };
       if (!Number.isFinite(payload.result) || !payload.result || payload.result <= 0) {
-        return null;
+        return this.getFallbackRate(fromCurrency, toCurrency);
       }
 
       return payload.result;
     } catch {
-      return null;
+      return this.getFallbackRate(fromCurrency, toCurrency);
     }
   }
  }

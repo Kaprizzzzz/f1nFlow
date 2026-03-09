@@ -49,11 +49,11 @@ export class GoalsComponent implements OnInit, OnDestroy {
   }
 
   recalculate(): void {
-    const start = new Date(this.periodStart);
-    const end = new Date(this.periodEnd);
+    const start = this.parseInputDate(this.periodStart);
+    const end = this.parseInputDate(this.periodEnd);
     const msPerDay = 1000 * 60 * 60 * 24;
 
-    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) {
+    if (!start || !end || end < start) {
       this.periodSpent = 0;
       this.spentPerDay = 0;
       this.spentPerWeek = 0;
@@ -62,19 +62,33 @@ export class GoalsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const daysInRange = Math.max(1, Math.floor((end.getTime() - start.getTime()) / msPerDay) + 1);
+    const endInclusive = new Date(end);
+    endInclusive.setHours(23, 59, 59, 999);
+
+    const daysInRange = Math.max(1, Math.floor((endInclusive.getTime() - start.getTime()) / msPerDay) + 1);
 
     this.periodSpent = this.transactions
-      .filter((item) => item.type === 'minus' && item.date >= start && item.date <= end)
+      .filter((item) => item.type === 'minus' && item.date >= start && item.date <= endInclusive)
       .reduce((sum, item) => sum + item.amount, 0);
 
     this.spentPerDay = this.periodSpent / daysInRange;
     this.spentPerWeek = this.spentPerDay * 7;
     this.spentPerMonth = this.spentPerDay * 30;
 
-    const deadlineDate = new Date(this.deadline);
-    const daysToDeadline = Math.max(1, Math.ceil((deadlineDate.getTime() - Date.now()) / msPerDay));
+    const deadlineDate = this.parseInputDate(this.deadline);
+    const daysToDeadline = deadlineDate
+      ? Math.max(1, Math.ceil((deadlineDate.getTime() - Date.now()) / msPerDay))
+      : 1;
     this.safeSpendPerDay = this.currentBalance > 0 ? this.currentBalance / daysToDeadline : 0;
+  }
+
+   private parseInputDate(value: string): Date | null {
+    const [year, month, day] = value.split('-').map((part) => Number(part));
+    if (!year || !month || !day) {
+      return null;
+    }
+
+    return new Date(year, month - 1, day);
   }
 
   private toInputDate(date: Date): string {

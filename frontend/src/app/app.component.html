@@ -1,6 +1,8 @@
 <app-loading *ngIf="showSplash"></app-loading>
  
 <div class="app-container" *ngIf="!showSplash">
+  <div class="app-bg-orb one" aria-hidden="true"></div>
+  <div class="app-bg-orb two" aria-hidden="true"></div>
   <div class="top-controls">
      <div class="top-spacer" aria-hidden="true"></div>
     <div class="user-strip" aria-label="Telegram user nickname">
@@ -21,13 +23,13 @@
       <span class="icon">🏠</span>
       <span>Main</span>
     </a>
-    <a routerLink="/referrals" routerLinkActive="active">
-      <span class="icon">👥</span>
-      <span>Referrals</span>
-    </a>
     <a routerLink="/goals" routerLinkActive="active">
       <span class="icon">🎯</span>
       <span>Goals</span>
+    </a>
+    <a routerLink="/referrals" routerLinkActive="active">
+      <span class="icon">👥</span>
+      <span>Referrals</span>
     </a>
     <a routerLink="/about" routerLinkActive="active">
       <span class="icon">ⓘ</span>

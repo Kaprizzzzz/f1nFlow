@@ -44,6 +44,7 @@ interface PersistedStatePayload {
    private sphereLayoutSubject = new BehaviorSubject<SphereLayout | null>(null);
  
    private isHydrating = false;
+   private isCurrencyConverting = false;
  
    balance$ = this.balanceSubject.asObservable();
    transactions$ = new BehaviorSubject<Transaction[]>([]);
@@ -122,9 +123,33 @@ interface PersistedStatePayload {
      this.syncBalanceAndTransactions();
    }
  
-  setCurrency(currency: 'EUR' | 'USD' | 'UAH'): void {
-    this.currencySubject.next(currency);
-    this.persistState();
+  async setCurrency(currency: 'EUR' | 'USD' | 'UAH'): Promise<void> {
+    const currentCurrency = this.currencySubject.value;
+    if (currency === currentCurrency || this.isCurrencyConverting) {
+      return;
+    }
+
+    this.isCurrencyConverting = true;
+
+    try {
+      const conversionRate = await this.fetchConversionRate(currentCurrency, currency);
+      if (!conversionRate) {
+        return;
+      }
+
+      this.transactions = this.transactions.map((transaction) => ({
+        ...transaction,
+        amount: this.roundToCents(transaction.amount * conversionRate)
+      }));
+
+      this.incomeCategoriesSubject.next(this.scaleCategories(this.incomeCategoriesSubject.value, conversionRate));
+      this.expenseCategoriesSubject.next(this.scaleCategories(this.expenseCategoriesSubject.value, conversionRate));
+      this.balanceSubject.next(this.roundToCents(this.balanceSubject.value * conversionRate));
+      this.currencySubject.next(currency);
+      this.syncBalanceAndTransactions(false);
+    } finally {
+      this.isCurrencyConverting = false;
+    }
   }
 
   setSphereLayout(layout: SphereLayout): void {
@@ -334,4 +359,40 @@ interface PersistedStatePayload {
        icon: item.icon || '📁'
      }));
    }
+   private scaleCategories(categories: CategoryItem[], rate: number): CategoryItem[] {
+    return categories.map((item) => ({
+      ...item,
+      amount: this.roundToCents(item.amount * rate)
+    }));
+  }
+
+  private async fetchConversionRate(
+    fromCurrency: 'EUR' | 'USD' | 'UAH',
+    toCurrency: 'EUR' | 'USD' | 'UAH'
+  ): Promise<number | null> {
+    if (!this.isBrowser) {
+      return null;
+    }
+
+    const endpoint = new URL('https://api.exchangerate.host/convert');
+    endpoint.searchParams.set('from', fromCurrency);
+    endpoint.searchParams.set('to', toCurrency);
+    endpoint.searchParams.set('amount', '1');
+
+    try {
+      const response = await fetch(endpoint.toString());
+      if (!response.ok) {
+        return null;
+      }
+
+      const payload = (await response.json()) as { result?: number };
+      if (!Number.isFinite(payload.result) || !payload.result || payload.result <= 0) {
+        return null;
+      }
+
+      return payload.result;
+    } catch {
+      return null;
+    }
+  }
  }

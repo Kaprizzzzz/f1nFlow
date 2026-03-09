@@ -43,7 +43,7 @@
    }
  
    pick(currency: Currency): void {
-    this.balanceService.setCurrency(currency);
+    void this.balanceService.setCurrency(currency);
      this.isOpen = false;
    }
  

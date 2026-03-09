@@ -14,7 +14,7 @@ import { BalanceService, Transaction } from '../history/balance.service';
 export class GoalsComponent implements OnInit, OnDestroy {
   periodStart = this.getDateOffset(30);
   periodEnd = this.toInputDate(new Date());
-  deadline = this.getDateOffset(14);
+  deadline = this.toInputDate(new Date());
 
   periodSpent = 0;
   spentPerDay = 0;

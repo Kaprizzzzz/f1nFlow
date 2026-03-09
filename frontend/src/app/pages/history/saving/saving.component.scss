@@ -35,11 +35,14 @@ $saving-glow: #63ffd0;
     }
 
     .value {
-      font-size: 28px;
+      font-size: clamp(16px, 6vw, 28px);
       font-weight: 600;
       line-height: 1;
       margin-top: 6px;
       transition: font-size 0.35s ease;
+      max-width: 84%;
+      text-align: center;
+      overflow: hidden;
     }
   }
 
@@ -54,7 +57,7 @@ $saving-glow: #63ffd0;
       }
 
       .value {
-        font-size: 40px;
+        font-size: clamp(18px, 8vw, 40px);
       }
     }
   }

@@ -1,28 +1,28 @@
 <section class="referrals-screen">
   <header class="screen-header">
-    <h2>Реферали</h2>
-    <p>Список людей, яких ви запросили, та Топ-100 за кількістю рефералів.</p>
+    <h2>Referrals</h2>
   </header>
 
-   <section class="card-block">
-    <h3>Запрошені вами</h3>
-    <div class="list" *ngIf="invitedPeople.length; else emptyInvited">
+    <section class="card-block">
+     <h3>People you invited</h3>
+     <p class="section-description">This is the list of users who joined with your referral code.</p>
+     <div class="list" *ngIf="invitedPeople.length; else emptyInvited">
       <article class="list-item" *ngFor="let person of invitedPeople; trackBy: trackById">
         <div>
           <div class="name">{{ person.name }}</div>
-          <div class="meta">Приєднався: {{ person.joinedAt | date:'dd.MM.yyyy' }}</div>
+          <div class="meta">Joined: {{ person.joinedAt | date:'dd.MM.yyyy' }}</div>
         </div>
-        <div class="count">{{ person.referralsCount }}</div>
       </article>
     </div>
     <ng-template #emptyInvited>
-      <p class="empty-state">У вас поки немає запрошених рефералів.</p>
+      <p class="empty-state">You do not have invited referrals yet.</p>
     </ng-template>
   </section>
 
     <section class="card-block">
-    <h3>Топ-100 рефералів</h3>
-    <div class="list compact">
+    <h3>Top 100 users by referrals</h3>
+    <p class="section-description">Leaderboard based only on real referral records from the database.</p>
+    <div class="list compact" *ngIf="topReferrers.length; else emptyTop">
       <article class="list-item" *ngFor="let person of topReferrers; let i = index; trackBy: trackById">
         <div>
           <div class="name">#{{ i + 1 }} {{ person.name }}</div>
@@ -30,5 +30,23 @@
         <div class="count">{{ person.referralsCount }}</div>
       </article>
     </div>
+    <ng-template #emptyTop>
+      <p class="empty-state">No referral leaderboard data yet.</p>
+    </ng-template>
+  </section>
+
+  <section class="card-block">
+    <h3>Your personal invite link</h3>
+    <p class="section-description">Copy and share it directly with Telegram or Viber.</p>
+
+    <div class="invite-link-box">{{ inviteLink || 'Loading...' }}</div>
+
+    <div class="share-row">
+      <button type="button" class="share-btn" (click)="copyInviteLink()">Copy link</button>
+      <a class="share-square" [href]="getTelegramShareLink()" target="_blank" rel="noopener noreferrer" aria-label="Share to Telegram">TG</a>
+      <a class="share-square" [href]="getViberShareLink()" aria-label="Share to Viber">V</a>
+    </div>
+
+    <p class="copy-status" *ngIf="copyStatus">{{ copyStatus }}</p>
   </section>
 </section>

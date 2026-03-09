@@ -21,6 +21,7 @@ interface SaveStatePayload {
 interface EnsureUserPayload {
   telegramId: string;
   userName?: string;
+  referredBy?: string;
 }  
 
  @Injectable()
@@ -32,14 +33,14 @@ interface EnsureUserPayload {
     private transactionsRepository: Repository<Transaction>
    ) {}
  
-   async findOrCreateUser(telegramId: string, userName: string): Promise<User> {
+   async findOrCreateUser(telegramId: string, userName: string, referredBy?: string): Promise<User> {
     if (telegramId === 'server-render') {
       throw new BadRequestException('Cannot create user for server-render profile');
     }
      let user = await this.usersRepository.findOne({ where: { telegramId } });
  
      if (!user) {
-       user = await this.createUserSafely(telegramId, userName);
+       user = await this.createUserSafely(telegramId, userName, referredBy);
     } else {
       user.userName = userName || user.userName;
       user.isOnline = true;
@@ -114,13 +115,60 @@ interface EnsureUserPayload {
     return this.usersRepository.save(user);
    }
 
-   private async createUserSafely(telegramId: string, userName?: string): Promise<User> {
+   async getReferralOverview(telegramId: string) {
+    const user = await this.ensureUser({ telegramId });
+
+    const invitedPeople = await this.usersRepository.find({
+      where: [{ referredBy: user.referralCode }, { referredBy: user.id }],
+      order: { firstSeenAt: 'DESC' }
+    });
+
+    const topRows = await this.usersRepository
+      .createQueryBuilder('user')
+      .select('user.referredBy', 'referrer')
+      .addSelect('COUNT(user.id)', 'referralsCount')
+      .where('user.referredBy IS NOT NULL')
+      .andWhere("TRIM(user.referredBy) <> ''")
+      .groupBy('user.referredBy')
+      .orderBy('COUNT(user.id)', 'DESC')
+      .limit(100)
+      .getRawMany<{ referrer: string; referralsCount: string }>();
+
+    const topReferrers = await Promise.all(
+      topRows.map(async (row) => {
+        const referrerUser = await this.usersRepository.findOne({
+          where: [{ referralCode: row.referrer }, { id: row.referrer }]
+        });
+
+        return {
+          id: referrerUser?.id || `external-${row.referrer}`,
+          name: referrerUser?.userName || `User ${row.referrer.slice(0, 6)}`,
+          joinedAt: referrerUser?.firstSeenAt || new Date(),
+          referralsCount: Number(row.referralsCount)
+        };
+      })
+    );
+
+    return {
+      referralCode: user.referralCode,
+      invitedPeople: invitedPeople.map((person) => ({
+        id: person.id,
+        name: person.userName || `User ${person.telegramId.slice(-4)}`,
+        joinedAt: person.firstSeenAt,
+        referralsCount: 0
+      })),
+      topReferrers
+    };
+  }
+
+   private async createUserSafely(telegramId: string, userName?: string, referredBy?: string): Promise<User> {
     try {
       return await this.usersRepository.save(
         this.usersRepository.create({
           telegramId,
           userName: userName || `Guest ${telegramId.slice(-4)}`,
           referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
+          referredBy: referredBy?.trim() || null,
           lastSeenAt: new Date(),
           isOnline: true
         })
@@ -138,7 +186,7 @@ interface EnsureUserPayload {
     }
   }
 
-   private async ensureUser({ telegramId, userName }: EnsureUserPayload): Promise<User> {
+   private async ensureUser({ telegramId, userName, referredBy }: EnsureUserPayload): Promise<User> {
     const existing = await this.usersRepository.findOne({ where: { telegramId } });
     if (existing) {
       if (userName && existing.userName !== userName) {
@@ -148,7 +196,7 @@ interface EnsureUserPayload {
       return existing;
     }
 
-    return this.createUserSafely(telegramId, userName);
+    return this.createUserSafely(telegramId, userName, referredBy);
   }
 } 
 

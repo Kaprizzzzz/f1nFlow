@@ -25,7 +25,7 @@ export type SphereLayout = Record<'income' | 'expense' | 'saving' | 'news', { le
    referralCode: string;
  
    @Column({ nullable: true })
-   referredBy: string;
+   referredBy: string | null;
  
   @Column({ default: 'EUR' })
   currency: string;

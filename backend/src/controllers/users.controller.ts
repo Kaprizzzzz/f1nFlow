@@ -6,6 +6,7 @@ interface LoginPayload {
   telegramId?: string;
   userName?: string;
   initData?: string;
+  referredBy?: string;
 }
 
 @Controller('users')
@@ -31,8 +32,8 @@ export class UsersController {
       throw new BadRequestException('telegramId is required for login');
     }
 
-    return this.usersService.findOrCreateUser(telegramId, userName || `Guest ${telegramId.slice(-4)}`);
-  }
+    return this.usersService.findOrCreateUser(telegramId, userName || `Guest ${telegramId.slice(-4)}`, data?.referredBy); 
+}
 
 
 
@@ -65,5 +66,9 @@ export class UsersController {
   @Patch(':telegramId/presence')
   async setPresence(@Param('telegramId') telegramId: string, @Body() payload: { isOnline: boolean }) {
     return this.usersService.updatePresence(telegramId, payload.isOnline);
+  }
+  @Get(':telegramId/referrals')
+    async getReferrals(@Param('telegramId') telegramId: string) {
+      return this.usersService.getReferralOverview(telegramId);
   }
 }

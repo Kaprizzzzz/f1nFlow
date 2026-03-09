@@ -1,5 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { SessionService } from '../user/service/user.service';
 
 
 interface ReferralPerson {
@@ -7,6 +10,12 @@ interface ReferralPerson {
   name: string;
   joinedAt: Date;
   referralsCount: number;
+}
+
+interface ReferralOverviewPayload {
+  referralCode: string;
+  invitedPeople: ReferralPerson[];
+  topReferrers: ReferralPerson[];
 }
 
 @Component({
@@ -17,26 +26,79 @@ interface ReferralPerson {
   styleUrl: './referrals.component.scss'
 })
 
+export class ReferralsComponent implements OnInit, OnDestroy {
+  invitedPeople: ReferralPerson[] = [];
+  topReferrers: ReferralPerson[] = [];
+  inviteLink = '';
+  copyStatus = '';
 
-export class ReferralsComponent {
-  readonly invitedPeople: ReferralPerson[] = [
-    { id: 'inv-1', name: 'Олексій', joinedAt: new Date('2026-01-18T11:20:00'), referralsCount: 4 },
-    { id: 'inv-2', name: 'Марина', joinedAt: new Date('2026-01-26T09:05:00'), referralsCount: 2 },
-    { id: 'inv-3', name: 'Ігор', joinedAt: new Date('2026-02-04T15:45:00'), referralsCount: 1 },
-    { id: 'inv-4', name: 'Катерина', joinedAt: new Date('2026-02-20T18:30:00'), referralsCount: 6 }
-  ];
+  private subscription = new Subscription();
 
-  readonly topReferrers: ReferralPerson[] = this.buildTopReferrers();
+  constructor(
+    private readonly sessionService: SessionService,
+    private readonly http: HttpClient
+  ) {}
+
+  ngOnInit(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+this.subscription.add(
+      this.sessionService.user$.subscribe((user) => {
+        if (!user) {
+          return;
+        }
+
+  const baseUrl = `${window.location.origin}${window.location.pathname}`;
+
+        this.http
+          .get<ReferralOverviewPayload>(`${this.getApiUrl()}/users/${user.telegramId}/referrals`)
+          .subscribe((data) => {
+            this.invitedPeople = data.invitedPeople.map((item) => ({
+              ...item,
+              joinedAt: new Date(item.joinedAt)
+            }));
+            this.topReferrers = data.topReferrers.map((item) => ({
+              ...item,
+              joinedAt: new Date(item.joinedAt)
+            }));
+            this.inviteLink = `${baseUrl}?ref=${encodeURIComponent(data.referralCode)}`;
+          });
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 
   trackById(_: number, item: ReferralPerson): string {
     return item.id;
   }
-  private buildTopReferrers(): ReferralPerson[] {
-    return Array.from({ length: 100 }, (_, index) => ({
-      id: `top-${index + 1}`,
-      name: `User #${index + 1}`,
-      joinedAt: new Date('2026-01-01T00:00:00'),
-      referralsCount: 220 - index
-    }));
+  async copyInviteLink(): Promise<void> {
+    if (!this.inviteLink || typeof navigator === 'undefined' || !navigator.clipboard) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(this.inviteLink);
+    this.copyStatus = 'Copied!';
+    setTimeout(() => (this.copyStatus = ''), 2200);
+  }
+
+  getTelegramShareLink(): string {
+    return `https://t.me/share/url?url=${encodeURIComponent(this.inviteLink)}&text=${encodeURIComponent('Join me on F1nFlow!')}`;
+  }
+
+  getViberShareLink(): string {
+    return `viber://forward?text=${encodeURIComponent(`Join me on F1nFlow: ${this.inviteLink}`)}`;
+  }
+
+  private getApiUrl(): string {
+    if (typeof localStorage === 'undefined') {
+      return 'http://localhost:3000';
+    }
+    const fromStorage = localStorage.getItem('f1nflow-api-url')?.trim();
+    return (fromStorage || 'http://localhost:3000').replace(/\/$/, '');
   }
 }

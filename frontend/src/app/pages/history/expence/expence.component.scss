@@ -26,13 +26,21 @@ $expense-glow: #ffb060;
     z-index: 2;
 
     .label { font-size: 22px; opacity: 0.95; }
-    .value { font-size: 44px; font-weight: 600; line-height: 1; margin-top: 8px; }
+    .value {
+      font-size: clamp(20px, 7.5vw, 44px);
+      font-weight: 600;
+      line-height: 1;
+      margin-top: 8px;
+      max-width: 84%;
+      text-align: center;
+      overflow: hidden;
+    }
   }
 
   &.active .main-circle {
     transform: scale(1.56);
     .label { font-size: 32px; }
-    .value { font-size: 60px; }
+    .value { font-size: clamp(22px, 10vw, 60px); }
   }
   &.active {
     padding-top: 70px;

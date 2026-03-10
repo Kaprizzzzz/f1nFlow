@@ -1,4 +1,4 @@
- <div class="dashboard-container" [class.has-active]="activeTab !== null">
+ <div class="dashboard-container" [class.has-active]="activeTab !== null" (click)="closeActiveTab()">
    <div class="layout-controls">
     <button
       type="button"
@@ -27,6 +27,7 @@
      (pointerup)="stopDrag()"
      (pointercancel)="stopDrag()"
      (pointerleave)="stopDrag()"
+     (click)="$event.stopPropagation(); closeActiveTab()"
    >
      <div
       #sphereRef
@@ -36,6 +37,7 @@
        [class.is-hidden]="isHidden('income')"
        [ngStyle]="getSphereStyle('income')"
        (pointerdown)="onDragStart($event, 'income')"
+       (click)="$event.stopPropagation()"
      >
        <app-income
          [isFullView]="activeTab === 'income'"
@@ -52,6 +54,7 @@
        [class.is-hidden]="isHidden('expense')"
        [ngStyle]="getSphereStyle('expense')"
        (pointerdown)="onDragStart($event, 'expense')"
+       (click)="$event.stopPropagation()"
      >
        <app-expence
          [isFullView]="activeTab === 'expense'"
@@ -68,6 +71,7 @@
        [class.is-hidden]="isHidden('saving')"
        [ngStyle]="getSphereStyle('saving')"
        (pointerdown)="onDragStart($event, 'saving')"
+       (click)="$event.stopPropagation()"
      >
        <app-saving
          [isFullView]="activeTab === 'saving'"
@@ -82,6 +86,7 @@
        [class.is-hidden]="isHidden('news')"
        [ngStyle]="getSphereStyle('news')"
        (pointerdown)="onDragStart($event, 'news')"
+       (click)="$event.stopPropagation()"
      >
        <app-news
          [isFullView]="activeTab === 'news'"

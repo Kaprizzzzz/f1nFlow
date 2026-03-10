@@ -79,28 +79,16 @@ export class MainComponent implements OnInit, OnDestroy {
     this.activeTab = this.activeTab === tab ? null : tab;
   }
 
-  @HostListener('document:click', ['$event'])
-  closeActiveTabOnOutsideClick(event: MouseEvent): void {
+  closeActiveTab(): void {
     if (this.isEditMode || this.activeTab === null) {
       return;
     }
-
-    const target = event.target as HTMLElement | null;
-    if (!target) {
-      return;
-    }
-
-    const clickedSphere = target.closest('.sphere-wrapper') as HTMLElement | null;
-    if (clickedSphere?.dataset['tab'] === this.activeTab) {
-      return;
-    }
-
-    const clickedInsideLayout = !!target.closest('.circles-layout');
-    if (clickedInsideLayout && !clickedSphere) {
-      return;
-    }
-
     this.activeTab = null;
+  }
+
+  @HostListener('window:keydown.escape')
+  onEscape(): void {
+    this.closeActiveTab();
   }
 
   toggleEditMode(): void {

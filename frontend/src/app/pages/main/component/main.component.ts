@@ -95,6 +95,11 @@ export class MainComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const clickedInsideLayout = !!target.closest('.circles-layout');
+    if (clickedInsideLayout && !clickedSphere) {
+      return;
+    }
+
     this.activeTab = null;
   }
 

@@ -7,8 +7,10 @@
   align-items: center;
   gap: 8px;
   z-index: 25;
+  pointer-events: none;
 
   .currency-hex {
+    position: relative;
     width: 64px;
     height: 72px;
     border: 2px solid rgba(143, 187, 255, 0.88);
@@ -20,6 +22,7 @@
     clip-path: polygon(50% 0%, 92% 25%, 92% 75%, 50% 100%, 8% 75%, 8% 25%);
     cursor: pointer;
     transition: transform 0.25s ease, opacity 0.25s ease;
+    pointer-events: auto;
   }
 
   .selected {
@@ -28,14 +31,28 @@
   }
 
   .option {
+    position: absolute;
+    top: 0;
+    left: 0;
     transform: translateY(-8px) scale(0.88);
     opacity: 0;
     pointer-events: none;
   }
 
+  .option:nth-child(2) {
+    transform: translateY(-8px) scale(0.88);
+  }
+
+  .option:nth-child(3) {
+    transform: translateY(-8px) scale(0.88);
+  }
+
   .option.visible {
-    transform: translateY(0) scale(1);
+    transform: translateY(80px) scale(1);
     opacity: 1;
     pointer-events: auto;
+  }
+  .option.visible:nth-child(3) {
+    transform: translateY(160px) scale(1);
   }
 }

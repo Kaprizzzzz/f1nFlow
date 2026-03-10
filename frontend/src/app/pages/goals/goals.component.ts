@@ -12,7 +12,7 @@ import { BalanceService, Transaction } from '../history/balance.service';
   styleUrl: './goals.component.scss'
 })
 export class GoalsComponent implements OnInit, OnDestroy {
-  periodStart = this.getDateOffset(30);
+  periodStart = this.toInputDate(new Date());
   periodEnd = this.toInputDate(new Date());
   deadline = this.toInputDate(new Date());
 
@@ -93,11 +93,5 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
   private toInputDate(date: Date): string {
     return date.toISOString().slice(0, 10);
-  }
-
-  private getDateOffset(daysBack: number): string {
-    const date = new Date();
-    date.setDate(date.getDate() - daysBack);
-    return this.toInputDate(date);
   }
 }

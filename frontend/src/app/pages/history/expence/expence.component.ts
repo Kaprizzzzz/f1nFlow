@@ -22,6 +22,7 @@ export class ExpenceComponent implements OnInit, OnDestroy {
   readonly emojiOptions = ['🍔', '🛍️', '🚗', '🏠', '🎁', '🧾'];
 
   totalExpense = 0;
+  totalIncome = 0;
   amount: number | null = null;
   selectedCategory = '';
 
@@ -46,6 +47,12 @@ export class ExpenceComponent implements OnInit, OnDestroy {
       this.balanceService.expenseCategories$
         .pipe(map((categories) => categories.reduce((acc, item) => acc + item.amount, 0)))
         .subscribe((sum) => (this.totalExpense = sum))
+    );
+
+    this.subscriptions.add(
+      this.balanceService.incomeCategories$
+        .pipe(map((categories) => categories.reduce((acc, item) => acc + item.amount, 0)))
+        .subscribe((sum) => (this.totalIncome = sum))
     );
 
     this.subscriptions.add(
@@ -80,6 +87,14 @@ export class ExpenceComponent implements OnInit, OnDestroy {
     return this.isFullView && this.selectedCategoryData ? this.selectedCategoryData.amount : this.totalExpense;
   }
 
+  get expenseShare(): number {
+    const total = this.totalIncome + this.totalExpense;
+    if (total <= 0) {
+      return 0;
+    }
+    return this.totalExpense / total;
+  }
+  
   handleCircleClick(): void {
     if (this.isFullView && this.selectedCategory) {
       this.selectedCategory = '';

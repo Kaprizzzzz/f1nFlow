@@ -18,7 +18,7 @@
    icon?: string;
  }
  
-export type SphereTab = 'income' | 'expense' | 'saving' | 'news';
+export type SphereTab = 'income' | 'expense' | 'saving' | 'news' | 'recent';
 export type SphereLayout = Record<SphereTab, { left: number; top: number }>;
 
 interface PersistedStatePayload {
@@ -80,7 +80,7 @@ interface PersistedStatePayload {
           this.incomeCategoriesSubject.next(this.normalizeCategories(state.user?.incomeCategories ?? []));
           this.expenseCategoriesSubject.next(this.normalizeCategories(state.user?.expenseCategories ?? []));
           this.currencySubject.next(state.user?.currency ?? 'EUR');
-          this.sphereLayoutSubject.next(state.user?.sphereLayout ?? null);
+          this.sphereLayoutSubject.next(this.normalizeSphereLayout(state.user?.sphereLayout ?? null));
           this.syncBalanceAndTransactions(false);
           this.isHydrating = false;
         },
@@ -151,12 +151,26 @@ interface PersistedStatePayload {
   }
 
   setSphereLayout(layout: SphereLayout): void {
-    this.sphereLayoutSubject.next(layout);
+    this.sphereLayoutSubject.next(this.normalizeSphereLayout(layout));
     this.persistState();
   }
 
   getSphereLayout(): SphereLayout | null {
-    return this.sphereLayoutSubject.value;
+    return this.normalizeSphereLayout(this.sphereLayoutSubject.value);
+  }
+
+  private normalizeSphereLayout(layout: SphereLayout | null): SphereLayout | null {
+    if (!layout) {
+      return null;
+    }
+
+    return {
+      income: layout.income,
+      expense: layout.expense,
+      saving: layout.saving,
+      news: layout.news,
+      recent: layout.recent ?? { top: 330, left: 250 }
+    };
   }
 
    addCategory(type: 'plus' | 'minus', categoryName: string, icon = '📁'): void {
@@ -297,8 +311,8 @@ interface PersistedStatePayload {
  
        this.incomeCategoriesSubject.next(this.normalizeCategories(parsed.incomeCategories ?? []));
        this.expenseCategoriesSubject.next(this.normalizeCategories(parsed.expenseCategories ?? []));
-      this.currencySubject.next(parsed.currency ?? 'EUR');
-      this.sphereLayoutSubject.next(parsed.sphereLayout ?? null);
+       this.currencySubject.next(parsed.currency ?? 'EUR');
+       this.sphereLayoutSubject.next(this.normalizeSphereLayout(parsed.sphereLayout ?? null));
      } catch {
        localStorage.removeItem(this.storageKey);
      }

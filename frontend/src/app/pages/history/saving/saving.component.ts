@@ -25,6 +25,8 @@ import { combineLatest, Subscription } from 'rxjs';
    @Output() onSelect = new EventEmitter<void>();
  
    savings = 0;
+   incomeTotal = 0;
+   expenseTotal = 0;
    historyRows: SavingsHistoryRow[] = [];
  
    private subscriptions = new Subscription();
@@ -42,6 +44,8 @@ import { combineLatest, Subscription } from 'rxjs';
 
         const income = incomeCategories.reduce((acc, item) => acc + item.amount, 0);
         const expense = expenseCategories.reduce((acc, item) => acc + item.amount, 0);
+        this.incomeTotal = income;
+        this.expenseTotal = expense;
         this.savings = income - expense;
       })
     );
@@ -55,9 +59,17 @@ import { combineLatest, Subscription } from 'rxjs';
     this.onSelect.emit();
    }
  
-   removeTransaction(transactionId: string | number, event: Event): void {
+  removeTransaction(transactionId: string | number, event: Event): void {
     event.stopPropagation();
     this.balanceService.removeTransaction(String(transactionId));
+  }
+
+  get incomeShare(): number {
+    const total = this.incomeTotal + this.expenseTotal;
+    if (total <= 0) {
+      return 0;
+    }
+    return this.incomeTotal / total;
   }
 
   private buildSavingsHistory(

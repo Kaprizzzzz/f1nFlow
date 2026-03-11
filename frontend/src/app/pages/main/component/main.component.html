@@ -18,31 +18,6 @@
       </div>
     }
     </div>
-
-  <div class="recent-widget" (click)="$event.stopPropagation()">
-    <button type="button" class="recent-trigger" (click)="toggleRecentTransactions($event)">
-      Last 5 added
-    </button>
-
-    @if (showRecentTransactions) {
-      <div class="recent-panel">
-        @if (recentTransactions.length === 0) {
-          <p class="recent-empty">No transactions yet</p>
-        } @else {
-          @for (item of recentTransactions; track item.id) {
-            <div class="recent-item">
-              <div>
-                <div class="recent-name">{{ item.category }}</div>
-                <div class="recent-meta">{{ item.type === 'plus' ? 'Income' : 'Expense' }} · {{ item.amount | number:'1.2-2' }}</div>
-              </div>
-              <button type="button" class="repeat-btn" (click)="repeatTransaction(item, $event)">↻</button>
-            </div>
-          }
-        }
-      </div>
-    }
-  </div>
-
    <div
      #layoutRef
      class="circles-layout"
@@ -116,6 +91,23 @@
          [isFullView]="activeTab === 'news'"
          (onSelect)="setActiveTab('news')"
        ></app-news>
+     </div>
+     <div
+      #sphereRef
+       class="sphere-wrapper"
+      data-tab="recent"
+       [class.is-active]="activeTab === 'recent'"
+       [class.is-hidden]="isHidden('recent')"
+       [ngStyle]="getSphereStyle('recent')"
+       (pointerdown)="onDragStart($event, 'recent')"
+       (click)="$event.stopPropagation()"
+     >
+       <app-recent
+         [isFullView]="activeTab === 'recent'"
+         [items]="frequentExpenses"
+         (onSelect)="setActiveTab('recent')"
+         (onRepeat)="repeatFrequentExpense($event)"
+       ></app-recent>
      </div>
    </div>
  </div>

@@ -10,6 +10,7 @@ $expense-glow: #ffb060;
   padding-top:0; // Додано відступ зверху для іконок
 
   .main-circle {
+    --expense-share: 0;
     width: 180px;
     height: 180px;
     border-radius: 50%;
@@ -24,6 +25,23 @@ $expense-glow: #ffb060;
     transform: scale(1);
     transition: transform 0.35s ease;
     z-index: 2;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      background: conic-gradient(
+        rgba(255, 182, 105, 0.96) 0deg,
+        rgba(255, 182, 105, 0.96) calc(var(--expense-share, 0) * 360deg),
+        rgba(118, 76, 36, 0.3) calc(var(--expense-share, 0) * 360deg),
+        rgba(118, 76, 36, 0.3) 360deg
+      );
+      -webkit-mask: radial-gradient(circle, transparent 66%, black 69%);
+      mask: radial-gradient(circle, transparent 66%, black 69%);
+      pointer-events: none;
+    }
 
     .label { font-size: 22px; opacity: 0.95; }
     .value {

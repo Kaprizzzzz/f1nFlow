@@ -6,6 +6,7 @@ import { IncomeComponent } from '../../history/income/income.component';
 import { NewsComponent } from '../../history/news/news.component';
 import { SavingComponent } from '../../history/saving/saving.component';
 import { BalanceService, SphereLayout, SphereTab, Transaction } from '../../history/balance.service';
+import { FrequentExpense, RecentComponent } from '../../history/recent/recent.component';
 
 type MainTab = SphereTab | null;
 type SpherePosition = { left: number; top: number };
@@ -14,7 +15,8 @@ const DEFAULT_SPHERE_POSITIONS: SphereLayout = {
   income: { top: 214, left: 156 },
   expense: { top: 78, left: 24 },
   saving: { top: 166, left: 244 },
-  news: { top: 336, left: 8 }
+  news: { top: 336, left: 8 },
+  recent: { top: 336, left: 246 }
 };
 
 const SPHERE_TOP_GAP = 0;
@@ -25,7 +27,7 @@ const EDIT_MODE_BOTTOM_GAP = ROUTING_PANEL_BOTTOM_OFFSET;
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [CommonModule, IncomeComponent, ExpenceComponent, SavingComponent, NewsComponent],
+  imports: [CommonModule, IncomeComponent, ExpenceComponent, SavingComponent, NewsComponent, RecentComponent],
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
 })
@@ -38,8 +40,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
   activeTab: MainTab = null;
   isEditMode = false;
-  showRecentTransactions = false;
-  recentTransactions: Transaction[] = [];
+  frequentExpenses: FrequentExpense[] = [];
 
   spherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
   private savedSpherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
@@ -70,9 +71,7 @@ export class MainComponent implements OnInit, OnDestroy {
     );
     this.subscription.add(
       this.balanceService.transactions$.subscribe((transactions) => {
-        this.recentTransactions = [...transactions]
-          .sort((a, b) => b.date.getTime() - a.date.getTime())
-          .slice(0, 5);
+        this.frequentExpenses = this.buildFrequentExpenses(transactions);
       })
     );
   }
@@ -95,14 +94,8 @@ export class MainComponent implements OnInit, OnDestroy {
     this.activeTab = null;
   }
 
-  toggleRecentTransactions(event: Event): void {
-    event.stopPropagation();
-    this.showRecentTransactions = !this.showRecentTransactions;
-  }
-
-  repeatTransaction(transaction: Transaction, event: Event): void {
-    event.stopPropagation();
-    this.balanceService.addTransaction(transaction.amount, transaction.category, transaction.type);
+  repeatFrequentExpense(item: FrequentExpense): void {
+    this.balanceService.addTransaction(item.repeatAmount, item.category, 'minus');
   }
 
   @HostListener('window:keydown.escape')
@@ -250,7 +243,7 @@ export class MainComponent implements OnInit, OnDestroy {
         return;
       }
 
-      const tabsOrder: SphereTab[] = ['income', 'expense', 'news', 'saving'];
+      const tabsOrder: SphereTab[] = ['income', 'expense', 'news', 'saving', 'recent'];
       const overlapStep = 26;
       const maxWidth = layout.clientWidth;
       const maxHeight = layout.clientHeight;
@@ -282,7 +275,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
   private getSphereTab(element: HTMLElement): SphereTab | null {
     const dataTab = element.dataset?.['tab'] ?? element.getAttribute('data-tab');
-    if (dataTab === 'income' || dataTab === 'expense' || dataTab === 'saving' || dataTab === 'news') {
+    if (dataTab === 'income' || dataTab === 'expense' || dataTab === 'saving' || dataTab === 'news' || dataTab === 'recent') {
       return dataTab;
     }
     return null;
@@ -293,7 +286,35 @@ export class MainComponent implements OnInit, OnDestroy {
       income: { ...positions.income },
       expense: { ...positions.expense },
       saving: { ...positions.saving },
-      news: { ...positions.news }
+      news: { ...positions.news },
+      recent: { ...positions.recent }
     };
+  }
+  private buildFrequentExpenses(transactions: Transaction[]): FrequentExpense[] {
+    const expenseTransactions = transactions
+      .filter((item) => item.type === 'minus')
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+
+    const grouped = new Map<string, FrequentExpense>();
+
+    for (const transaction of expenseTransactions) {
+      const existing = grouped.get(transaction.category);
+      if (existing) {
+        existing.totalAmount += transaction.amount;
+        existing.repeatCount += 1;
+        continue;
+      }
+
+      grouped.set(transaction.category, {
+        category: transaction.category,
+        totalAmount: transaction.amount,
+        repeatAmount: transaction.amount,
+        repeatCount: 1
+      });
+    }
+
+    return [...grouped.values()]
+      .sort((a, b) => b.repeatCount - a.repeatCount || b.totalAmount - a.totalAmount)
+      .slice(0, 5);
   }
 }

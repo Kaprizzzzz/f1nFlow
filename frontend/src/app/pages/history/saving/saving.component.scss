@@ -7,6 +7,7 @@ $saving-glow: #63ffd0;
   align-items: center;
 
   .main-circle {
+    --income-share: 0;
     width: 143px;
     height: 143px;
     border-radius: 50%;
@@ -21,6 +22,23 @@ $saving-glow: #63ffd0;
     transform: scale(1);
     transform-origin: center;
     transition: transform 0.35s ease;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      background: conic-gradient(
+        rgba(132, 255, 198, 0.95) 0deg,
+        rgba(132, 255, 198, 0.95) calc(var(--income-share, 0) * 360deg),
+        rgba(255, 136, 136, 0.9) calc(var(--income-share, 0) * 360deg),
+        rgba(255, 136, 136, 0.9) 360deg
+      );
+      -webkit-mask: radial-gradient(circle, transparent 64%, black 68%);
+      mask: radial-gradient(circle, transparent 64%, black 68%);
+      pointer-events: none;
+    }
 
     &.negative {
       border-color: rgba(255, 119, 119, 0.9);

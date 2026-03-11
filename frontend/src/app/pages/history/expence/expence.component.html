@@ -1,5 +1,5 @@
 <div class="circle-wrapper" [class.active]="isFullView">
-  <div class="main-circle" (click)="handleCircleClick()">
+  <div class="main-circle" (click)="handleCircleClick()" [style.--expense-share]="expenseShare">
     <span class="label">{{ displayLabel }}</span>
     <span class="value">{{ displayValue | number:'1.2-2' }}</span>
   </div>

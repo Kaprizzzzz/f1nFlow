@@ -1,0 +1,21 @@
+<div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
+  <div class="main-circle">
+    <span class="label">Recent</span>
+  </div>
+
+  <div class="recent-panel" *ngIf="isFullView" (click)="$event.stopPropagation()">
+    @if (items.length === 0) {
+      <p class="recent-empty">No expense stats yet</p>
+    } @else {
+      @for (item of items; track item.category) {
+        <div class="recent-item">
+          <div>
+            <div class="recent-name">{{ item.category }}</div>
+            <div class="recent-meta">{{ item.totalAmount | number:'1.2-2' }} · {{ item.repeatCount }}x</div>
+          </div>
+          <button type="button" class="repeat-btn" (click)="repeat(item, $event)">↻</button>
+        </div>
+      }
+    }
+  </div>
+</div>

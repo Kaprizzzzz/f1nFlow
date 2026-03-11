@@ -1,5 +1,5 @@
 <div class="circle-wrapper" [class.active]="isFullView">
-   <div class="main-circle" [class.negative]="savings < 0" (click)="handleCircleClick()">
+   <div class="main-circle" [class.negative]="savings < 0" (click)="handleCircleClick()" [style.--income-share]="incomeShare">
      <span class="label">Savings</span>
      <span class="value">{{ savings | number:'1.2-2' }}</span>
     </div>

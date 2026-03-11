@@ -22,6 +22,7 @@ export class IncomeComponent implements OnInit, OnDestroy {
   readonly emojiOptions = ['💼', '🏦', '💸', '🎯', '📈', '✨'];
 
   totalIncome = 0;
+  totalExpense = 0;
   amount: number | null = null;
   selectedCategory = '';
 
@@ -46,6 +47,12 @@ export class IncomeComponent implements OnInit, OnDestroy {
       this.balanceService.incomeCategories$
         .pipe(map((categories) => categories.reduce((acc, item) => acc + item.amount, 0)))
         .subscribe((sum) => (this.totalIncome = sum))
+    );
+
+    this.subscriptions.add(
+      this.balanceService.expenseCategories$
+        .pipe(map((categories) => categories.reduce((acc, item) => acc + item.amount, 0)))
+        .subscribe((sum) => (this.totalExpense = sum))
     );
 
     this.subscriptions.add(
@@ -78,6 +85,14 @@ export class IncomeComponent implements OnInit, OnDestroy {
 
   get displayValue(): number {
     return this.isFullView && this.selectedCategoryData ? this.selectedCategoryData.amount : this.totalIncome;
+  }
+
+  get incomeShare(): number {
+    const total = this.totalIncome + this.totalExpense;
+    if (total <= 0) {
+      return 0;
+    }
+    return this.totalIncome / total;
   }
 
   handleCircleClick(): void {

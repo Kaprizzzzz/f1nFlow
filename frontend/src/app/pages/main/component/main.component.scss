@@ -164,4 +164,61 @@
     transform-origin: top center;
     margin-top: -6px;
   }
+  .recent-widget {
+  position: fixed;
+  bottom: 112px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(390px, calc(100% - 24px));
+  z-index: 1002;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.recent-trigger {
+  border: 1px solid rgba(134, 172, 239, 0.46);
+  background: rgba(9, 19, 37, 0.93);
+  color: #dce9ff;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 12px;
+}
+
+.recent-panel {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(134, 172, 239, 0.3);
+  background: linear-gradient(180deg, rgba(13, 24, 45, 0.95), rgba(8, 14, 27, 0.95));
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.recent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.recent-name {
+  color: #e5efff;
+  font-size: 13px;
+}
+
+.recent-meta,
+.recent-empty {
+  color: rgba(206, 224, 255, 0.8);
+  font-size: 11px;
+}
+
+.repeat-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(145, 188, 255, 0.55);
+  background: rgba(18, 36, 66, 0.92);
+  color: #dce9ff;
+}
 }

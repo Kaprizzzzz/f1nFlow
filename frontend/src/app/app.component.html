@@ -11,7 +11,9 @@
       <span class="hex-cap" aria-hidden="true"></span>
     </div>
  
-    <app-currency-picker class="currency-slot"></app-currency-picker>
+    @if (isMainRoute) {
+      <app-currency-picker class="currency-slot"></app-currency-picker>
+    }
   </div>
  
   <div class="content">

@@ -17,6 +17,30 @@
         <button type="button" class="action-hex option visible secondary" (click)="resetToDefaultLayout()" aria-label="Reset layout">↺</button>
       </div>
     }
+    </div>
+
+  <div class="recent-widget" (click)="$event.stopPropagation()">
+    <button type="button" class="recent-trigger" (click)="toggleRecentTransactions($event)">
+      Last 5 added
+    </button>
+
+    @if (showRecentTransactions) {
+      <div class="recent-panel">
+        @if (recentTransactions.length === 0) {
+          <p class="recent-empty">No transactions yet</p>
+        } @else {
+          @for (item of recentTransactions; track item.id) {
+            <div class="recent-item">
+              <div>
+                <div class="recent-name">{{ item.category }}</div>
+                <div class="recent-meta">{{ item.type === 'plus' ? 'Income' : 'Expense' }} · {{ item.amount | number:'1.2-2' }}</div>
+              </div>
+              <button type="button" class="repeat-btn" (click)="repeatTransaction(item, $event)">↻</button>
+            </div>
+          }
+        }
+      </div>
+    }
   </div>
 
    <div

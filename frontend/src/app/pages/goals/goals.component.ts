@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { BalanceService, Transaction } from '../history/balance.service';
 
+type ViewMode = 'amount' | 'segments';
+type CategorySummary = { name: string; amount: number; segments: number };
+
 @Component({
   selector: 'app-goals',
   standalone: true,
@@ -12,7 +15,7 @@ import { BalanceService, Transaction } from '../history/balance.service';
   styleUrl: './goals.component.scss'
 })
 export class GoalsComponent implements OnInit, OnDestroy {
-  periodStart = this.toInputDate(new Date());
+  periodStart = this.toInputDate(this.startOfMonth(new Date()));
   periodEnd = this.toInputDate(new Date());
   deadline = this.toInputDate(new Date());
 
@@ -21,6 +24,10 @@ export class GoalsComponent implements OnInit, OnDestroy {
   spentPerWeek = 0;
   spentPerMonth = 0;
   safeSpendPerDay = 0;
+
+  incomeSummary: CategorySummary[] = [];
+  expenseSummary: CategorySummary[] = [];
+  visualizationMode: ViewMode = 'amount';
 
   private transactions: Transaction[] = [];
   private currentBalance = 0;
@@ -48,6 +55,10 @@ export class GoalsComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  setVisualizationMode(mode: ViewMode): void {
+    this.visualizationMode = mode;
+  }
+
   recalculate(): void {
     const start = this.parseInputDate(this.periodStart);
     const end = this.parseInputDate(this.periodEnd);
@@ -59,6 +70,8 @@ export class GoalsComponent implements OnInit, OnDestroy {
       this.spentPerWeek = 0;
       this.spentPerMonth = 0;
       this.safeSpendPerDay = 0;
+      this.incomeSummary = [];
+      this.expenseSummary = [];
       return;
     }
 
@@ -67,13 +80,18 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
     const daysInRange = Math.max(1, Math.floor((endInclusive.getTime() - start.getTime()) / msPerDay) + 1);
 
-    this.periodSpent = this.transactions
-      .filter((item) => item.type === 'minus' && item.date >= start && item.date <= endInclusive)
+    const periodTransactions = this.transactions.filter((item) => item.date >= start && item.date <= endInclusive);
+
+    this.periodSpent = periodTransactions
+      .filter((item) => item.type === 'minus')
       .reduce((sum, item) => sum + item.amount, 0);
 
     this.spentPerDay = this.periodSpent / daysInRange;
     this.spentPerWeek = this.spentPerDay * 7;
     this.spentPerMonth = this.spentPerDay * 30;
+
+    this.incomeSummary = this.buildSummary(periodTransactions, 'plus');
+    this.expenseSummary = this.buildSummary(periodTransactions, 'minus');
 
     const deadlineDate = this.parseInputDate(this.deadline);
     const daysToDeadline = deadlineDate
@@ -82,7 +100,49 @@ export class GoalsComponent implements OnInit, OnDestroy {
     this.safeSpendPerDay = this.currentBalance > 0 ? this.currentBalance / daysToDeadline : 0;
   }
 
-   private parseInputDate(value: string): Date | null {
+   trackByCategory(_: number, item: CategorySummary): string {
+    return item.name;
+  }
+
+  getSegmentsArray(count: number): number[] {
+    return Array.from({ length: Math.max(0, count) }, (_, index) => index);
+  }
+
+  private buildSummary(periodTransactions: Transaction[], type: 'plus' | 'minus'): CategorySummary[] {
+    const grouped = new Map<string, number>();
+
+    for (const tx of periodTransactions) {
+      if (tx.type !== type) {
+        continue;
+      }
+      grouped.set(tx.category, (grouped.get(tx.category) ?? 0) + tx.amount);
+    }
+
+    const summary = Array.from(grouped.entries())
+      .map(([name, amount]) => ({ name, amount }))
+      .sort((a, b) => b.amount - a.amount);
+
+    const total = summary.reduce((acc, item) => acc + item.amount, 0);
+    if (total <= 0 || summary.length === 0) {
+      return [];
+    }
+
+    const withSegments = summary.map((item) => ({
+      ...item,
+      segments: Math.round((item.amount / total) * 10)
+    }));
+
+    const used = withSegments.reduce((acc, item) => acc + item.segments, 0);
+    const diff = 10 - used;
+
+    if (diff !== 0) {
+      withSegments[0].segments = Math.max(1, withSegments[0].segments + diff);
+    }
+
+    return withSegments;
+  }
+
+  private parseInputDate(value: string): Date | null {
     const [year, month, day] = value.split('-').map((part) => Number(part));
     if (!year || !month || !day) {
       return null;
@@ -94,4 +154,9 @@ export class GoalsComponent implements OnInit, OnDestroy {
   private toInputDate(date: Date): string {
     return date.toISOString().slice(0, 10);
   }
+
+  private startOfMonth(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+  }
+  
 }

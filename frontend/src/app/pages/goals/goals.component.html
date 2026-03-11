@@ -1,13 +1,73 @@
 <section class="goals-screen">
-  <h2>Goals</h2>
+  <div class="goals-visual-controls">
+    <button
+      type="button"
+      class="viz-hex"
+      [class.active]="visualizationMode === 'amount'"
+      (click)="setVisualizationMode('amount')"
+      aria-label="Amount view"
+    >Σ</button>
+    <button
+      type="button"
+      class="viz-hex"
+      [class.active]="visualizationMode === 'segments'"
+      (click)="setVisualizationMode('segments')"
+      aria-label="Segments view"
+    >◫</button>
+  </div>
 
   <section class="card">
-    <h3>Spending in selected period</h3>
+    <h3>Period categories</h3>
     <div class="row">
       <label>From <input type="date" [(ngModel)]="periodStart" (change)="recalculate()" /></label>
       <label>To <input type="date" [(ngModel)]="periodEnd" (change)="recalculate()" /></label>
     </div>
 
+     <div class="category-columns">
+      <div>
+        <h4>Income:</h4>
+        @if (incomeSummary.length === 0) {
+          <p class="empty">No income in selected period</p>
+        } @else {
+          @for (item of incomeSummary; track trackByCategory($index, item)) {
+            <div class="category-line">
+              <span>{{ item.name }} - {{ item.amount | number:'1.2-2' }}</span>
+              @if (visualizationMode === 'segments') {
+                <span class="segments" aria-hidden="true">
+                  @for (_ of getSegmentsArray(item.segments); track $index) {
+                    <i></i>
+                  }
+                </span>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <div>
+        <h4>Expense:</h4>
+        @if (expenseSummary.length === 0) {
+          <p class="empty">No expenses in selected period</p>
+        } @else {
+          @for (item of expenseSummary; track trackByCategory($index, item)) {
+            <div class="category-line">
+              <span>{{ item.name }} - {{ item.amount | number:'1.2-2' }}</span>
+              @if (visualizationMode === 'segments') {
+                <span class="segments" aria-hidden="true">
+                  @for (_ of getSegmentsArray(item.segments); track $index) {
+                    <i></i>
+                  }
+                </span>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>Spending in selected period</h3>
     <p class="metric">Spent in period: <strong>{{ periodSpent | number:'1.2-2' }}</strong></p>
     <p class="metric">Average per day: <strong>{{ spentPerDay | number:'1.2-2' }}</strong></p>
     <p class="metric">Average per week: <strong>{{ spentPerWeek | number:'1.2-2' }}</strong></p>

@@ -5,7 +5,7 @@ import { ExpenceComponent } from '../../history/expence/expence.component';
 import { IncomeComponent } from '../../history/income/income.component';
 import { NewsComponent } from '../../history/news/news.component';
 import { SavingComponent } from '../../history/saving/saving.component';
-import { BalanceService, SphereLayout, SphereTab } from '../../history/balance.service';
+import { BalanceService, SphereLayout, SphereTab, Transaction } from '../../history/balance.service';
 
 type MainTab = SphereTab | null;
 type SpherePosition = { left: number; top: number };
@@ -38,6 +38,8 @@ export class MainComponent implements OnInit, OnDestroy {
 
   activeTab: MainTab = null;
   isEditMode = false;
+  showRecentTransactions = false;
+  recentTransactions: Transaction[] = [];
 
   spherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
   private savedSpherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
@@ -66,6 +68,13 @@ export class MainComponent implements OnInit, OnDestroy {
         this.savedSpherePositions = this.clonePositions(layout);
       })
     );
+    this.subscription.add(
+      this.balanceService.transactions$.subscribe((transactions) => {
+        this.recentTransactions = [...transactions]
+          .sort((a, b) => b.date.getTime() - a.date.getTime())
+          .slice(0, 5);
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -84,6 +93,16 @@ export class MainComponent implements OnInit, OnDestroy {
       return;
     }
     this.activeTab = null;
+  }
+
+  toggleRecentTransactions(event: Event): void {
+    event.stopPropagation();
+    this.showRecentTransactions = !this.showRecentTransactions;
+  }
+
+  repeatTransaction(transaction: Transaction, event: Event): void {
+    event.stopPropagation();
+    this.balanceService.addTransaction(transaction.amount, transaction.category, transaction.type);
   }
 
   @HostListener('window:keydown.escape')

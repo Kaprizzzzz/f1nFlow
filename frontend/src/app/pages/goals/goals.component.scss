@@ -7,6 +7,30 @@
   gap: 14px;
 }
 
+.goals-visual-controls {
+  position: fixed;
+  top: 4px;
+  right: calc(50% - min(430px, 100vw) / 2 + 12px);
+  display: grid;
+  gap: 8px;
+  z-index: 1001;
+}
+
+.viz-hex {
+  width: 64px;
+  height: 72px;
+  border: 2px solid rgba(143, 187, 255, 0.88);
+  background: linear-gradient(180deg, rgba(11, 22, 42, 0.95) 0%, rgba(8, 14, 28, 0.95) 100%);
+  color: #dfeaff;
+  font-weight: 700;
+  font-size: 24px;
+  clip-path: polygon(50% 0%, 92% 25%, 92% 75%, 50% 100%, 8% 75%, 8% 25%);
+
+  &.active {
+    box-shadow: 0 0 22px rgba(107, 164, 255, 0.45);
+  }
+}
+
 .card {
   border: 1px solid rgba(118, 159, 228, 0.28);
   background: linear-gradient(180deg, rgba(13, 24, 45, 0.95), rgba(8, 14, 27, 0.95));
@@ -35,3 +59,40 @@ input {
 }
 
 .metric { font-size: 13px; }
+
+.category-columns {
+  margin-top: 10px;
+  display: grid;
+  gap: 12px;
+}
+
+h4 {
+  margin: 0 0 8px;
+}
+
+.category-line {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.segments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #91d9ff 0%, #58a6ec 100%);
+  }
+}
+
+.empty {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.75;
+}

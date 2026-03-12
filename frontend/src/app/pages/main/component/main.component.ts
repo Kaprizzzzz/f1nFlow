@@ -20,9 +20,9 @@ const DEFAULT_SPHERE_POSITIONS: SphereLayout = {
 };
 
 const SPHERE_TOP_GAP = 0;
-// Визначає відступ куль від нижньої панелі роутингу (чим більше значення, тим вище кулі над меню).
-const ROUTING_PANEL_BOTTOM_OFFSET = 22;
-const EDIT_MODE_BOTTOM_GAP = ROUTING_PANEL_BOTTOM_OFFSET;
+// Визначає базовий відступ куль від нижньої панелі роутингу.
+const ROUTING_PANEL_BOTTOM_OFFSET_DESKTOP = 22;
+const ROUTING_PANEL_BOTTOM_OFFSET_MOBILE = 8;
 
 @Component({
   selector: 'app-main',
@@ -200,7 +200,8 @@ export class MainComponent implements OnInit, OnDestroy {
     const nextTop = event.clientY - layoutRect.top - this.dragState.pointerOffsetY;
 
     const maxLeft = Math.max(0, layout.clientWidth - this.dragState.sphereWidth);
-    const maxTop = Math.max(0, layout.clientHeight - this.dragState.sphereHeight - ROUTING_PANEL_BOTTOM_OFFSET);
+    const bottomOffset = this.getRoutingPanelBottomOffset();
+    const maxTop = Math.max(0, layout.clientHeight - this.dragState.sphereHeight - bottomOffset);
     const minTop = SPHERE_TOP_GAP;
 
     this.spherePositions[this.dragState.tab] = {
@@ -240,7 +241,8 @@ export class MainComponent implements OnInit, OnDestroy {
       .find((item) => this.getSphereTab(item) === tab);
 
     const sphereHeight = sphereElement?.offsetHeight ?? 190;
-    const maxTop = Math.max(SPHERE_TOP_GAP, layout.clientHeight - sphereHeight - ROUTING_PANEL_BOTTOM_OFFSET);
+    const bottomOffset = this.getRoutingPanelBottomOffset();
+    const maxTop = Math.max(SPHERE_TOP_GAP, layout.clientHeight - sphereHeight - bottomOffset);
     return this.clamp(top, SPHERE_TOP_GAP, maxTop);
   }
 
@@ -264,6 +266,7 @@ export class MainComponent implements OnInit, OnDestroy {
       const overlapStep = 26;
       const maxWidth = layout.clientWidth;
       const maxHeight = layout.clientHeight;
+      const bottomOffset = this.getRoutingPanelBottomOffset();
       const centerX = maxWidth / 2;
       const centerShift = (tabsOrder.length - 1) / 2;
 
@@ -278,7 +281,7 @@ export class MainComponent implements OnInit, OnDestroy {
         
         const maxTopAboveTaskbar = Math.max(
           SPHERE_TOP_GAP,
-          maxHeight - sphereHeight - Math.max(EDIT_MODE_BOTTOM_GAP, ROUTING_PANEL_BOTTOM_OFFSET)
+          maxHeight - sphereHeight - bottomOffset
         );
 
         const top = this.clamp(maxTopAboveTaskbar, SPHERE_TOP_GAP, maxTopAboveTaskbar);
@@ -288,6 +291,12 @@ export class MainComponent implements OnInit, OnDestroy {
         this.spherePositions[tab] = { top, left };
       }
     });
+  }
+
+   private getRoutingPanelBottomOffset(): number {
+    return window.matchMedia('(max-width: 560px)').matches
+      ? ROUTING_PANEL_BOTTOM_OFFSET_MOBILE
+      : ROUTING_PANEL_BOTTOM_OFFSET_DESKTOP;
   }
 
   private getSphereTab(element: HTMLElement): SphereTab | null {

@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, TooManyRequestsException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class RateLimitGuard implements CanActivate {
@@ -15,7 +15,7 @@ export class RateLimitGuard implements CanActivate {
     const next = existing.filter((timestamp) => now - timestamp <= this.windowMs);
 
     if (next.length >= this.limit) {
-      throw new TooManyRequestsException('Too many requests');
+      throw new HttpException('Too many requests', HttpStatus.TOO_MANY_REQUESTS);
     }
 
     next.push(now);

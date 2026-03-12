@@ -372,7 +372,7 @@ interface PersistedStatePayload {
       return;
     }
 
-    this.sessionService.saveState(currentUser.telegramId, {
+    this.sessionService.saveState({
       ...payload,
       transactions: this.transactions.map((item) => ({
         ...item,

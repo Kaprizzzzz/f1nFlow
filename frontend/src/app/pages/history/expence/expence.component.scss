@@ -62,7 +62,7 @@ $expense-glow: #ffb060;
 
 .sticker-row {
   position: absolute;
-  top: 150px; // Центр відносно якого будуть "орбіти"
+  top: 168px; // Центр відносно якого будуть "орбіти"
   left: 50%;
   width: 0;
   height: 0;
@@ -107,7 +107,7 @@ $expense-glow: #ffb060;
 }
 
 .panel {
-  margin-top: 75px;
+  margin-top: 96px;
   width: 330px;
   display: grid;
   gap: 8px;

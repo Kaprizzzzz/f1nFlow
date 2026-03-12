@@ -43,14 +43,20 @@ export class AppComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.isMainRoute = this.router.url === '/';
+    this.isMainRoute = this.isRootRoute(this.router.url);
     this.subscription.add(
       this.router.events.subscribe((event) => {
         if (event instanceof NavigationEnd) {
-          this.isMainRoute = event.urlAfterRedirects === '/';
+          this.isMainRoute = this.isRootRoute(event.urlAfterRedirects);
         }
       })
     );
+  }
+
+  private isRootRoute(url: string): boolean {
+    const parsed = this.router.parseUrl(url);
+    const primarySegments = parsed.root.children['primary']?.segments ?? [];
+    return primarySegments.length === 0;
   }
 
   ngOnDestroy(): void {

@@ -41,7 +41,7 @@ export class MainComponent implements OnInit, OnDestroy {
   activeTab: MainTab = null;
   isEditMode = false;
   frequentExpenses: FrequentExpense[] = [];
-  quickTransactionsLimit = 5;
+  quickTransactionsLimit = 3;
 
   spherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
   private savedSpherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);

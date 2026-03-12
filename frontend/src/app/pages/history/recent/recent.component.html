@@ -7,9 +7,17 @@
     <div class="quick-limit-row">
       <span>Quick tx count:</span>
       <div class="quick-limit-actions">
-        @for (limit of [3,4,5,6,7,8,9,10]; track limit) {
-          <button type="button" [class.active]="quickLimit === limit" (click)="setQuickLimit(limit, $event)">{{ limit }}</button>
-        }
+        <div class="quick-limit-picker" [class.open]="isQuickLimitMenuOpen">
+        <button type="button" class="quick-limit-current" (click)="toggleQuickLimitMenu($event)">
+          {{ quickLimit }}
+          <span class="caret">▾</span>
+        </button>
+
+        <div class="quick-limit-menu" *ngIf="isQuickLimitMenuOpen">
+          @for (limit of quickLimitOptions; track limit) {
+            <button type="button" [class.active]="quickLimit === limit" (click)="setQuickLimit(limit, $event)">{{ limit }}</button>
+          }
+        </div>
       </div>
     </div>
     @if (items.length === 0) {

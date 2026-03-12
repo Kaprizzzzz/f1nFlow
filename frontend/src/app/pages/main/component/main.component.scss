@@ -1,7 +1,7 @@
 .dashboard-container {
   width: 100%;
-  height: calc(100dvh - 106px);
-  max-height: calc(100dvh - 106px);
+  height: calc(100dvh - 112px - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 112px - env(safe-area-inset-bottom, 0px));
   background:
     radial-gradient(circle at 50% 30%, rgba(61, 130, 240, 0.35) 0%, transparent 35%),
     radial-gradient(circle at 22% 72%, rgba(255, 164, 67, 0.2) 0%, transparent 28%),

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface FrequentExpense {
@@ -18,10 +18,13 @@ export interface FrequentExpense {
 export class RecentComponent {
   @Input() isFullView = false;
   @Input() items: FrequentExpense[] = [];
-  @Input() quickLimit = 5;
+  @Input() quickLimit = 3;
   @Output() onSelect = new EventEmitter<void>();
   @Output() onRepeat = new EventEmitter<FrequentExpense>();
   @Output() quickLimitChange = new EventEmitter<number>();
+
+  readonly quickLimitOptions = [3, 4, 5, 6, 7, 8, 9, 10];
+  isQuickLimitMenuOpen = false;
 
   handleCircleClick(): void {
     this.onSelect.emit();
@@ -31,9 +34,20 @@ export class RecentComponent {
     event.stopPropagation();
     this.onRepeat.emit(item);
   }
-setQuickLimit(value: number, event: Event): void {
+toggleQuickLimitMenu(event: Event): void {
+    event.stopPropagation();
+    this.isQuickLimitMenuOpen = !this.isQuickLimitMenuOpen;
+  }
+
+  setQuickLimit(value: number, event: Event): void {
     event.stopPropagation();
     this.quickLimitChange.emit(value);
+    this.isQuickLimitMenuOpen = false;
+  }
+
+  @HostListener('document:click')
+  closeQuickLimitMenu(): void {
+    this.isQuickLimitMenuOpen = false;
   }
 
   get quickRingGradient(): string {

@@ -14,8 +14,8 @@
   <section class="card">
     <h3>Period categories</h3>
     <div class="row">
-      <label>From <input type="date" [(ngModel)]="periodStart" [value]="currentMonthStart" [min]="currentMonthStart" [max]="currentMonthStart" disabled /></label>
-      <label>To <input type="date" [(ngModel)]="periodEnd" [min]="currentMonthStart" [max]="todayDate" (change)="recalculate()" /></label>
+      <label>From <input type="date" [(ngModel)]="periodStart" [max]="periodEnd" (change)="recalculate()" /></label>
+      <label>To <input type="date" [(ngModel)]="periodEnd" [min]="periodStart" [max]="todayDate" (change)="recalculate()" /></label>
     </div>
 
     <div class="category-columns">

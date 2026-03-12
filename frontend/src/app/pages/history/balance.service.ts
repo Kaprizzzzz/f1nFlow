@@ -50,7 +50,7 @@ interface PersistedStatePayload {
    private expenseCategoriesSubject = new BehaviorSubject<CategoryItem[]>([]);
    private currencySubject = new BehaviorSubject<'EUR' | 'USD' | 'UAH'>('EUR');
    private sphereLayoutSubject = new BehaviorSubject<SphereLayout | null>(null);
-   private quickTransactionsLimitSubject = new BehaviorSubject<number>(5);
+   private quickTransactionsLimitSubject = new BehaviorSubject<number>(3);
    private newsSubject = new BehaviorSubject<NewsItem[]>([
     { id: '1', title: 'Market update', isRead: false },
     { id: '2', title: 'Budget tip of the week', isRead: false },

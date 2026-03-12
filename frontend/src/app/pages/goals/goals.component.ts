@@ -39,8 +39,6 @@ export class GoalsComponent implements OnInit, OnDestroy {
   constructor(private readonly balanceService: BalanceService) {}
 
   ngOnInit(): void {
-    this.forceCurrentMonthStart();
-
     this.subscription.add(
       this.balanceService.transactions$.subscribe((transactions) => {
         this.transactions = transactions;
@@ -78,8 +76,6 @@ export class GoalsComponent implements OnInit, OnDestroy {
   }
 
   recalculate(): void {
-    this.forceCurrentMonthStart();
-
     const start = this.parseInputDate(this.periodStart);
     const end = this.parseInputDate(this.periodEnd);
     const msPerDay = 1000 * 60 * 60 * 24;
@@ -126,10 +122,6 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
   getSegmentsArray(count: number): number[] {
     return Array.from({ length: Math.max(0, count) }, (_, index) => index);
-  }
-
-  get currentMonthStart(): string {
-    return this.toInputDate(this.startOfMonth(new Date()));
   }
 
   get todayDate(): string {
@@ -185,11 +177,5 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
   private startOfMonth(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth(), 1);
-  }
-  private forceCurrentMonthStart(): void {
-    this.periodStart = this.currentMonthStart;
-    if (this.periodEnd < this.periodStart) {
-      this.periodEnd = this.periodStart;
-    }
   }
 }

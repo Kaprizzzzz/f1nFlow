@@ -111,7 +111,7 @@ $saving-glow: #63ffd0;
   transition: margin-top 0.35s ease;
 
   h4 {
-    margin: 0 0 8px;
+    margin: 0 0 10px;
     color: #d8fff2;
     font-size: 14px;
     font-weight: 600;
@@ -121,11 +121,14 @@ $saving-glow: #63ffd0;
     display: flex;
     flex-direction: column;
     gap: 6px;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(153, 255, 225, 0.16);
+    padding: 10px;
+    border: 1px solid rgba(153, 255, 225, 0.18);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    background: rgba(3, 24, 20, 0.72);
 
     &:last-child {
-      border-bottom: 0;
+      margin-bottom: 0;
     }
   }
 
@@ -133,6 +136,30 @@ $saving-glow: #63ffd0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
+  }
+
+  .category-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .history-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    border: 1px solid rgba(137, 255, 211, 0.4);
+    color: #84ffc6;
+
+    &.minus {
+      border-color: rgba(255, 150, 150, 0.45);
+      color: #ff9494;
+    }
   }
 
   .category {
@@ -157,17 +184,33 @@ $saving-glow: #63ffd0;
   .totals-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px 10px;
-    color: #b9f7e0;
+    gap: 6px;
     font-size: 12px;
+  }
+
+  .chip {
+    border-radius: 999px;
+    padding: 2px 8px;
+    border: 1px solid rgba(153, 255, 225, 0.2);
+    color: #b9f7e0;
+
+    &.income {
+      background: rgba(50, 140, 105, 0.18);
+    }
+
+    &.expense {
+      background: rgba(129, 71, 71, 0.16);
+    }
   }
 
   .positive-diff {
     color: #84ffc6;
+    background: rgba(66, 169, 127, 0.18);
   }
 
   .negative-diff {
     color: #ff9494;
+    background: rgba(157, 66, 66, 0.2);
   }
 
   .delete-btn {

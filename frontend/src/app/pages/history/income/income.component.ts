@@ -23,7 +23,7 @@ export class IncomeComponent implements OnInit, OnDestroy {
 
   totalIncome = 0;
   totalExpense = 0;
-  amount: number | null = null;
+  amountInput = '';
   selectedCategory = '';
 
   categories: CategoryItem[] = [];
@@ -109,7 +109,7 @@ export class IncomeComponent implements OnInit, OnDestroy {
     }
     this.selectedCategory = category.name;
     this.panelMode = null;
-    this.amount = null;
+    this.amountInput = '';
   }
 
   getMiniCircleStyle(index: number, total: number): Record<string, string> {
@@ -118,7 +118,7 @@ export class IncomeComponent implements OnInit, OnDestroy {
     const endAngle = 335;
     const angle = total <= 1 ? singleItemArcAngle : startAngle + ((endAngle - startAngle) * index) / (total - 1);
     const radians = (angle * Math.PI) / 180;
-    const radius = 172;
+    const radius = 190;
 
     return {
       left: `${Math.cos(radians) * radius}px`,
@@ -130,24 +130,37 @@ export class IncomeComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     const isSameCategory = this.selectedCategory === category.name;
     this.selectedCategory = category.name;
-    this.amount = null;
+    this.amountInput = '';
     this.panelMode = isSameCategory && this.panelMode === 'amount' ? null : 'amount';
   }
 
   saveData(): void {
-    if (this.amount && this.amount > 0 && this.selectedCategory) {
-      this.balanceService.addTransaction(this.amount, this.selectedCategory, 'plus');
-      this.amount = null;
+     const amount = this.parseAmountInput(this.amountInput);
+
+    if (amount !== null && amount > 0 && this.selectedCategory) {
+      this.balanceService.addTransaction(amount, this.selectedCategory, 'plus');
+      this.amountInput = '';
       this.panelMode = null;
     }
   }
 
   closeAmountPanel(event?: Event): void {
     event?.stopPropagation();
-    this.amount = null;
+    this.amountInput = '';
     if (this.panelMode === 'amount') {
       this.panelMode = null;
     }
+  }
+
+  private parseAmountInput(rawValue: string): number | null {
+    const normalized = rawValue.replace(/,/g, '.').trim();
+
+    if (!normalized) {
+      return null;
+    }
+
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : null;
   }
 
   addCategory(event: Event): void {
@@ -306,11 +319,11 @@ export class IncomeComponent implements OnInit, OnDestroy {
 
     return `conic-gradient(${parts.join(', ')})`;
   }
-  
+
   private resetEditState(): void {
     this.editModeCategory = '';
     this.panelMode = null;
     this.editedCategoryName = '';
-    this.amount = null;
+    this.amountInput = '';
   }
 }

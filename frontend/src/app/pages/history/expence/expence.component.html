@@ -60,7 +60,7 @@
   <div class="amount-modal-backdrop" *ngIf="selectedCategoryData && panelMode === 'amount'" (click)="closeAmountPanel()">
     <div class="amount-modal" (click)="$event.stopPropagation()">
       <div class="amount-modal-title">{{ selectedCategoryData.name }}</div>
-        <input type="number" [(ngModel)]="amount" placeholder="0.00" inputmode="decimal" min="0.01" step="0.01" />
+        <input type="text" [(ngModel)]="amountInput" placeholder="0,00" inputmode="decimal" autocomplete="off" />
       
         <div class="amount-modal-actions">
           <button type="button" class="small-btn ghost" (click)="closeAmountPanel($event)">Cancel</button>

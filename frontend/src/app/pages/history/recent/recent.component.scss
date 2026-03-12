@@ -100,23 +100,49 @@ $recent-glow: #ff78c7;
   margin-top: 84px;
 }
 .quick-limit-row {
-  display: grid;
-  gap: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   color: #ffeaf6;
   font-size: 12px;
 }
 
-.quick-limit-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.quick-limit-picker {
+  position: relative;
+}
+
+.quick-limit-current {
+  border: 1px solid rgba(255, 181, 224, 0.6);
+  border-radius: 10px;
+  background: rgba(89, 14, 55, 0.75);
+  color: #ffe5f4;
+  padding: 4px 10px;
+  font-size: 12px;
+  min-width: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.quick-limit-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 2;
+  display: grid;
+  gap: 4px;
+  background: rgba(44, 8, 29, 0.98);
+  border: 1px solid rgba(255, 181, 224, 0.45);
+  border-radius: 10px;
+  padding: 6px;
 
   button {
-    border: 1px solid rgba(255, 181, 224, 0.6);
+    border: 1px solid rgba(255, 181, 224, 0.35);
     border-radius: 8px;
-    background: rgba(89, 14, 55, 0.65);
+    background: rgba(89, 14, 55, 0.58);
     color: #ffe5f4;
-    padding: 2px 7px;
+    padding: 3px 8px;
     font-size: 11px;
 
     &.active {

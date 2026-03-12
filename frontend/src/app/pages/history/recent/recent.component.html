@@ -1,9 +1,17 @@
 <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
-  <div class="main-circle">
+  <div class="main-circle" [style.--quick-ring]="quickRingGradient">
     <span class="label">Recent</span>
   </div>
 
   <div class="recent-panel" *ngIf="isFullView" (click)="$event.stopPropagation()">
+    <div class="quick-limit-row">
+      <span>Quick tx count:</span>
+      <div class="quick-limit-actions">
+        @for (limit of [3,4,5,6,7,8,9,10]; track limit) {
+          <button type="button" [class.active]="quickLimit === limit" (click)="setQuickLimit(limit, $event)">{{ limit }}</button>
+        }
+      </div>
+    </div>
     @if (items.length === 0) {
       <p class="recent-empty">No expense stats yet</p>
     } @else {

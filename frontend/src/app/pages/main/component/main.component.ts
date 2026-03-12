@@ -41,10 +41,12 @@ export class MainComponent implements OnInit, OnDestroy {
   activeTab: MainTab = null;
   isEditMode = false;
   frequentExpenses: FrequentExpense[] = [];
+  quickTransactionsLimit = 5;
 
   spherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
   private savedSpherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
   private subscription = new Subscription();
+  private transactionsCache: Transaction[] = [];
 
   private dragState: {
     tab: SphereTab;
@@ -71,7 +73,14 @@ export class MainComponent implements OnInit, OnDestroy {
     );
     this.subscription.add(
       this.balanceService.transactions$.subscribe((transactions) => {
+        this.transactionsCache = transactions;
         this.frequentExpenses = this.buildFrequentExpenses(transactions);
+      })
+    );
+    this.subscription.add(
+      this.balanceService.quickTransactionsLimit$.subscribe((limit) => {
+        this.quickTransactionsLimit = limit;
+        this.frequentExpenses = this.buildFrequentExpenses(this.transactionsCache);
       })
     );
   }
@@ -84,7 +93,11 @@ export class MainComponent implements OnInit, OnDestroy {
     if (this.isEditMode) {
       return;
     }
-    this.activeTab = this.activeTab === tab ? null : tab;
+    const nextTab = this.activeTab === tab ? null : tab;
+    this.activeTab = nextTab;
+    if (nextTab === 'news') {
+      this.balanceService.markAllNewsRead();
+    }
   }
 
   closeActiveTab(): void {
@@ -96,6 +109,10 @@ export class MainComponent implements OnInit, OnDestroy {
 
   repeatFrequentExpense(item: FrequentExpense): void {
     this.balanceService.addTransaction(item.repeatAmount, item.category, 'minus');
+  }
+
+  setQuickTransactionsLimit(limit: number): void {
+    this.balanceService.setQuickTransactionsLimit(limit);
   }
 
   @HostListener('window:keydown.escape')
@@ -315,6 +332,6 @@ export class MainComponent implements OnInit, OnDestroy {
 
     return [...grouped.values()]
       .sort((a, b) => b.repeatCount - a.repeatCount || b.totalAmount - a.totalAmount)
-      .slice(0, 5);
+      .slice(0, this.quickTransactionsLimit);
   }
 }

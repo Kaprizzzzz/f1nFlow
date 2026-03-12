@@ -87,12 +87,8 @@ export class IncomeComponent implements OnInit, OnDestroy {
     return this.isFullView && this.selectedCategoryData ? this.selectedCategoryData.amount : this.totalIncome;
   }
 
-  get incomeShare(): number {
-    const total = this.totalIncome + this.totalExpense;
-    if (total <= 0) {
-      return 0;
-    }
-    return this.totalIncome / total;
+  get categoriesRingGradient(): string {
+    return this.buildCategoryRingGradient(this.categories, 'rgba(137, 211, 255, 0.95)', 'rgba(73, 99, 146, 0.28)');
   }
 
   handleCircleClick(): void {
@@ -117,7 +113,7 @@ export class IncomeComponent implements OnInit, OnDestroy {
   }
 
   getMiniCircleStyle(index: number, total: number): Record<string, string> {
-    const singleItemArcAngle = 270; // Якщо категорія одна, вона буде рівно зверху
+    const singleItemArcAngle = 270;
     const startAngle = 205;
     const endAngle = 335;
     const angle = total <= 1 ? singleItemArcAngle : startAngle + ((endAngle - startAngle) * index) / (total - 1);
@@ -281,6 +277,36 @@ export class IncomeComponent implements OnInit, OnDestroy {
     this.resetEditState();
   }
 
+  private buildCategoryRingGradient(categories: CategoryItem[], activeColor: string, emptyColor: string): string {
+    const total = categories.reduce((sum, item) => sum + Math.max(0, item.amount), 0);
+    if (total <= 0) {
+      return `conic-gradient(${emptyColor} 0deg, ${emptyColor} 360deg)`;
+    }
+
+    const gap = 1.5;
+    let cursor = 0;
+    const parts: string[] = [];
+
+    for (const category of categories) {
+      const share = (Math.max(0, category.amount) / total) * 360;
+      const start = cursor;
+      const end = Math.min(360, cursor + share);
+      const visibleEnd = Math.max(start, end - gap);
+
+      parts.push(`${activeColor} ${start}deg ${visibleEnd}deg`);
+      if (visibleEnd < end) {
+        parts.push(`${emptyColor} ${visibleEnd}deg ${end}deg`);
+      }
+      cursor = end;
+    }
+
+    if (cursor < 360) {
+      parts.push(`${emptyColor} ${cursor}deg 360deg`);
+    }
+
+    return `conic-gradient(${parts.join(', ')})`;
+  }
+  
   private resetEditState(): void {
     this.editModeCategory = '';
     this.panelMode = null;

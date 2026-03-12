@@ -1,0 +1,23 @@
+.goals-screen.theme-girly {
+  color: #ffe6f4;
+
+  .card {
+    border-color: rgba(255, 145, 209, 0.44);
+    background: linear-gradient(180deg, rgba(66, 20, 52, 0.92), rgba(38, 8, 29, 0.95));
+    box-shadow: 0 0 16px rgba(255, 128, 199, 0.18);
+  }
+
+  input {
+    background: rgba(71, 22, 54, 0.84);
+    border-color: rgba(255, 157, 219, 0.5);
+    color: #ffe6f4;
+  }
+
+  .segments i {
+    background: linear-gradient(180deg, #ffb2e1 0%, #ff78c7 100%);
+  }
+
+  .theme-chip.active {
+    box-shadow: 0 0 16px rgba(255, 120, 199, 0.45);
+  }
+}

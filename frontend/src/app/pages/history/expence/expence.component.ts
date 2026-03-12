@@ -87,12 +87,8 @@ export class ExpenceComponent implements OnInit, OnDestroy {
     return this.isFullView && this.selectedCategoryData ? this.selectedCategoryData.amount : this.totalExpense;
   }
 
-  get expenseShare(): number {
-    const total = this.totalIncome + this.totalExpense;
-    if (total <= 0) {
-      return 0;
-    }
-    return this.totalExpense / total;
+  get categoriesRingGradient(): string {
+    return this.buildCategoryRingGradient(this.categories, 'rgba(255, 166, 166, 0.94)', 'rgba(127, 70, 85, 0.35)');
   }
   
   handleCircleClick(): void {
@@ -116,20 +112,17 @@ export class ExpenceComponent implements OnInit, OnDestroy {
     this.amount = null;
   }
 
-  /**
-   * Обчислює позицію іконки на дузі навколо основного кола
-   */
   getMiniCircleStyle(index: number, total: number): Record<string, string> {
-    const singleItemArcAngle = 270; // Кут для одиночного елемента (зверху)
-    const startAngle = 205; // Початок дуги
-    const endAngle = 335;   // Кінець дуги
-    
-    const angle = total <= 1 
-      ? singleItemArcAngle 
+    const singleItemArcAngle = 270;
+    const startAngle = 205;
+    const endAngle = 335;
+
+    const angle = total <= 1
+      ? singleItemArcAngle
       : startAngle + ((endAngle - startAngle) * index) / (total - 1);
     
     const radians = (angle * Math.PI) / 180;
-    const radius = 172; // Відстань від центру основного кола
+    const radius = 172;
 
     return {
       left: `${Math.cos(radians) * radius}px`,
@@ -288,6 +281,36 @@ export class ExpenceComponent implements OnInit, OnDestroy {
     this.resetEditState();
   }
 
+  private buildCategoryRingGradient(categories: CategoryItem[], activeColor: string, emptyColor: string): string {
+    const total = categories.reduce((sum, item) => sum + Math.max(0, item.amount), 0);
+    if (total <= 0) {
+      return `conic-gradient(${emptyColor} 0deg, ${emptyColor} 360deg)`;
+    }
+
+    const gap = 1.5;
+    let cursor = 0;
+    const parts: string[] = [];
+
+    for (const category of categories) {
+      const share = (Math.max(0, category.amount) / total) * 360;
+      const start = cursor;
+      const end = Math.min(360, cursor + share);
+      const visibleEnd = Math.max(start, end - gap);
+
+      parts.push(`${activeColor} ${start}deg ${visibleEnd}deg`);
+      if (visibleEnd < end) {
+        parts.push(`${emptyColor} ${visibleEnd}deg ${end}deg`);
+      }
+      cursor = end;
+    }
+
+    if (cursor < 360) {
+      parts.push(`${emptyColor} ${cursor}deg 360deg`);
+    }
+
+    return `conic-gradient(${parts.join(', ')})`;
+  }
+  
   private resetEditState(): void {
     this.editModeCategory = '';
     this.panelMode = null;

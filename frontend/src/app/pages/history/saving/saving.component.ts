@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BalanceService, CategoryItem, Transaction } from '../balance.service';
+import { BalanceService, CategoryItem, NewsItem, Transaction } from '../balance.service';
 import { combineLatest, Subscription } from 'rxjs';
  
  interface SavingsHistoryRow {
@@ -28,6 +28,7 @@ import { combineLatest, Subscription } from 'rxjs';
    incomeTotal = 0;
    expenseTotal = 0;
    historyRows: SavingsHistoryRow[] = [];
+   newsItems: NewsItem[] = [];
  
    private subscriptions = new Subscription();
  
@@ -38,9 +39,11 @@ import { combineLatest, Subscription } from 'rxjs';
       combineLatest([
         this.balanceService.transactions$,
         this.balanceService.incomeCategories$,
-        this.balanceService.expenseCategories$
-      ]).subscribe(([transactions, incomeCategories, expenseCategories]) => {
+        this.balanceService.expenseCategories$,
+        this.balanceService.news$
+      ]).subscribe(([transactions, incomeCategories, expenseCategories, news]) => {
         this.historyRows = this.buildSavingsHistory(transactions, incomeCategories, expenseCategories);
+        this.newsItems = news;
 
         const income = incomeCategories.reduce((acc, item) => acc + item.amount, 0);
         const expense = expenseCategories.reduce((acc, item) => acc + item.amount, 0);
@@ -70,6 +73,30 @@ import { combineLatest, Subscription } from 'rxjs';
       return 0;
     }
     return this.incomeTotal / total;
+  }
+
+  get hasUnreadNews(): boolean {
+    return this.newsItems.some((item) => !item.isRead);
+  }
+
+  get newsRingGradient(): string {
+    if (this.newsItems.length === 0) {
+      return 'conic-gradient(rgba(120, 255, 209, 0.26) 0deg, rgba(120, 255, 209, 0.26) 360deg)';
+    }
+
+    const segment = 360 / this.newsItems.length;
+    const gap = Math.min(2.4, segment * 0.2);
+    const parts: string[] = [];
+
+    this.newsItems.forEach((item, index) => {
+      const start = index * segment;
+      const end = (index + 1) * segment;
+      const fill = item.isRead ? 'rgba(104, 184, 157, 0.48)' : 'rgba(166, 255, 223, 0.98)';
+      parts.push(`${fill} ${start}deg ${Math.max(start, end - gap)}deg`);
+      parts.push(`rgba(120, 255, 209, 0.26) ${Math.max(start, end - gap)}deg ${end}deg`);
+    });
+
+    return `conic-gradient(${parts.join(', ')})`;
   }
 
   private buildSavingsHistory(

@@ -18,6 +18,12 @@
    icon?: string;
  }
  
+ export interface NewsItem {
+   id: string;
+   title: string;
+   isRead: boolean;
+ }
+
 export type SphereTab = 'income' | 'expense' | 'saving' | 'news' | 'recent';
 export type SphereLayout = Record<SphereTab, { left: number; top: number }>;
 
@@ -28,6 +34,8 @@ interface PersistedStatePayload {
     expenseCategories?: CategoryItem[];
     currency?: 'EUR' | 'USD' | 'UAH';
     sphereLayout?: SphereLayout | null;
+    quickTransactionsLimit?: number;
+    news?: NewsItem[];
   };
 }
 
@@ -42,6 +50,12 @@ interface PersistedStatePayload {
    private expenseCategoriesSubject = new BehaviorSubject<CategoryItem[]>([]);
    private currencySubject = new BehaviorSubject<'EUR' | 'USD' | 'UAH'>('EUR');
    private sphereLayoutSubject = new BehaviorSubject<SphereLayout | null>(null);
+   private quickTransactionsLimitSubject = new BehaviorSubject<number>(5);
+   private newsSubject = new BehaviorSubject<NewsItem[]>([
+    { id: '1', title: 'Market update', isRead: false },
+    { id: '2', title: 'Budget tip of the week', isRead: false },
+    { id: '3', title: 'Saving challenge', isRead: true }
+   ]);
  
    private isHydrating = false;
    private isCurrencyConverting = false;
@@ -52,6 +66,8 @@ interface PersistedStatePayload {
    expenseCategories$ = this.expenseCategoriesSubject.asObservable();
    currency$ = this.currencySubject.asObservable();
    sphereLayout$ = this.sphereLayoutSubject.asObservable();
+   quickTransactionsLimit$ = this.quickTransactionsLimitSubject.asObservable();
+   news$ = this.newsSubject.asObservable();
  
    constructor(
     @Inject(PLATFORM_ID) platformId: Object,
@@ -81,6 +97,8 @@ interface PersistedStatePayload {
           this.expenseCategoriesSubject.next(this.normalizeCategories(state.user?.expenseCategories ?? []));
           this.currencySubject.next(state.user?.currency ?? 'EUR');
           this.sphereLayoutSubject.next(this.normalizeSphereLayout(state.user?.sphereLayout ?? null));
+          this.quickTransactionsLimitSubject.next(this.normalizeQuickLimit(state.user?.quickTransactionsLimit));
+          this.newsSubject.next(this.normalizeNews(state.user?.news));
           this.syncBalanceAndTransactions(false);
           this.isHydrating = false;
         },
@@ -157,6 +175,16 @@ interface PersistedStatePayload {
 
   getSphereLayout(): SphereLayout | null {
     return this.normalizeSphereLayout(this.sphereLayoutSubject.value);
+  }
+
+  setQuickTransactionsLimit(limit: number): void {
+    this.quickTransactionsLimitSubject.next(this.normalizeQuickLimit(limit));
+    this.persistState();
+  }
+
+  markAllNewsRead(): void {
+    this.newsSubject.next(this.newsSubject.value.map((item) => ({ ...item, isRead: true })));
+    this.persistState();
   }
 
   private normalizeSphereLayout(layout: SphereLayout | null): SphereLayout | null {
@@ -297,11 +325,13 @@ interface PersistedStatePayload {
  
      try {
        const parsed = JSON.parse(rawState) as {
-         transactions?: Array<Omit<Transaction, 'date'> & { date: string }>;
-         incomeCategories?: CategoryItem[];
-         expenseCategories?: CategoryItem[];
-        currency?: 'EUR' | 'USD' | 'UAH';
-        sphereLayout?: SphereLayout;
+          transactions?: Array<Omit<Transaction, 'date'> & { date: string }>;
+          incomeCategories?: CategoryItem[];
+          expenseCategories?: CategoryItem[];
+          currency?: 'EUR' | 'USD' | 'UAH';
+          sphereLayout?: SphereLayout;
+          quickTransactionsLimit?: number;
+          news?: NewsItem[];
        };
  
        this.transactions = (parsed.transactions ?? []).map((tx) => ({
@@ -313,7 +343,9 @@ interface PersistedStatePayload {
        this.expenseCategoriesSubject.next(this.normalizeCategories(parsed.expenseCategories ?? []));
        this.currencySubject.next(parsed.currency ?? 'EUR');
        this.sphereLayoutSubject.next(this.normalizeSphereLayout(parsed.sphereLayout ?? null));
-     } catch {
+       this.quickTransactionsLimitSubject.next(this.normalizeQuickLimit(parsed.quickTransactionsLimit));
+       this.newsSubject.next(this.normalizeNews(parsed.news));
+      } catch {
        localStorage.removeItem(this.storageKey);
      }
    }
@@ -326,9 +358,11 @@ interface PersistedStatePayload {
      const payload = {
        transactions: this.transactions,
        incomeCategories: this.incomeCategoriesSubject.value,
-      expenseCategories: this.expenseCategoriesSubject.value,
-      currency: this.currencySubject.value,
-      sphereLayout: this.sphereLayoutSubject.value
+       expenseCategories: this.expenseCategoriesSubject.value,
+       currency: this.currencySubject.value,
+       sphereLayout: this.sphereLayoutSubject.value,
+       quickTransactionsLimit: this.quickTransactionsLimitSubject.value,
+       news: this.newsSubject.value
      };
  
      localStorage.setItem(this.storageKey, JSON.stringify(payload));
@@ -391,6 +425,30 @@ interface PersistedStatePayload {
     const fromInUsd = ratesInUsd[fromCurrency];
     const toInUsd = ratesInUsd[toCurrency];
     return fromInUsd / toInUsd;
+  }
+
+  private normalizeQuickLimit(limit: number | undefined): number {
+    const raw = Number(limit);
+    if (!Number.isFinite(raw)) {
+      return 5;
+    }
+    return Math.min(10, Math.max(3, Math.round(raw)));
+  }
+
+  private normalizeNews(news?: NewsItem[]): NewsItem[] {
+    if (!news || news.length === 0) {
+      return [
+        { id: '1', title: 'Market update', isRead: false },
+        { id: '2', title: 'Budget tip of the week', isRead: false },
+        { id: '3', title: 'Saving challenge', isRead: true }
+      ];
+    }
+
+    return news.map((item, index) => ({
+      id: item.id || String(index + 1),
+      title: item.title || 'News',
+      isRead: !!item.isRead
+    }));
   }
 
   private async fetchConversionRate(

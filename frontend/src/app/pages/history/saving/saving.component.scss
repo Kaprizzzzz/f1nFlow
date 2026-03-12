@@ -8,6 +8,7 @@ $saving-glow: #63ffd0;
 
   .main-circle {
     --income-share: 0;
+    --news-ring: conic-gradient(rgba(120, 255, 209, 0.26) 0deg, rgba(120, 255, 209, 0.26) 360deg);
     width: 143px;
     height: 143px;
     border-radius: 50%;
@@ -23,6 +24,23 @@ $saving-glow: #63ffd0;
     transform-origin: center;
     transition: transform 0.35s ease;
     position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -18px;
+      border-radius: 50%;
+      background: var(--news-ring);
+      -webkit-mask: radial-gradient(circle, transparent 72%, black 75%);
+      mask: radial-gradient(circle, transparent 72%, black 75%);
+      pointer-events: none;
+      opacity: 0.85;
+    }
+
+    &.unread-news::before {
+      box-shadow: 0 0 18px rgba(143, 255, 221, 0.45);
+      opacity: 1;
+    }
 
     &::after {
       content: '';

@@ -105,8 +105,10 @@
        <app-recent
          [isFullView]="activeTab === 'recent'"
          [items]="frequentExpenses"
+         [quickLimit]="quickTransactionsLimit"
          (onSelect)="setActiveTab('recent')"
          (onRepeat)="repeatFrequentExpense($event)"
+         (quickLimitChange)="setQuickTransactionsLimit($event)"
        ></app-recent>
      </div>
    </div>

@@ -10,7 +10,7 @@ $income-glow: #62b5ff;
   padding-top: 0;
 
   .main-circle {
-    --income-share: 0;
+    --category-ring: conic-gradient(rgba(73, 99, 146, 0.28) 0deg, rgba(73, 99, 146, 0.28) 360deg);
     width: 220px;
     height: 220px;
     border-radius: 50%;
@@ -32,12 +32,7 @@ $income-glow: #62b5ff;
       position: absolute;
       inset: -10px;
       border-radius: 50%;
-      background: conic-gradient(
-        rgba(137, 211, 255, 0.95) 0deg,
-        rgba(137, 211, 255, 0.95) calc(var(--income-share, 0) * 360deg),
-        rgba(73, 99, 146, 0.28) calc(var(--income-share, 0) * 360deg),
-        rgba(73, 99, 146, 0.28) 360deg
-      );
+      background: var(--category-ring);
       -webkit-mask: radial-gradient(circle, transparent 66%, black 69%);
       mask: radial-gradient(circle, transparent 66%, black 69%);
       pointer-events: none;

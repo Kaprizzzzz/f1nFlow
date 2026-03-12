@@ -7,6 +7,8 @@ $recent-glow: #ff78c7;
   align-items: center;
 
   .main-circle {
+    --quick-ring: conic-gradient(rgba(255, 167, 223, 0.95) 0deg, rgba(112, 34, 76, 0.44) 360deg);
+    position: relative;
     width: 152px;
     height: 152px;
     border-radius: 50%;
@@ -19,6 +21,17 @@ $recent-glow: #ff78c7;
     align-items: center;
     transform: scale(1);
     transition: transform 0.35s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      background: var(--quick-ring);
+      -webkit-mask: radial-gradient(circle, transparent 66%, black 69%);
+      mask: radial-gradient(circle, transparent 66%, black 69%);
+      pointer-events: none;
+    }
 
     .label {
       font-size: 24px;
@@ -85,4 +98,30 @@ $recent-glow: #ff78c7;
 
 .circle-wrapper.active .recent-panel {
   margin-top: 84px;
+}
+.quick-limit-row {
+  display: grid;
+  gap: 6px;
+  color: #ffeaf6;
+  font-size: 12px;
+}
+
+.quick-limit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  button {
+    border: 1px solid rgba(255, 181, 224, 0.6);
+    border-radius: 8px;
+    background: rgba(89, 14, 55, 0.65);
+    color: #ffe5f4;
+    padding: 2px 7px;
+    font-size: 11px;
+
+    &.active {
+      background: rgba(255, 120, 199, 0.35);
+      box-shadow: 0 0 10px rgba(255, 120, 199, 0.3);
+    }
+  }
 }

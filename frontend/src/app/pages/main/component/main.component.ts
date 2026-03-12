@@ -21,7 +21,7 @@ const DEFAULT_SPHERE_POSITIONS: SphereLayout = {
 
 const SPHERE_TOP_GAP = 0;
 // Визначає базовий відступ куль від нижньої панелі роутингу.
-const ROUTING_PANEL_BOTTOM_OFFSET_DESKTOP = 22;
+const ROUTING_PANEL_BOTTOM_OFFSET = 4;
 const ROUTING_PANEL_BOTTOM_OFFSET_MOBILE = 8;
 
 @Component({

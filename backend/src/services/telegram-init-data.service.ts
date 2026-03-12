@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { createHash, createHmac, timingSafeEqual } from 'crypto';
 
 export interface TelegramProfileFromInitData {
   telegramId: string;
@@ -7,7 +9,9 @@ export interface TelegramProfileFromInitData {
 
 @Injectable()
 export class TelegramInitDataService {
-  parse(initData?: string | null): TelegramProfileFromInitData | null {
+  constructor(private readonly configService: ConfigService) {}
+
+  validateAndParse(initData?: string | null): TelegramProfileFromInitData | null {
     if (!initData) {
       return null;
     }
@@ -17,7 +21,40 @@ export class TelegramInitDataService {
       return null;
     }
 
+     const botToken = this.configService.get<string>('TELEGRAM_BOT_TOKEN');
+    if (!botToken) {
+      return null;
+    }
+
+
     const params = new URLSearchParams(normalized);
+    const hash = params.get('hash');
+    if (!hash) {
+      return null;
+    }
+
+    const entries = [...params.entries()]
+      .filter(([key]) => key !== 'hash')
+      .sort(([a], [b]) => a.localeCompare(b));
+
+    const checkString = entries.map(([key, value]) => `${key}=${value}`).join('\n');
+    const secretKey = createHash('sha256').update(botToken).digest();
+    const computedHash = createHmac('sha256', secretKey).update(checkString).digest('hex');
+
+    const expectedBuffer = Buffer.from(computedHash, 'hex');
+    const providedBuffer = Buffer.from(hash, 'hex');
+
+    if (expectedBuffer.length !== providedBuffer.length || !timingSafeEqual(expectedBuffer, providedBuffer)) {
+      return null;
+    }
+
+    const authDateRaw = params.get('auth_date');
+    const authDate = Number(authDateRaw);
+    const maxAgeSeconds = Number(this.configService.get('TELEGRAM_INIT_DATA_MAX_AGE_SECONDS') ?? 86400);
+    if (!Number.isFinite(authDate) || Math.abs(Date.now() / 1000 - authDate) > maxAgeSeconds) {
+      return null;
+    }
+
     const userRaw = params.get('user');
 
     if (!userRaw) {

@@ -5,10 +5,11 @@
  import { User } from '../entities/user.entity';
  import { Transaction } from '../entities/transaction.entity';
  import { TelegramInitDataService } from '../services/telegram-init-data.service';
+ import { AuthGuard } from '../common/guards';
  
  @Module({
   imports: [TypeOrmModule.forFeature([User, Transaction])],
-  providers: [UsersService, TelegramInitDataService],
+  providers: [UsersService, TelegramInitDataService, AuthGuard],
   controllers: [UsersController],
   exports: [UsersService]
  })

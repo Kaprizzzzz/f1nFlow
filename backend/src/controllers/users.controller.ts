@@ -1,13 +1,21 @@
-import { BadRequestException, Body, Controller, Get, Headers, Param, Patch, Post, Put } from '@nestjs/common';
-import { UsersService } from '../services/users.service';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Patch,
+  Post,
+  Put,
+  Req,
+  UnauthorizedException,
+  UseGuards
+} from '@nestjs/common';
+import { Request } from 'express';
+import { LoginDto, PresenceDto, SaveStateDto } from '../common/dto';
+import { AuthGuard } from '../common/guards';
 import { TelegramInitDataService } from '../services/telegram-init-data.service';
-
-interface LoginPayload {
-  telegramId?: string;
-  userName?: string;
-  initData?: string;
-  referredBy?: string;
-}
+import { UsersService } from '../services/users.service';
 
 @Controller('users')
 export class UsersController {
@@ -18,12 +26,19 @@ export class UsersController {
 
   @Post('login')
   async login(
-    @Body() data: LoginPayload,
+    @Body() data: LoginDto,
     @Headers('authorization') authorization?: string,
     @Headers('x-telegram-init-data') headerInitData?: string
   ) {
     const authInitData = authorization?.startsWith('tma ') ? authorization.slice(4) : undefined;
-    const parsedTelegramProfile = this.telegramInitDataService.parse(data?.initData || headerInitData || authInitData);
+    const parsedTelegramProfile = this.telegramInitDataService.validateAndParse(
+      data?.initData || headerInitData || authInitData
+    );
+
+    const allowInsecure = (process.env.ALLOW_INSECURE_LOGIN || '').toLowerCase() === 'true';
+    if (!parsedTelegramProfile && !allowInsecure) {
+      throw new UnauthorizedException('Invalid Telegram initData signature');
+    }
 
     const telegramId = parsedTelegramProfile?.telegramId || data.telegramId;
     const userName = parsedTelegramProfile?.userName || data.userName;
@@ -32,43 +47,62 @@ export class UsersController {
       throw new BadRequestException('telegramId is required for login');
     }
 
-    return this.usersService.findOrCreateUser(telegramId, userName || `Guest ${telegramId.slice(-4)}`, data?.referredBy); 
-}
+    const user = await this.usersService.findOrCreateUser(
+      telegramId,
+      userName || `Guest ${telegramId.slice(-4)}`,
+      data?.referredBy
+    );
 
+    const accessToken = await this.usersService.issueSessionToken(user.id);
 
+    return {
+      user,
+      accessToken
+    };
+  }
 
-  @Get(':telegramId/state')
-  async getState(@Param('telegramId') telegramId: string) {
+  @Get('me/state')
+  @UseGuards(AuthGuard)
+  async getState(@Req() request: Request & { user?: { telegramId: string } }) {
+    const telegramId = request.user?.telegramId;
+    if (!telegramId) {
+      throw new BadRequestException('Authenticated user is required');
+    }
     return this.usersService.getUserState(telegramId);
   }
 
-  @Put(':telegramId/state')
+  @Put('me/state')
+  @UseGuards(AuthGuard)
   async saveState(
-    @Param('telegramId') telegramId: string,
-    @Body()
-    payload: {
-      currency?: string;
-      incomeCategories?: Array<{ name: string; amount: number; icon?: string }>;
-      expenseCategories?: Array<{ name: string; amount: number; icon?: string }>;
-      sphereLayout?: Record<'income' | 'expense' | 'saving' | 'news', { left: number; top: number }>;
-      transactions?: Array<{
-        amount: number;
-        category: string;
-        type: 'plus' | 'minus';
-        date: string;
-        label?: string;
-      }>;
-    }
+    @Req() request: Request & { user?: { telegramId: string } },
+    @Body() payload: SaveStateDto
   ) {
+    const telegramId = request.user?.telegramId;
+    if (!telegramId) {
+      throw new BadRequestException('Authenticated user is required');
+    }
     return this.usersService.saveUserState(telegramId, payload);
   }
 
-  @Patch(':telegramId/presence')
-  async setPresence(@Param('telegramId') telegramId: string, @Body() payload: { isOnline: boolean }) {
+  @Patch('me/presence')
+  @UseGuards(AuthGuard)
+  async setPresence(
+    @Req() request: Request & { user?: { telegramId: string } },
+    @Body() payload: PresenceDto
+  ) {
+    const telegramId = request.user?.telegramId;
+    if (!telegramId) {
+      throw new BadRequestException('Authenticated user is required');
+    }
     return this.usersService.updatePresence(telegramId, payload.isOnline);
   }
-  @Get(':telegramId/referrals')
-    async getReferrals(@Param('telegramId') telegramId: string) {
-      return this.usersService.getReferralOverview(telegramId);
+ @Get('me/referrals')
+  @UseGuards(AuthGuard)
+  async getReferrals(@Req() request: Request & { user?: { telegramId: string } }) {
+    const telegramId = request.user?.telegramId;
+    if (!telegramId) {
+      throw new BadRequestException('Authenticated user is required');
+    }
+    return this.usersService.getReferralOverview(telegramId);
   }
 }

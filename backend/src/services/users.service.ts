@@ -1,23 +1,13 @@
- import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
- import { InjectRepository } from '@nestjs/typeorm';
- import { QueryFailedError, Repository } from 'typeorm';
- import { User } from '../entities/user.entity';
- import { Transaction } from '../entities/transaction.entity';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { createHash, randomBytes } from 'crypto';
+import { QueryFailedError, Repository } from 'typeorm';
+import { User } from '../entities/user.entity';
+import { Transaction } from '../entities/transaction.entity';
+import { SaveStateDto } from '../common/dto';
 
-interface SaveStatePayload {
-  currency?: string;
-  incomeCategories?: Array<{ name: string; amount: number; icon?: string }>;
-  expenseCategories?: Array<{ name: string; amount: number; icon?: string }>;
-  sphereLayout?: User['sphereLayout'];
-  transactions?: Array<{
-    amount: number;
-    category: string;
-    type: 'plus' | 'minus';
-    date: string;
-    label?: string;
-  }>;
-}
- 
+
+
 interface EnsureUserPayload {
   telegramId: string;
   userName?: string;
@@ -25,10 +15,10 @@ interface EnsureUserPayload {
 }  
 
  @Injectable()
- export class UsersService {
-   constructor(
-     @InjectRepository(User)
-     private usersRepository: Repository<User>,
+export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
     @InjectRepository(Transaction)
     private transactionsRepository: Repository<Transaction>
    ) {}
@@ -48,6 +38,26 @@ interface EnsureUserPayload {
       user = await this.usersRepository.save(user);
     }
     return user;
+  }
+
+  async issueSessionToken(userId: string): Promise<string> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const token = randomBytes(32).toString('hex');
+    user.sessionTokenHash = this.hashToken(token);
+    await this.usersRepository.save(user);
+    return token;
+  }
+
+  async findBySessionToken(token: string): Promise<User | null> {
+    if (!token) {
+      return null;
+    }
+
+    return this.usersRepository.findOne({ where: { sessionTokenHash: this.hashToken(token) } });
   }
 
   async getUserState(telegramId: string) {
@@ -76,13 +86,15 @@ interface EnsureUserPayload {
     };
   }
 
-  async saveUserState(telegramId: string, payload: SaveStatePayload) {
+  async saveUserState(telegramId: string, payload: SaveStateDto) {
     const user = await this.ensureUser({ telegramId });
 
     user.currency = payload.currency ?? user.currency;
     user.incomeCategories = payload.incomeCategories ?? user.incomeCategories ?? [];
     user.expenseCategories = payload.expenseCategories ?? user.expenseCategories ?? [];
     user.sphereLayout = payload.sphereLayout ?? user.sphereLayout;
+    user.quickTransactionsLimit = payload.quickTransactionsLimit ?? user.quickTransactionsLimit ?? 3;
+    user.news = payload.news ?? user.news ?? [];
     user.lastSeenAt = new Date();
 
     await this.usersRepository.save(user);
@@ -161,7 +173,11 @@ interface EnsureUserPayload {
     };
   }
 
-   private async createUserSafely(telegramId: string, userName?: string, referredBy?: string): Promise<User> {
+  private hashToken(token: string): string {
+    return createHash('sha256').update(token).digest('hex');
+  }
+
+  private async createUserSafely(telegramId: string, userName?: string, referredBy?: string): Promise<User> {
     try {
       return await this.usersRepository.save(
         this.usersRepository.create({

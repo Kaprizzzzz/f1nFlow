@@ -9,6 +9,10 @@ interface UserProfile {
   userName: string;
   initData?: string;
 }
+
+interface LoginResponse {
+  accessToken: string;
+}
  
 type TelegramWebAppUser = {
   id?: number | string;
@@ -32,6 +36,7 @@ export class SessionService {
   private readonly isBrowser: boolean;
   private readonly fallbackIdKey = 'f1nflow-fallback-telegram-id';
   private readonly apiUrlStorageKey = 'f1nflow-api-url';
+  private readonly sessionTokenKey = 'f1nflow-session-token';
 
   private lastApiUrl: string | null = null;
   private hasBeforeUnloadListener = false;
@@ -67,12 +72,13 @@ export class SessionService {
     const profile = this.resolveProfile();
     this.userSubject.next(profile);
 
-    return this.http.post(`${this.getApiUrl()}/users/login`, {
+    return this.http.post<LoginResponse>(`${this.getApiUrl()}/users/login`, {
       telegramId: profile.telegramId,
       userName: profile.userName,
       initData: profile.initData
     }).pipe(
-      tap(() => {
+      tap((response) => {
+        localStorage.setItem(this.sessionTokenKey, response.accessToken);
         this.sendPresence(true);
         if (!this.hasBeforeUnloadListener) {
           window.addEventListener('beforeunload', () => this.sendPresence(false));
@@ -83,13 +89,13 @@ export class SessionService {
     );
   }
 
-  fetchState(telegramId: string): Observable<unknown> {
-    return this.http.get(`${this.getApiUrl()}/users/${telegramId}/state`);
+  fetchState(): Observable<unknown> {
+    return this.http.get(`${this.getApiUrl()}/users/me/state`);
   }
 
-  saveState(telegramId: string, payload: unknown): void {
+  saveState(payload: unknown): void {
     this.http
-      .put(`${this.getApiUrl()}/users/${telegramId}/state`, payload)
+      .put(`${this.getApiUrl()}/users/me/state`, payload)
       .pipe(catchError(() => EMPTY))
       .subscribe();
    }
@@ -101,7 +107,7 @@ export class SessionService {
     }
 
     this.http
-      .patch(`${this.getApiUrl()}/users/${user.telegramId}/presence`, { isOnline })
+      .patch(`${this.getApiUrl()}/users/me/presence`, { isOnline })
       .pipe(catchError(() => EMPTY))
       .subscribe();
   }
@@ -214,4 +220,10 @@ export class SessionService {
       initData: this.getTelegramInitData()
     };
    }
+   getSessionToken(): string | null {
+    if (!this.isBrowser) {
+      return null;
+    }
+    return localStorage.getItem(this.sessionTokenKey);
+  }
 }

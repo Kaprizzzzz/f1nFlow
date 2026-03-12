@@ -82,7 +82,7 @@ interface PersistedStatePayload {
         return;
       }
 
-      this.sessionService.fetchState(user.telegramId).subscribe({
+      this.sessionService.fetchState().subscribe({
         next: (payload) => {
           const state = payload as PersistedStatePayload;
 

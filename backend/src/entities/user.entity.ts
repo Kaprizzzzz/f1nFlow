@@ -39,6 +39,15 @@ export type SphereLayout = Record<'income' | 'expense' | 'saving' | 'news', { le
   @Column({ type: 'jsonb', nullable: true })
   sphereLayout: SphereLayout | null;
 
+  @Column({ type: 'int', default: 3 })
+  quickTransactionsLimit: number;
+
+  @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
+  news: Array<{ id: string; title: string; isRead: boolean }>;
+
+  @Column({ nullable: true })
+  sessionTokenHash: string | null;
+
   @Column({ default: false })
   isOnline: boolean;
 

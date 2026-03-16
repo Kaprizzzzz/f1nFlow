@@ -299,6 +299,10 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
    private getRoutingPanelBottomOffset(): number {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return ROUTING_PANEL_BOTTOM_OFFSET_DESKTOP;
+    }
+    
     return window.matchMedia('(max-width: 560px)').matches
       ? ROUTING_PANEL_BOTTOM_OFFSET_MOBILE
       : ROUTING_PANEL_BOTTOM_OFFSET_DESKTOP;

@@ -67,6 +67,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
    private setupTelegramWebApp(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    
     const webApp = (window as TelegramWindow).Telegram?.WebApp;
     if (!webApp) {
       return;

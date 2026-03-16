@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { BalanceService, Transaction } from '../history/balance.service';
+import { BalanceService, GoalsPreferences, Transaction } from '../history/balance.service';
+
 
 type ViewMode = 'amount' | 'segments';
 type GoalsTheme = 'default' | 'girly';
@@ -52,6 +53,12 @@ export class GoalsComponent implements OnInit, OnDestroy {
         this.recalculate();
       })
     );
+
+    this.subscription.add(
+      this.balanceService.goalsPreferences$.subscribe((preferences) => {
+        this.applyGoalsPreferences(preferences);
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -60,10 +67,12 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
   setVisualizationMode(mode: ViewMode): void {
     this.visualizationMode = mode;
+    this.persistGoalsPreferences();
   }
 
   setTheme(theme: GoalsTheme): void {
     this.theme = theme;
+    this.persistGoalsPreferences();
   }
 
   toggleUiPicker(event: Event): void {
@@ -126,6 +135,18 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
   get todayDate(): string {
     return this.toInputDate(new Date());
+  }
+
+  private persistGoalsPreferences(): void {
+    this.balanceService.setGoalsPreferences({
+      theme: this.theme,
+      visualizationMode: this.visualizationMode
+    });
+  }
+
+  private applyGoalsPreferences(preferences: GoalsPreferences): void {
+    this.theme = preferences.theme;
+    this.visualizationMode = preferences.visualizationMode;
   }
 
   private buildSummary(periodTransactions: Transaction[], type: 'plus' | 'minus'): CategorySummary[] {

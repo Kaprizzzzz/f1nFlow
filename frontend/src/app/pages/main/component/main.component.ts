@@ -58,6 +58,8 @@ export class MainComponent implements OnInit, OnDestroy {
   } | null = null;
 
   private previousBodyTouchAction = '';
+  private readonly globalPointerMoveHandler = (event: PointerEvent): void => this.onDragMove(event);
+  private readonly globalPointerUpHandler = (event: PointerEvent): void => this.onGlobalPointerStop(event);
 
   constructor(private balanceService: BalanceService) {}
 
@@ -86,6 +88,7 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.detachGlobalPointerListeners();
     this.subscription.unsubscribe();
   }
 
@@ -175,6 +178,7 @@ export class MainComponent implements OnInit, OnDestroy {
     };
 
     sphere.setPointerCapture(event.pointerId);
+    this.attachGlobalPointerListeners();
     this.previousBodyTouchAction = document.body.style.touchAction;
     document.body.style.touchAction = 'none';
   }
@@ -212,6 +216,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
   stopDrag(): void {
     this.dragState = null;
+    this.detachGlobalPointerListeners();
     document.body.style.touchAction = this.previousBodyTouchAction;
   }
 
@@ -316,6 +321,27 @@ export class MainComponent implements OnInit, OnDestroy {
       recent: { ...positions.recent }
     };
   }
+
+  private onGlobalPointerStop(event: PointerEvent): void {
+    if (!this.dragState || event.pointerId !== this.dragState.pointerId) {
+      return;
+    }
+
+    this.stopDrag();
+  }
+
+  private attachGlobalPointerListeners(): void {
+    window.addEventListener('pointermove', this.globalPointerMoveHandler, { passive: false });
+    window.addEventListener('pointerup', this.globalPointerUpHandler, { passive: true });
+    window.addEventListener('pointercancel', this.globalPointerUpHandler, { passive: true });
+  }
+
+  private detachGlobalPointerListeners(): void {
+    window.removeEventListener('pointermove', this.globalPointerMoveHandler);
+    window.removeEventListener('pointerup', this.globalPointerUpHandler);
+    window.removeEventListener('pointercancel', this.globalPointerUpHandler);
+  }
+
   private buildFrequentExpenses(transactions: Transaction[]): FrequentExpense[] {
     const expenseTransactions = transactions
       .filter((item) => item.type === 'minus')

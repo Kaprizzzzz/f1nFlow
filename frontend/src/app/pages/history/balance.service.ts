@@ -26,6 +26,10 @@
 
 export type SphereTab = 'income' | 'expense' | 'saving' | 'news' | 'recent';
 export type SphereLayout = Record<SphereTab, { left: number; top: number }>;
+export type GoalsPreferences = {
+  theme: 'default' | 'girly';
+  visualizationMode: 'amount' | 'segments';
+};
 
 interface PersistedStatePayload {
   transactions?: Array<Omit<Transaction, 'date'> & { date: string }>;
@@ -36,6 +40,7 @@ interface PersistedStatePayload {
     sphereLayout?: SphereLayout | null;
     quickTransactionsLimit?: number;
     news?: NewsItem[];
+    goalsPreferences?: GoalsPreferences;
   };
 }
 
@@ -51,6 +56,7 @@ interface PersistedStatePayload {
    private currencySubject = new BehaviorSubject<'EUR' | 'USD' | 'UAH'>('EUR');
    private sphereLayoutSubject = new BehaviorSubject<SphereLayout | null>(null);
    private quickTransactionsLimitSubject = new BehaviorSubject<number>(3);
+   private goalsPreferencesSubject = new BehaviorSubject<GoalsPreferences>({ theme: 'default', visualizationMode: 'amount' });
    private newsSubject = new BehaviorSubject<NewsItem[]>([
     { id: '1', title: 'Market update', isRead: false },
     { id: '2', title: 'Budget tip of the week', isRead: false },
@@ -67,6 +73,7 @@ interface PersistedStatePayload {
    currency$ = this.currencySubject.asObservable();
    sphereLayout$ = this.sphereLayoutSubject.asObservable();
    quickTransactionsLimit$ = this.quickTransactionsLimitSubject.asObservable();
+   goalsPreferences$ = this.goalsPreferencesSubject.asObservable();
    news$ = this.newsSubject.asObservable();
  
    constructor(
@@ -98,6 +105,7 @@ interface PersistedStatePayload {
           this.currencySubject.next(state.user?.currency ?? 'EUR');
           this.sphereLayoutSubject.next(this.normalizeSphereLayout(state.user?.sphereLayout ?? null));
           this.quickTransactionsLimitSubject.next(this.normalizeQuickLimit(state.user?.quickTransactionsLimit));
+          this.goalsPreferencesSubject.next(this.normalizeGoalsPreferences(state.user?.goalsPreferences));
           this.newsSubject.next(this.normalizeNews(state.user?.news));
           this.syncBalanceAndTransactions(false);
           this.isHydrating = false;
@@ -184,6 +192,12 @@ interface PersistedStatePayload {
 
   markAllNewsRead(): void {
     this.newsSubject.next(this.newsSubject.value.map((item) => ({ ...item, isRead: true })));
+    this.persistState();
+  }
+
+  setGoalsPreferences(preferences: Partial<GoalsPreferences>): void {
+    const current = this.goalsPreferencesSubject.value;
+    this.goalsPreferencesSubject.next(this.normalizeGoalsPreferences({ ...current, ...preferences }));
     this.persistState();
   }
 
@@ -332,6 +346,7 @@ interface PersistedStatePayload {
           sphereLayout?: SphereLayout;
           quickTransactionsLimit?: number;
           news?: NewsItem[];
+          goalsPreferences?: GoalsPreferences;
        };
  
        this.transactions = (parsed.transactions ?? []).map((tx) => ({
@@ -344,6 +359,7 @@ interface PersistedStatePayload {
        this.currencySubject.next(parsed.currency ?? 'EUR');
        this.sphereLayoutSubject.next(this.normalizeSphereLayout(parsed.sphereLayout ?? null));
        this.quickTransactionsLimitSubject.next(this.normalizeQuickLimit(parsed.quickTransactionsLimit));
+       this.goalsPreferencesSubject.next(this.normalizeGoalsPreferences(parsed.goalsPreferences));
        this.newsSubject.next(this.normalizeNews(parsed.news));
       } catch {
        localStorage.removeItem(this.storageKey);
@@ -362,6 +378,7 @@ interface PersistedStatePayload {
        currency: this.currencySubject.value,
        sphereLayout: this.sphereLayoutSubject.value,
        quickTransactionsLimit: this.quickTransactionsLimitSubject.value,
+       goalsPreferences: this.goalsPreferencesSubject.value,
        news: this.newsSubject.value
      };
  
@@ -435,6 +452,12 @@ interface PersistedStatePayload {
     return Math.min(10, Math.max(3, Math.round(raw)));
   }
 
+  private normalizeGoalsPreferences(preferences?: Partial<GoalsPreferences> | null): GoalsPreferences {
+    const theme = preferences?.theme === 'girly' ? 'girly' : 'default';
+    const visualizationMode = preferences?.visualizationMode === 'segments' ? 'segments' : 'amount';
+    return { theme, visualizationMode };
+  }
+  
   private normalizeNews(news?: NewsItem[]): NewsItem[] {
     if (!news || news.length === 0) {
       return [

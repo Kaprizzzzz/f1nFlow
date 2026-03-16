@@ -6,6 +6,17 @@ import { LoadingComponent } from './pages/loading/loading.component';
 import { CurrencyPickerComponent } from './pages/currency-picker/currency-picker.component';
 import { SessionService } from './pages/user/service/user.service';
 
+type TelegramWindow = Window & {
+  Telegram?: {
+    WebApp?: {
+      ready?: () => void;
+      expand?: () => void;
+      disableVerticalSwipes?: () => void;
+      isExpanded?: boolean;
+    };
+  };
+};
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -37,6 +48,8 @@ export class AppComponent implements OnInit, OnDestroy {
       this.showSplash = false;
     }, 2500);
 
+    this.setupTelegramWebApp();
+
     this.subscription.add(
       this.sessionService.user$.subscribe((user) => {
         this.userName = user?.userName || 'Guest';
@@ -51,6 +64,17 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+   private setupTelegramWebApp(): void {
+    const webApp = (window as TelegramWindow).Telegram?.WebApp;
+    if (!webApp) {
+      return;
+    }
+
+    webApp.ready?.();
+    webApp.expand?.();
+    webApp.disableVerticalSwipes?.();
   }
 
   private isRootRoute(url: string): boolean {

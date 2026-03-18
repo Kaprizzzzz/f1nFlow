@@ -1,4 +1,14 @@
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  QueryList,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ExpenceComponent } from '../../history/expence/expence.component';
@@ -10,6 +20,7 @@ import { FrequentExpense, RecentComponent } from '../../history/recent/recent.co
 
 type MainTab = SphereTab | null;
 type SpherePosition = { left: number; top: number };
+type SphereSize = { width: number; height: number };
 
 const DEFAULT_SPHERE_POSITIONS: SphereLayout = {
   income: { top: 214, left: 156 },
@@ -24,14 +35,6 @@ const SPHERE_TOP_GAP = 0;
 const FALLBACK_BOTTOM_NAV_OFFSET = 90;
 const BOTTOM_NAV_OFFSET_CSS_VARIABLE = '--bottom-nav-offset';
 
-const SPHERE_BASE_SIZE: Record<SphereTab, { width: number; height: number }> = {
-  income: { width: 220, height: 220 },
-  expense: { width: 210, height: 210 },
-  saving: { width: 143, height: 143 },
-  news: { width: 140, height: 140 },
-  recent: { width: 152, height: 152 }
-};
-
 @Component({
   selector: 'app-main',
   standalone: true,
@@ -39,9 +42,12 @@ const SPHERE_BASE_SIZE: Record<SphereTab, { width: number; height: number }> = {
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
 })
-export class MainComponent implements OnInit, OnDestroy {
+export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('layoutRef')
   private layoutRef?: ElementRef<HTMLElement>;
+
+  @ViewChildren('sphereRef')
+  private sphereRefs?: QueryList<ElementRef<HTMLElement>>;
 
   activeTab: MainTab = null;
   isEditMode = false;
@@ -52,6 +58,7 @@ export class MainComponent implements OnInit, OnDestroy {
   private savedSpherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
   private subscription = new Subscription();
   private transactionsCache: Transaction[] = [];
+  private sphereSizes: Record<SphereTab, SphereSize> = this.createFallbackSphereSizes();
 
   private dragState: {
     tab: SphereTab;
@@ -98,6 +105,22 @@ export class MainComponent implements OnInit, OnDestroy {
     );
   }
 
+  ngAfterViewInit(): void {
+    this.measureSphereSizes();
+    if (this.sphereRefs) {
+      this.subscription.add(this.sphereRefs.changes.subscribe(() => this.measureSphereSizes()));
+    }
+
+    const raf =
+      globalThis.requestAnimationFrame ?? ((callback: FrameRequestCallback) => setTimeout(() => callback(0), 0));
+
+    raf(() => {
+      this.measureSphereSizes();
+      this.spherePositions = this.clampAllSpherePositions(this.spherePositions);
+      this.savedSpherePositions = this.clampAllSpherePositions(this.savedSpherePositions);
+    });
+  }
+
   ngOnDestroy(): void {
     this.detachGlobalPointerListeners();
     this.subscription.unsubscribe();
@@ -134,6 +157,19 @@ export class MainComponent implements OnInit, OnDestroy {
     this.closeActiveTab();
   }
 
+  @HostListener('window:resize')
+  onResize(): void {
+    this.measureSphereSizes();
+
+    if (this.isEditMode) {
+      this.spawnSpheresAtBottom();
+      return;
+    }
+
+    this.spherePositions = this.clampAllSpherePositions(this.spherePositions);
+    this.savedSpherePositions = this.clampAllSpherePositions(this.savedSpherePositions);
+  }
+
   toggleEditMode(): void {
     if (this.isEditMode) {
       this.isEditMode = false;
@@ -148,6 +184,8 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   saveLayout(): void {
+    this.measureSphereSizes();
+    this.spherePositions = this.clampAllSpherePositions(this.spherePositions);
     this.savedSpherePositions = this.clonePositions(this.spherePositions);
     this.balanceService.setSphereLayout(this.savedSpherePositions);
     this.isEditMode = false;
@@ -156,8 +194,8 @@ export class MainComponent implements OnInit, OnDestroy {
 
   resetToDefaultLayout(): void {
     this.savedSpherePositions = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
-    this.spherePositions = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
-    this.balanceService.setSphereLayout(this.savedSpherePositions);
+    this.spherePositions = this.clampAllSpherePositions(DEFAULT_SPHERE_POSITIONS);
+    this.balanceService.setSphereLayout(this.spherePositions);
     this.isEditMode = false;
     this.stopDrag();
   }
@@ -214,14 +252,14 @@ export class MainComponent implements OnInit, OnDestroy {
     const nextLeft = event.clientX - layoutRect.left - this.dragState.pointerOffsetX;
     const nextTop = event.clientY - layoutRect.top - this.dragState.pointerOffsetY;
 
-    const maxLeft = Math.max(0, layout.clientWidth - this.dragState.sphereWidth);
-    const bottomOffset = this.getRoutingPanelBottomOffset();
-    const maxTop = Math.max(0, layout.clientHeight - this.dragState.sphereHeight - bottomOffset);
-    const minTop = SPHERE_TOP_GAP;
+    const bounds = this.getSphereBounds(layout, {
+      width: this.dragState.sphereWidth,
+      height: this.dragState.sphereHeight
+    });
 
     this.spherePositions[this.dragState.tab] = {
-      left: this.clamp(nextLeft, 0, maxLeft),
-      top: this.clamp(nextTop, minTop, maxTop)
+      left: this.clamp(nextLeft, 0, bounds.maxLeft),
+      top: this.clamp(nextTop, SPHERE_TOP_GAP, bounds.maxTop)
     };
   }
 
@@ -246,14 +284,9 @@ export class MainComponent implements OnInit, OnDestroy {
       };
     }
 
-const size = SPHERE_BASE_SIZE[tab];
-    const maxLeft = Math.max(0, layout.clientWidth - size.width);
-    const maxTop = Math.max(
-      SPHERE_TOP_GAP,
-      layout.clientHeight - size.height - this.getRoutingPanelBottomOffset()
-    );
+  const { maxLeft, maxTop } = this.getSphereBounds(layout, this.getSphereSize(tab));
 
-return {
+    return {
       top: `${this.clamp(top, SPHERE_TOP_GAP, maxTop)}px`,
       left: `${this.clamp(left, 0, maxLeft)}px`
     };
@@ -273,28 +306,20 @@ return {
         return;
       }
 
+      this.measureSphereSizes();
+
       const tabsOrder: SphereTab[] = ['income', 'expense', 'news', 'saving', 'recent'];
       const overlapStep = 26;
-      const maxWidth = layout.clientWidth;
-      const maxHeight = layout.clientHeight;
-      const bottomOffset = this.getRoutingPanelBottomOffset();
-      const centerX = maxWidth / 2;
+      const centerX = layout.clientWidth / 2;
       const centerShift = (tabsOrder.length - 1) / 2;
 
       for (const [index, tab] of tabsOrder.entries()) {
-        const sphereWidth = SPHERE_BASE_SIZE[tab].width;
-        const sphereHeight = SPHERE_BASE_SIZE[tab].height;
-
-        const maxTopAboveTaskbar = Math.max(
-          SPHERE_TOP_GAP,
-          maxHeight - sphereHeight - bottomOffset
-        );
-
-        const top = this.clamp(maxTopAboveTaskbar, SPHERE_TOP_GAP, maxTopAboveTaskbar);
+        const size = this.getSphereSize(tab);
+        const { maxLeft, maxTop } = this.getSphereBounds(layout, size);
         const overlapOffset = (index - centerShift) * overlapStep;
-        const left = this.clamp(centerX - sphereWidth / 2 + overlapOffset, 0, Math.max(0, maxWidth - sphereWidth));
-        
-        this.spherePositions[tab] = { top, left };
+        const left = this.clamp(centerX - size.width / 2 + overlapOffset, 0, maxLeft);
+
+        this.spherePositions[tab] = { top: maxTop, left };
       }
     });
   }
@@ -319,6 +344,74 @@ return {
       saving: { ...positions.saving },
       news: { ...positions.news },
       recent: { ...positions.recent }
+    };
+  }
+
+  private createFallbackSphereSizes(): Record<SphereTab, SphereSize> {
+    return {
+      income: { width: 220, height: 220 },
+      expense: { width: 180, height: 180 },
+      saving: { width: 143, height: 143 },
+      news: { width: 154, height: 154 },
+      recent: { width: 152, height: 152 }
+    };
+  }
+
+  private measureSphereSizes(): void {
+    this.sphereRefs?.forEach((sphereRef) => {
+      const element = sphereRef.nativeElement;
+      const tab = element.dataset['tab'] as SphereTab | undefined;
+
+      if (!tab) {
+        return;
+      }
+
+      const rect = element.getBoundingClientRect();
+      const width = rect.width || element.offsetWidth;
+      const height = rect.height || element.offsetHeight;
+
+      if (!width || !height) {
+        return;
+      }
+
+      this.sphereSizes[tab] = { width, height };
+    });
+  }
+
+  private getSphereSize(tab: SphereTab): SphereSize {
+    return this.sphereSizes[tab] ?? this.createFallbackSphereSizes()[tab];
+  }
+
+  private getSphereBounds(layout: HTMLElement, size: SphereSize): { maxLeft: number; maxTop: number } {
+    return {
+      maxLeft: Math.max(0, layout.clientWidth - size.width),
+      maxTop: Math.max(SPHERE_TOP_GAP, layout.clientHeight - size.height - this.getRoutingPanelBottomOffset())
+    };
+  }
+
+  private clampAllSpherePositions(
+    positions: Record<SphereTab, SpherePosition>
+  ): Record<SphereTab, SpherePosition> {
+    const layout = this.layoutRef?.nativeElement;
+    if (!layout) {
+      return this.clonePositions(positions);
+    }
+
+    return {
+      income: this.clampSpherePosition('income', positions.income, layout),
+      expense: this.clampSpherePosition('expense', positions.expense, layout),
+      saving: this.clampSpherePosition('saving', positions.saving, layout),
+      news: this.clampSpherePosition('news', positions.news, layout),
+      recent: this.clampSpherePosition('recent', positions.recent, layout)
+    };
+  }
+
+  private clampSpherePosition(tab: SphereTab, position: SpherePosition, layout: HTMLElement): SpherePosition {
+    const { maxLeft, maxTop } = this.getSphereBounds(layout, this.getSphereSize(tab));
+
+    return {
+      left: this.clamp(position.left, 0, maxLeft),
+      top: this.clamp(position.top, SPHERE_TOP_GAP, maxTop)
     };
   }
 

@@ -103,6 +103,7 @@
 .circles-layout {
   position: relative;
   width: 390px;
+  max-width: 100%;
   height: 100%;
   max-height: none;
   -webkit-app-region: no-drag;
@@ -148,7 +149,7 @@
 }
 
 .dashboard-container.has-active .sphere-wrapper.is-active {
-  animation: active-sphere-pop 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: active-sphere-pop 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes active-sphere-pop {
@@ -165,8 +166,7 @@
 
 @media (max-width: 560px) {
   .circles-layout {
-    transform: scale(0.86);
-    transform-origin: top center;
-    margin-top: -6px;
+    width: min(390px, 100vw - 16px);
+    margin: 0 auto;
   }
 }

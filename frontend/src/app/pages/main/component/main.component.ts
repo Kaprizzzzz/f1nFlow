@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ExpenceComponent } from '../../history/expence/expence.component';
@@ -21,8 +21,16 @@ const DEFAULT_SPHERE_POSITIONS: SphereLayout = {
 
 const SPHERE_TOP_GAP = 0;
 // Визначає базовий відступ куль від нижньої панелі роутингу.
-const ROUTING_PANEL_BOTTOM_OFFSET_DESKTOP = 4;
-const ROUTING_PANEL_BOTTOM_OFFSET_MOBILE = 8;
+const ROUTING_PANEL_BOTTOM_OFFSET_DESKTOP = 0;
+const ROUTING_PANEL_BOTTOM_OFFSET_MOBILE = 0;
+
+const SPHERE_BASE_SIZE: Record<SphereTab, { width: number; height: number }> = {
+  income: { width: 220, height: 220 },
+  expense: { width: 210, height: 210 },
+  saving: { width: 143, height: 143 },
+  news: { width: 140, height: 140 },
+  recent: { width: 152, height: 152 }
+};
 
 @Component({
   selector: 'app-main',
@@ -34,9 +42,6 @@ const ROUTING_PANEL_BOTTOM_OFFSET_MOBILE = 8;
 export class MainComponent implements OnInit, OnDestroy {
   @ViewChild('layoutRef')
   private layoutRef?: ElementRef<HTMLElement>;
-
-  @ViewChildren('sphereRef')
-  private sphereRefs?: QueryList<ElementRef<HTMLElement>>;
 
   activeTab: MainTab = null;
   isEditMode = false;
@@ -64,6 +69,12 @@ export class MainComponent implements OnInit, OnDestroy {
   constructor(private balanceService: BalanceService) {}
 
   ngOnInit(): void {
+    const initialLayout = this.balanceService.getSphereLayout();
+    if (initialLayout) {
+      this.spherePositions = this.clonePositions(initialLayout);
+      this.savedSpherePositions = this.clonePositions(initialLayout);
+    }
+
     this.subscription.add(
       this.balanceService.sphereLayout$.subscribe((layout) => {
         if (!layout) {
@@ -226,29 +237,26 @@ export class MainComponent implements OnInit, OnDestroy {
 
   getSphereStyle(tab: SphereTab): Record<string, string> {
     const { top, left } = this.spherePositions[tab];
-    // Використовуємо динамічний перерахунок лімітів для відображення
-    const clampedTop = this.clampTopWithinViewport(tab, top);
-    return {
-      top: `${clampedTop}px`,
-      left: `${left}px`
-    };
-  }
 
-  private clampTopWithinViewport(tab: SphereTab, top: number): number {
     const layout = this.layoutRef?.nativeElement;
     if (!layout) {
-      return Math.max(SPHERE_TOP_GAP, top);
+      return {
+        top: `${Math.max(SPHERE_TOP_GAP, top)}px`,
+        left: `${Math.max(0, left)}px`
+      };
     }
 
-    const sphereElement = this.sphereRefs
-      ?.toArray()
-      .map((item) => item.nativeElement)
-      .find((item) => this.getSphereTab(item) === tab);
+const size = SPHERE_BASE_SIZE[tab];
+    const maxLeft = Math.max(0, layout.clientWidth - size.width);
+    const maxTop = Math.max(
+      SPHERE_TOP_GAP,
+      layout.clientHeight - size.height - this.getRoutingPanelBottomOffset()
+    );
 
-    const sphereHeight = sphereElement?.offsetHeight ?? 190;
-    const bottomOffset = this.getRoutingPanelBottomOffset();
-    const maxTop = Math.max(SPHERE_TOP_GAP, layout.clientHeight - sphereHeight - bottomOffset);
-    return this.clamp(top, SPHERE_TOP_GAP, maxTop);
+return {
+      top: `${this.clamp(top, SPHERE_TOP_GAP, maxTop)}px`,
+      left: `${this.clamp(left, 0, maxLeft)}px`
+    };
   }
 
   private clamp(value: number, min: number, max: number): number {
@@ -261,9 +269,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
     raf(() => {
       const layout = this.layoutRef?.nativeElement;
-      const sphereElements = this.sphereRefs?.toArray().map((item) => item.nativeElement) ?? [];
-
-      if (!layout || sphereElements.length === 0) {
+      if (!layout) {
         return;
       }
 
@@ -276,14 +282,9 @@ export class MainComponent implements OnInit, OnDestroy {
       const centerShift = (tabsOrder.length - 1) / 2;
 
       for (const [index, tab] of tabsOrder.entries()) {
-        const element = sphereElements.find((item) => this.getSphereTab(item) === tab);
-        if (!element) {
-          continue;
-        }
+        const sphereWidth = SPHERE_BASE_SIZE[tab].width;
+        const sphereHeight = SPHERE_BASE_SIZE[tab].height;
 
-        const sphereWidth = element.offsetWidth;
-        const sphereHeight = element.offsetHeight;
-        
         const maxTopAboveTaskbar = Math.max(
           SPHERE_TOP_GAP,
           maxHeight - sphereHeight - bottomOffset
@@ -306,14 +307,6 @@ export class MainComponent implements OnInit, OnDestroy {
     return window.matchMedia('(max-width: 560px)').matches
       ? ROUTING_PANEL_BOTTOM_OFFSET_MOBILE
       : ROUTING_PANEL_BOTTOM_OFFSET_DESKTOP;
-  }
-
-  private getSphereTab(element: HTMLElement): SphereTab | null {
-    const dataTab = element.dataset?.['tab'] ?? element.getAttribute('data-tab');
-    if (dataTab === 'income' || dataTab === 'expense' || dataTab === 'saving' || dataTab === 'news' || dataTab === 'recent') {
-      return dataTab;
-    }
-    return null;
   }
 
   private clonePositions(positions: Record<SphereTab, SpherePosition>): Record<SphereTab, SpherePosition> {

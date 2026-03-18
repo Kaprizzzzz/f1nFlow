@@ -103,7 +103,9 @@ interface PersistedStatePayload {
           this.incomeCategoriesSubject.next(this.normalizeCategories(state.user?.incomeCategories ?? []));
           this.expenseCategoriesSubject.next(this.normalizeCategories(state.user?.expenseCategories ?? []));
           this.currencySubject.next(state.user?.currency ?? 'EUR');
-          this.sphereLayoutSubject.next(this.normalizeSphereLayout(state.user?.sphereLayout ?? null));
+          const remoteLayout = this.normalizeSphereLayout(state.user?.sphereLayout ?? null);
+          const localLayout = this.sphereLayoutSubject.value;
+          this.sphereLayoutSubject.next(localLayout ?? remoteLayout);
           this.quickTransactionsLimitSubject.next(this.normalizeQuickLimit(state.user?.quickTransactionsLimit));
           this.goalsPreferencesSubject.next(this.normalizeGoalsPreferences(state.user?.goalsPreferences));
           this.newsSubject.next(this.normalizeNews(state.user?.news));

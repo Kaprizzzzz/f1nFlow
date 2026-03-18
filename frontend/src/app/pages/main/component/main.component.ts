@@ -21,8 +21,8 @@ const DEFAULT_SPHERE_POSITIONS: SphereLayout = {
 
 const SPHERE_TOP_GAP = 0;
 // Визначає базовий відступ куль від нижньої панелі роутингу.
-const ROUTING_PANEL_BOTTOM_OFFSET_DESKTOP = 0;
-const ROUTING_PANEL_BOTTOM_OFFSET_MOBILE = 0;
+const FALLBACK_BOTTOM_NAV_OFFSET = 90;
+const BOTTOM_NAV_OFFSET_CSS_VARIABLE = '--bottom-nav-offset';
 
 const SPHERE_BASE_SIZE: Record<SphereTab, { width: number; height: number }> = {
   income: { width: 220, height: 220 },
@@ -300,13 +300,16 @@ return {
   }
 
    private getRoutingPanelBottomOffset(): number {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      return ROUTING_PANEL_BOTTOM_OFFSET_DESKTOP;
+    const layout = this.layoutRef?.nativeElement;
+
+    if (typeof window === 'undefined' || !layout) {
+      return FALLBACK_BOTTOM_NAV_OFFSET;
     }
     
-    return window.matchMedia('(max-width: 560px)').matches
-      ? ROUTING_PANEL_BOTTOM_OFFSET_MOBILE
-      : ROUTING_PANEL_BOTTOM_OFFSET_DESKTOP;
+    const bottomNavOffset = window.getComputedStyle(layout).getPropertyValue(BOTTOM_NAV_OFFSET_CSS_VARIABLE).trim();
+    const parsedOffset = Number.parseFloat(bottomNavOffset);
+
+    return Number.isFinite(parsedOffset) ? parsedOffset : FALLBACK_BOTTOM_NAV_OFFSET;
   }
 
   private clonePositions(positions: Record<SphereTab, SpherePosition>): Record<SphereTab, SpherePosition> {

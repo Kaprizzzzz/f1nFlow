@@ -1,7 +1,8 @@
 .dashboard-container {
   width: 100%;
-  height: calc(100dvh - 98px - env(safe-area-inset-bottom, 0px));
-  max-height: calc(100dvh - 98px - env(safe-area-inset-bottom, 0px));
+  height: 100%;
+  min-height: 100%;
+  max-height: 100%;
   background:
     radial-gradient(circle at 50% 30%, rgba(61, 130, 240, 0.35) 0%, transparent 35%),
     radial-gradient(circle at 22% 72%, rgba(255, 164, 67, 0.2) 0%, transparent 28%),
@@ -17,7 +18,9 @@
   -webkit-app-region: no-drag;
 
   &.has-active {
+    overflow-x: hidden;
     overflow-y: auto;
+    overscroll-behavior-y: contain;
   }
 }
 
@@ -142,7 +145,7 @@
 
 .sphere-wrapper.is-active {
   z-index: 20 !important;
-  top: 144px !important;
+  top: 132px !important;
   left: 50% !important;
   right: auto !important;
   transform: translateX(-50%) !important;

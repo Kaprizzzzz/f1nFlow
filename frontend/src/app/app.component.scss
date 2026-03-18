@@ -1,4 +1,7 @@
  :host {
+  --bottom-nav-height: 82px;
+   --bottom-nav-gap: 8px;
+   --bottom-nav-offset: calc(var(--bottom-nav-height) + var(--bottom-nav-gap) + env(safe-area-inset-bottom, 0px));
    display: block;
    height: 100dvh;
    min-height: 100dvh;
@@ -86,16 +89,16 @@
  .content {
    flex: 1;
    overflow: hidden;
-   padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+   padding-bottom: var(--bottom-nav-offset);
  }
  
  .bottom-nav {
    position: fixed;
-    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(var(--bottom-nav-gap) + env(safe-area-inset-bottom, 0px));
     left: 50%;
     transform: translateX(-50%);
     width: min(390px, calc(100% - 24px));
-    height: 82px;
+    height: var(--bottom-nav-height);
     border-radius: 22px;
     background: linear-gradient(180deg, rgba(16, 25, 44, 0.95) 0%, rgba(10, 14, 28, 0.98) 100%);
     border: 1px solid rgba(117, 150, 218, 0.22);

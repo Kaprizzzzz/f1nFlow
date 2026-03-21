@@ -11,7 +11,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 0 8px 0;
+  padding: var(--dashboard-top-offset) 8px 0;
   overflow: hidden;
   overscroll-behavior: none;
   position: relative;
@@ -112,6 +112,7 @@
   -webkit-app-region: no-drag;
 
   .sphere-wrapper {
+    z-index: 1;
     position: absolute;
     transition: top 0.28s ease-out, left 0.28s ease-out, transform 0.62s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.42s ease;
     will-change: transform, top, left, opacity;
@@ -145,7 +146,7 @@
 
 .sphere-wrapper.is-active {
   z-index: 20 !important;
-  top: 132px !important;
+  top: var(--dashboard-top-offset) !important;
   left: 50% !important;
   right: auto !important;
   transform: translateX(-50%) !important;
@@ -171,5 +172,20 @@
   .circles-layout {
     width: min(390px, 100vw - 16px);
     margin: 0 auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard-container {
+    --dashboard-top-offset: 112px;
+  }
+
+  .layout-controls {
+    left: 12px;
+  }
+
+  .sphere-wrapper.is-active {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
   }
 }

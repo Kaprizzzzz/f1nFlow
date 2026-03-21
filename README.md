@@ -2,6 +2,8 @@
     Front = Angular
  - ng build --configuration production --base-href "https://kaprizzzzz.github.io/f1nFlow/"
  - npx ngh --dir dist/f1n-flow-frontend/browser
+ could be this:
+ - npx angular-cli-ghpages --dir=dist/f1n-flow-frontend/browser
     
     Back = Nest
  - npm run start:dev

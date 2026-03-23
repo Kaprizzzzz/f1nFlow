@@ -31,7 +31,9 @@ const DEFAULT_SPHERE_POSITIONS: SphereLayout = {
 };
 
 const SPHERE_TOP_GAP = 0;
-// Визначає базовий відступ куль від нижньої панелі роутингу.
+// ОСЬ ТАК: тут ти сам редагуєш нижню межу руху сфер.
+const FALLBACK_BOTTOM_NAV_OFFSET = 90;
+// ОСЬ ТАК: тут ти сам редагуєш, наскільки сферу можна витягнути вище верхньої межі на мобілці.
 const MOBILE_SPHERE_TOP_OVERSHOOT = 36;
 const MOBILE_LAYOUT_BREAKPOINT = 560;
 
@@ -369,7 +371,20 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.sphereSizes[tab] ?? this.createFallbackSphereSizes()[tab];
   }
 
-    private getSphereTopLimit(): number {
+    private getRoutingPanelBottomOffset(): number {
+    const layout = this.layoutRef?.nativeElement;
+
+    if (typeof window === 'undefined' || !layout) {
+      return FALLBACK_BOTTOM_NAV_OFFSET;
+    }
+
+    const bottomNavOffset = window.getComputedStyle(layout).getPropertyValue(BOTTOM_NAV_OFFSET_CSS_VARIABLE).trim();
+    const parsedOffset = Number.parseFloat(bottomNavOffset);
+
+    return Number.isFinite(parsedOffset) ? parsedOffset : FALLBACK_BOTTOM_NAV_OFFSET;
+  }
+
+  private getSphereTopLimit(): number {
     if (typeof window !== 'undefined' && window.innerWidth <= MOBILE_LAYOUT_BREAKPOINT) {
       return -MOBILE_SPHERE_TOP_OVERSHOOT;
     }
@@ -380,7 +395,8 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   private getSphereBounds(layout: HTMLElement, size: SphereSize): { maxLeft: number; maxTop: number } {
     return {
       maxLeft: Math.max(0, layout.clientWidth - size.width),
-      maxTop: Math.max(this.getSphereTopLimit(), layout.clientHeight - size.height)
+      // ОСЬ ТАК: якщо хочеш сам поміняти нижню межу руху сфери — редагуй формулу `maxTop` тут.
+      maxTop: Math.max(this.getSphereTopLimit(), layout.clientHeight - size.height - FALLBACK_BOTTOM_NAV_OFFSET)
     };
   }
 

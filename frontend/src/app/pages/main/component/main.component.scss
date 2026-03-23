@@ -4,9 +4,12 @@
   min-height: 100%;
   max-height: 100%;
   background:
-    radial-gradient(circle at 50% 30%, rgba(61, 130, 240, 0.35) 0%, transparent 35%),
-    radial-gradient(circle at 22% 72%, rgba(255, 164, 67, 0.2) 0%, transparent 28%),
-    radial-gradient(circle at 80% 68%, rgba(66, 235, 176, 0.2) 0%, transparent 24%),
+// ОСЬ ТАК: центральне синє сяйво опустив трохи нижче, щоб підсвітка краще лягала під опущені сфери.
+    radial-gradient(circle at 50% 40%, rgba(61, 130, 240, 0.35) 0%, transparent 38%),
+    // ОСЬ ТАК: лівий теплий акцент теж зсунув вниз, щоб не лишався візуальний провал біля таббару.
+    radial-gradient(circle at 22% 82%, rgba(255, 164, 67, 0.2) 0%, transparent 30%),
+    // ОСЬ ТАК: правий зелений акцент підвів ближче до нижнього ряду куль для балансу композиції.
+    radial-gradient(circle at 80% 80%, rgba(66, 235, 176, 0.2) 0%, transparent 26%),
     linear-gradient(180deg, #060b17 0%, #02050d 100%);
   display: flex;
   justify-content: center;

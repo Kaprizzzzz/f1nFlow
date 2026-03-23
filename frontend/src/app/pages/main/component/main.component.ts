@@ -34,7 +34,7 @@ const SPHERE_TOP_GAP = 0;
 // ОСЬ ТАК: тут ти сам редагуєш нижню межу руху сфер.
 const ROUTING_PANEL_BOTTOM_OFFSET = 0;
 // ОСЬ ТАК: тут ти сам редагуєш, наскільки сферу можна витягнути вище верхньої межі на мобілці.
-const MOBILE_SPHERE_TOP_OVERSHOOT = 0;
+const MOBILE_SPHERE_TOP_OVERSHOOT = 500;
 const MOBILE_LAYOUT_BREAKPOINT = 560;
 
 @Component({

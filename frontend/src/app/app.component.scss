@@ -87,9 +87,10 @@
  }
  
  .content {
-   flex: 1;
+  // ОСЬ ТАК: відрізав контент по висоті до верхнього краю таббару, щоб не лишалась темна пустота під сторінками.
+   flex: 0 0 calc(100dvh - var(--bottom-nav-offset));
+   height: calc(100dvh - var(--bottom-nav-offset));
    overflow: hidden;
-   padding-bottom: var(--bottom-nav-offset);
  }
  
  .bottom-nav {

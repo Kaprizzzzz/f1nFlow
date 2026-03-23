@@ -32,8 +32,8 @@ const DEFAULT_SPHERE_POSITIONS: SphereLayout = {
 
 const SPHERE_TOP_GAP = 0;
 // Визначає базовий відступ куль від нижньої панелі роутингу.
-const FALLBACK_BOTTOM_NAV_OFFSET = 90;
-const BOTTOM_NAV_OFFSET_CSS_VARIABLE = '--bottom-nav-offset';
+const MOBILE_SPHERE_TOP_OVERSHOOT = 36;
+const MOBILE_LAYOUT_BREAKPOINT = 560;
 
 @Component({
   selector: 'app-main',
@@ -259,7 +259,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.spherePositions[this.dragState.tab] = {
       left: this.clamp(nextLeft, 0, bounds.maxLeft),
-      top: this.clamp(nextTop, SPHERE_TOP_GAP, bounds.maxTop)
+      top: this.clamp(nextTop, this.getSphereTopLimit(), bounds.maxTop)
     };
   }
 
@@ -279,7 +279,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     const layout = this.layoutRef?.nativeElement;
     if (!layout) {
       return {
-        top: `${Math.max(SPHERE_TOP_GAP, top)}px`,
+        top: `${Math.max(this.getSphereTopLimit(), top)}px`,
         left: `${Math.max(0, left)}px`
       };
     }
@@ -287,7 +287,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   const { maxLeft, maxTop } = this.getSphereBounds(layout, this.getSphereSize(tab));
 
     return {
-      top: `${this.clamp(top, SPHERE_TOP_GAP, maxTop)}px`,
+      top: `${this.clamp(top, this.getSphereTopLimit(), maxTop)}px`,
       left: `${this.clamp(left, 0, maxLeft)}px`
     };
   }
@@ -322,19 +322,6 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
         this.spherePositions[tab] = { top: maxTop, left };
       }
     });
-  }
-
-   private getRoutingPanelBottomOffset(): number {
-    const layout = this.layoutRef?.nativeElement;
-
-    if (typeof window === 'undefined' || !layout) {
-      return FALLBACK_BOTTOM_NAV_OFFSET;
-    }
-    
-    const bottomNavOffset = window.getComputedStyle(layout).getPropertyValue(BOTTOM_NAV_OFFSET_CSS_VARIABLE).trim();
-    const parsedOffset = Number.parseFloat(bottomNavOffset);
-
-    return Number.isFinite(parsedOffset) ? parsedOffset : FALLBACK_BOTTOM_NAV_OFFSET;
   }
 
   private clonePositions(positions: Record<SphereTab, SpherePosition>): Record<SphereTab, SpherePosition> {
@@ -382,10 +369,18 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.sphereSizes[tab] ?? this.createFallbackSphereSizes()[tab];
   }
 
+    private getSphereTopLimit(): number {
+    if (typeof window !== 'undefined' && window.innerWidth <= MOBILE_LAYOUT_BREAKPOINT) {
+      return -MOBILE_SPHERE_TOP_OVERSHOOT;
+    }
+
+    return SPHERE_TOP_GAP;
+  }
+
   private getSphereBounds(layout: HTMLElement, size: SphereSize): { maxLeft: number; maxTop: number } {
     return {
       maxLeft: Math.max(0, layout.clientWidth - size.width),
-      maxTop: Math.max(SPHERE_TOP_GAP, layout.clientHeight - size.height - this.getRoutingPanelBottomOffset())
+      maxTop: Math.max(this.getSphereTopLimit(), layout.clientHeight - size.height)
     };
   }
 
@@ -411,7 +406,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
     return {
       left: this.clamp(position.left, 0, maxLeft),
-      top: this.clamp(position.top, SPHERE_TOP_GAP, maxTop)
+      top: this.clamp(position.top, this.getSphereTopLimit(), maxTop)
     };
   }
 

@@ -47,5 +47,5 @@
  }
 
 .circle-wrapper.active .news-panel {
-  margin-top: 80px;
+  margin-top: var(--active-panel-gap, 92px);
 }

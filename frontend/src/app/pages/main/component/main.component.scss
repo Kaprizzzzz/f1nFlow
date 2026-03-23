@@ -1,4 +1,6 @@
 .dashboard-container {
+    --dashboard-top-offset: 80px;
+  --active-panel-gap: 50px;
   width: 100%;
   height: 100%;
   min-height: 100%;
@@ -180,7 +182,7 @@
 
 @media (max-width: 560px) {
   .dashboard-container {
-    --dashboard-top-offset: 112px;
+    --dashboard-top-offset: 124px;
   }
 
   .layout-controls {

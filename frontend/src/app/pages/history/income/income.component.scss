@@ -113,7 +113,7 @@ $income-glow: #62b5ff;
 }
 
 .panel {
-  margin-top: 94px;
+  margin-top: var(--active-panel-gap, 92px);
   width: 330px;
   display: grid;
   gap: 8px;

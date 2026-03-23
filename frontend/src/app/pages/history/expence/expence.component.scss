@@ -107,7 +107,7 @@ $expense-glow: #ffb060;
 }
 
 .panel {
-  margin-top: 96px;
+  margin-top: var(--active-panel-gap, 92px);
   width: 330px;
   display: grid;
   gap: 8px;

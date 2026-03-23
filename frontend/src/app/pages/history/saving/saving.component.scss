@@ -231,5 +231,5 @@ $saving-glow: #63ffd0;
   }
 }
 .circle-wrapper.active .history-list { 
-margin-top: 86px;
+  margin-top: var(--active-panel-gap, 92px);
 }

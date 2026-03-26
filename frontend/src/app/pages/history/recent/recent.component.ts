@@ -1,11 +1,16 @@
 import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-export interface FrequentExpense {
+export interface RecentTransactionBubble {
+  category: string;
+  amount: number;
+}
+
+export interface RecentCategoryGroup {
   category: string;
   totalAmount: number;
-  repeatAmount: number;
   repeatCount: number;
+  latestTransactions: number[];
 }
 
 @Component({
@@ -17,10 +22,10 @@ export interface FrequentExpense {
 })
 export class RecentComponent {
   @Input() isFullView = false;
-  @Input() items: FrequentExpense[] = [];
+  @Input() items: RecentCategoryGroup[] = [];
   @Input() quickLimit = 3;
   @Output() onSelect = new EventEmitter<void>();
-  @Output() onRepeat = new EventEmitter<FrequentExpense>();
+  @Output() onRepeat = new EventEmitter<RecentTransactionBubble>();
   @Output() quickLimitChange = new EventEmitter<number>();
 
   readonly quickLimitOptions = [3, 4, 5, 6, 7, 8, 9, 10];
@@ -30,11 +35,11 @@ export class RecentComponent {
     this.onSelect.emit();
   }
 
-  repeat(item: FrequentExpense, event: Event): void {
+   repeat(category: string, amount: number, event: Event): void {
     event.stopPropagation();
-    this.onRepeat.emit(item);
+    this.onRepeat.emit({ category, amount });
   }
-toggleQuickLimitMenu(event: Event): void {
+   toggleQuickLimitMenu(event: Event): void {
     event.stopPropagation();
     this.isQuickLimitMenuOpen = !this.isQuickLimitMenuOpen;
   }

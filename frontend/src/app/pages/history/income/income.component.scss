@@ -11,12 +11,12 @@ $income-glow: #62b5ff;
 
   .main-circle {
     --category-ring: conic-gradient(rgba(73, 99, 146, 0.28) 0deg, rgba(73, 99, 146, 0.28) 360deg);
-    width: 220px;
-    height: 220px;
+    width: 165px;
+    height: 165px;
     border-radius: 50%;
     background: radial-gradient(circle at 50% 15%, #89d0ff 0%, #4f91e6 17%, #123e88 50%, #050f2f 100%);
     border: 2px solid rgba($income-glow, 0.9);
-    box-shadow: 0 0 30px rgba($income-glow, 0.45), inset 0 -24px 34px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 0 24px rgba($income-glow, 0.45), inset 0 -18px 28px rgba(0, 0, 0, 0.45);
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -39,15 +39,15 @@ $income-glow: #62b5ff;
     }
 
     .label {
-      font-size: 24px;
+      font-size: 20px;
       opacity: 0.92;
     }
 
     .value {
-      font-size: clamp(22px, 8vw, 50px);
+      font-size: clamp(18px, 6vw, 38px);
       font-weight: 600;
       line-height: 1;
-      margin-top: 8px;
+      margin-top: 6px;
       max-width: 86%;
       text-align: center;
       overflow: hidden;
@@ -63,13 +63,13 @@ $income-glow: #62b5ff;
   }
 
   &.active {
-    padding-top: 70px;
+    padding-top: 48px;
   }
 }
 
 .sticker-row {
   position: absolute;
-  top: 194px;
+  top: 150px;
   left: 50%;
   width: 0;
   height: 0;
@@ -77,13 +77,13 @@ $income-glow: #62b5ff;
 
   .mini-circle {
     position: absolute;
-    width: 56px;
-    height: 56px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 1px solid rgba($income-glow, 0.7);
     background: rgba(8, 17, 34, 0.95);
     color: #fff;
-    font-size: 22px;
+    font-size: 18px;
     cursor: grab;
     transform: translate(-50%, -50%);
     touch-action: none;
@@ -103,11 +103,11 @@ $income-glow: #62b5ff;
 }
 
 .add-category-circle {
-  left: 148px;
-  top: 124px;
-  width: 68px;
-  height: 68px;
-  font-size: 30px;
+  left: 118px;
+  top: 98px;
+  width: 52px;
+  height: 52px;
+  font-size: 24px;
   border-style: dashed;
   font-weight: 700;
 }

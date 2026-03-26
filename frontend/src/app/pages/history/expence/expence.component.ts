@@ -122,7 +122,7 @@ export class ExpenceComponent implements OnInit, OnDestroy {
       : startAngle + ((endAngle - startAngle) * index) / (total - 1);
     
     const radians = (angle * Math.PI) / 180;
-    const radius = 190;
+    const radius = 148;
 
     return {
       left: `${Math.cos(radians) * radius}px`,

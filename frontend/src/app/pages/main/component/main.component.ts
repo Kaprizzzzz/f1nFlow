@@ -16,18 +16,19 @@ import { IncomeComponent } from '../../history/income/income.component';
 import { NewsComponent } from '../../history/news/news.component';
 import { SavingComponent } from '../../history/saving/saving.component';
 import { BalanceService, SphereLayout, SphereTab, Transaction } from '../../history/balance.service';
-import { FrequentExpense, RecentComponent } from '../../history/recent/recent.component';
+import { RecentCategoryGroup, RecentComponent } from '../../history/recent/recent.component';
+import { SessionService } from '../../user/service/user.service';
 
 type MainTab = SphereTab | null;
 type SpherePosition = { left: number; top: number };
 type SphereSize = { width: number; height: number };
 
 const DEFAULT_SPHERE_POSITIONS: SphereLayout = {
-  income: { top: 214, left: 156 },
-  expense: { top: 78, left: 24 },
-  saving: { top: 166, left: 244 },
-  news: { top: 336, left: 8 },
-  recent: { top: 336, left: 246 }
+  income: { top: 196, left: 148 },
+  expense: { top: 88, left: 28 },
+  saving: { top: 158, left: 252 },
+  news: { top: 296, left: 18 },
+  recent: { top: 298, left: 256 }
 };
 
 const SPHERE_TOP_GAP = 0;
@@ -36,6 +37,9 @@ const ROUTING_PANEL_BOTTOM_OFFSET = 0;
 // ОСЬ ТАК: тут ти сам редагуєш, наскільки сферу можна витягнути вище верхньої межі на мобілці.
 const MOBILE_SPHERE_TOP_OVERSHOOT = 500;
 const MOBILE_LAYOUT_BREAKPOINT = 560;
+const LAYOUT_EDITOR_STORAGE_KEY = 'f1nflow-layout-editor';
+const LAYOUT_EDITOR_IDS = ['guest-me'];
+const LAYOUT_EDITOR_NAMES = ['@your_admin_username']
 
 @Component({
   selector: 'app-main',
@@ -53,7 +57,8 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   activeTab: MainTab = null;
   isEditMode = false;
-  frequentExpenses: FrequentExpense[] = [];
+  canEditLayout = false;
+  recentCategoryGroups: RecentCategoryGroup[] = [];
   quickTransactionsLimit = 3;
 
   spherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
@@ -75,14 +80,29 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly globalPointerMoveHandler = (event: PointerEvent): void => this.onDragMove(event);
   private readonly globalPointerUpHandler = (event: PointerEvent): void => this.onGlobalPointerStop(event);
 
-  constructor(private balanceService: BalanceService) {}
+  constructor(
+    private balanceService: BalanceService,
+    private sessionService: SessionService
+  ) {}
 
   ngOnInit(): void {
+    this.canEditLayout = this.resolveCanEditLayout();
+
     const initialLayout = this.balanceService.getSphereLayout();
     if (initialLayout) {
       this.spherePositions = this.clonePositions(initialLayout);
       this.savedSpherePositions = this.clonePositions(initialLayout);
     }
+
+    this.subscription.add(
+      this.sessionService.user$.subscribe(() => {
+        this.canEditLayout = this.resolveCanEditLayout();
+        if (!this.canEditLayout && this.isEditMode) {
+          this.isEditMode = false;
+          this.stopDrag();
+        }
+      })
+    );
 
     this.subscription.add(
       this.balanceService.sphereLayout$.subscribe((layout) => {
@@ -96,13 +116,13 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription.add(
       this.balanceService.transactions$.subscribe((transactions) => {
         this.transactionsCache = transactions;
-        this.frequentExpenses = this.buildFrequentExpenses(transactions);
+        this.recentCategoryGroups = this.buildRecentCategoryGroups(transactions);
       })
     );
     this.subscription.add(
       this.balanceService.quickTransactionsLimit$.subscribe((limit) => {
         this.quickTransactionsLimit = limit;
-        this.frequentExpenses = this.buildFrequentExpenses(this.transactionsCache);
+        this.recentCategoryGroups = this.buildRecentCategoryGroups(this.transactionsCache);
       })
     );
   }
@@ -146,8 +166,8 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.activeTab = null;
   }
 
-  repeatFrequentExpense(item: FrequentExpense): void {
-    this.balanceService.addTransaction(item.repeatAmount, item.category, 'minus');
+  repeatTransaction(category: string, amount: number): void {
+    this.balanceService.addTransaction(amount, category, 'minus');
   }
 
   setQuickTransactionsLimit(limit: number): void {
@@ -163,16 +183,14 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   onResize(): void {
     this.measureSphereSizes();
 
-    if (this.isEditMode) {
-      this.spawnSpheresAtBottom();
-      return;
-    }
-
     this.spherePositions = this.clampAllSpherePositions(this.spherePositions);
     this.savedSpherePositions = this.clampAllSpherePositions(this.savedSpherePositions);
   }
 
   toggleEditMode(): void {
+    if (!this.canEditLayout) {
+      return;
+    }
     if (this.isEditMode) {
       this.isEditMode = false;
       this.stopDrag();
@@ -182,7 +200,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.activeTab = null;
     this.isEditMode = true;
     this.stopDrag();
-    this.spawnSpheresAtBottom();
+    this.spherePositions = this.clonePositions(this.savedSpherePositions);
   }
 
   saveLayout(): void {
@@ -203,7 +221,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onDragStart(event: PointerEvent, tab: SphereTab): void {
-    if (!this.isEditMode || this.activeTab !== null) {
+    if (!this.isEditMode || this.activeTab !== null || !this.canEditLayout) {
       return;
     }
 
@@ -294,36 +312,18 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  private clamp(value: number, min: number, max: number): number {
-    return Math.min(Math.max(value, min), max);
+  getOrderedSphereCoordinates(): Array<{ tab: SphereTab; top: number; left: number; isDragging: boolean }> {
+    const tabs: SphereTab[] = ['income', 'expense', 'saving', 'news', 'recent'];
+    return tabs.map((tab) => ({
+      tab,
+      top: Math.round(this.spherePositions[tab].top),
+      left: Math.round(this.spherePositions[tab].left),
+      isDragging: this.dragState?.tab === tab
+    }));
   }
 
-  private spawnSpheresAtBottom(): void {
-    const raf =
-      globalThis.requestAnimationFrame ?? ((callback: FrameRequestCallback) => setTimeout(() => callback(0), 0));
-
-    raf(() => {
-      const layout = this.layoutRef?.nativeElement;
-      if (!layout) {
-        return;
-      }
-
-      this.measureSphereSizes();
-
-      const tabsOrder: SphereTab[] = ['income', 'expense', 'news', 'saving', 'recent'];
-      const overlapStep = 26;
-      const centerX = layout.clientWidth / 2;
-      const centerShift = (tabsOrder.length - 1) / 2;
-
-      for (const [index, tab] of tabsOrder.entries()) {
-        const size = this.getSphereSize(tab);
-        const { maxLeft, maxTop } = this.getSphereBounds(layout, size);
-        const overlapOffset = (index - centerShift) * overlapStep;
-        const left = this.clamp(centerX - size.width / 2 + overlapOffset, 0, maxLeft);
-
-        this.spherePositions[tab] = { top: maxTop, left };
-      }
-    });
+  private clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max);
   }
 
   private clonePositions(positions: Record<SphereTab, SpherePosition>): Record<SphereTab, SpherePosition> {
@@ -338,11 +338,11 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private createFallbackSphereSizes(): Record<SphereTab, SphereSize> {
     return {
-      income: { width: 220, height: 220 },
-      expense: { width: 180, height: 180 },
-      saving: { width: 143, height: 143 },
-      news: { width: 154, height: 154 },
-      recent: { width: 152, height: 152 }
+       income: { width: 165, height: 165 },
+      expense: { width: 135, height: 135 },
+      saving: { width: 108, height: 108 },
+      news: { width: 116, height: 116 },
+      recent: { width: 114, height: 114 }
     };
   }
 
@@ -433,31 +433,41 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     window.removeEventListener('pointercancel', this.globalPointerUpHandler);
   }
 
-  private buildFrequentExpenses(transactions: Transaction[]): FrequentExpense[] {
+   private buildRecentCategoryGroups(transactions: Transaction[]): RecentCategoryGroup[] {
     const expenseTransactions = transactions
       .filter((item) => item.type === 'minus')
       .sort((a, b) => b.date.getTime() - a.date.getTime());
 
-    const grouped = new Map<string, FrequentExpense>();
+    const grouped = new Map<string, RecentCategoryGroup>();
 
     for (const transaction of expenseTransactions) {
       const existing = grouped.get(transaction.category);
-      if (existing) {
-        existing.totalAmount += transaction.amount;
-        existing.repeatCount += 1;
+      if (!existing) {
+        grouped.set(transaction.category, {
+          category: transaction.category,
+          totalAmount: transaction.amount,
+          repeatCount: 1,
+          latestTransactions: [transaction.amount]
+        });
         continue;
       }
 
-      grouped.set(transaction.category, {
-        category: transaction.category,
-        totalAmount: transaction.amount,
-        repeatAmount: transaction.amount,
-        repeatCount: 1
-      });
+      existing.totalAmount += transaction.amount;
+      existing.repeatCount += 1;
+      if (existing.latestTransactions.length < this.quickTransactionsLimit) {
+        existing.latestTransactions.push(transaction.amount);
+      }
     }
 
-    return [...grouped.values()]
-      .sort((a, b) => b.repeatCount - a.repeatCount || b.totalAmount - a.totalAmount)
-      .slice(0, this.quickTransactionsLimit);
+    return [...grouped.values()].sort((a, b) => b.repeatCount - a.repeatCount || b.totalAmount - a.totalAmount);
+  }
+
+  private resolveCanEditLayout(): boolean {
+    const user = this.sessionService.userSnapshot;
+    const id = user?.telegramId?.trim() ?? '';
+    const userName = user?.userName?.trim() ?? '';
+    const hasStorageOverride = typeof localStorage !== 'undefined' && localStorage.getItem(LAYOUT_EDITOR_STORAGE_KEY) === '1';
+
+    return hasStorageOverride || LAYOUT_EDITOR_IDS.includes(id) || LAYOUT_EDITOR_NAMES.includes(userName);
   }
 }

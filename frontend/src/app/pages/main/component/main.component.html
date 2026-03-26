@@ -1,5 +1,5 @@
  <div class="dashboard-container" [class.has-active]="activeTab !== null" (click)="closeActiveTab()">
-   <div class="layout-controls">
+   <div class="layout-controls" *ngIf="canEditLayout">
     <button
       type="button"
       class="edit-hex"
@@ -16,6 +16,15 @@
         <button type="button" class="action-hex option visible" (click)="saveLayout()" aria-label="Save layout">💾</button>
         <button type="button" class="action-hex option visible secondary" (click)="resetToDefaultLayout()" aria-label="Reset layout">↺</button>
       </div>
+       <aside class="coords-panel" aria-label="Sphere coordinates">
+        <div class="coords-title">Sphere coords</div>
+        @for (item of getOrderedSphereCoordinates(); track item.tab) {
+          <div class="coord-row" [class.dragging]="item.isDragging">
+            <span class="coord-name">{{ item.tab }}</span>
+            <code>top: {{ item.top }} / left: {{ item.left }}</code>
+          </div>
+        }
+      </aside>
     }
     </div>
    <div
@@ -101,10 +110,10 @@
      >
        <app-recent
          [isFullView]="activeTab === 'recent'"
-         [items]="frequentExpenses"
+         [items]="recentCategoryGroups"
          [quickLimit]="quickTransactionsLimit"
          (onSelect)="setActiveTab('recent')"
-         (onRepeat)="repeatFrequentExpense($event)"
+         (onRepeat)="repeatTransaction($event.category, $event.amount)"
          (quickLimitChange)="setQuickTransactionsLimit($event)"
        ></app-recent>
      </div>

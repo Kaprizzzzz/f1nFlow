@@ -13,25 +13,38 @@
           <span class="caret">▾</span>
         </button>
 
-        <div class="quick-limit-menu" *ngIf="isQuickLimitMenuOpen">
-          @for (limit of quickLimitOptions; track limit) {
-            <button type="button" [class.active]="quickLimit === limit" (click)="setQuickLimit(limit, $event)">{{ limit }}</button>
-          }
+         <div class="quick-limit-menu" *ngIf="isQuickLimitMenuOpen">
+            @for (limit of quickLimitOptions; track limit) {
+              <button type="button" [class.active]="quickLimit === limit" (click)="setQuickLimit(limit, $event)">{{ limit }}</button>
+            }
+          </div>
         </div>
       </div>
     </div>
     @if (items.length === 0) {
       <p class="recent-empty">No expense stats yet</p>
     } @else {
-      @for (item of items; track item.category) {
-        <div class="recent-item">
-          <div>
-            <div class="recent-name">{{ item.category }}</div>
-            <div class="recent-meta">{{ item.totalAmount | number:'1.2-2' }} · {{ item.repeatCount }}x</div>
-          </div>
-          <button type="button" class="repeat-btn" (click)="repeat(item, $event)">↻</button>
-        </div>
-      }
+      <div class="recent-groups">
+        @for (item of items; track item.category) {
+          <section class="recent-group-card">
+            <div class="recent-group-header">
+              <div>
+                <div class="recent-name">{{ item.category }}</div>
+                <div class="recent-meta">{{ item.repeatCount }} transactions · total {{ item.totalAmount | number:'1.2-2' }}</div>
+              </div>
+            </div>
+
+            <div class="recent-bubbles">
+              @for (amount of item.latestTransactions; track $index) {
+                <button type="button" class="recent-bubble" (click)="repeat(item.category, amount, $event)">
+                  <span class="bubble-amount">{{ amount | number:'1.2-2' }}</span>
+                  <span class="bubble-multiplier">x{{ $index + 1 }}</span>
+                </button>
+              }
+            </div>
+          </section>
+        }
+      </div>
     }
   </div>
 </div>

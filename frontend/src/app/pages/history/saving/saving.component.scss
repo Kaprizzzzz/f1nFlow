@@ -9,8 +9,8 @@ $saving-glow: #63ffd0;
   .main-circle {
     --income-share: 0;
     --news-ring: conic-gradient(rgba(120, 255, 209, 0.26) 0deg, rgba(120, 255, 209, 0.26) 360deg);
-    width: 143px;
-    height: 143px;
+    width: 108px;
+    height: 108px;
     border-radius: 50%;
     background: radial-gradient(circle at 55% 20%, #9fffe1 0%, #42dfaf 18%, #0c8466 54%, #02241d 100%);
     border: 2px solid rgba($saving-glow, 0.9);
@@ -28,7 +28,7 @@ $saving-glow: #63ffd0;
     &::before {
       content: '';
       position: absolute;
-      inset: -18px;
+      inset: -14px;
       border-radius: 50%;
       background: var(--news-ring);
       -webkit-mask: radial-gradient(circle, transparent 72%, black 75%);
@@ -45,7 +45,7 @@ $saving-glow: #63ffd0;
     &::after {
       content: '';
       position: absolute;
-      inset: -8px;
+      inset: -6px;
       border-radius: 50%;
       background: conic-gradient(
         rgba(132, 255, 198, 0.95) 0deg,
@@ -65,16 +65,16 @@ $saving-glow: #63ffd0;
     }
 
     .label {
-      font-size: 15px;
+      font-size: 12px;
       opacity: 0.95;
       transition: font-size 0.35s ease;
     }
 
     .value {
-      font-size: clamp(16px, 6vw, 28px);
+      font-size: clamp(14px, 4.8vw, 22px);
       font-weight: 600;
       line-height: 1;
-      margin-top: 6px;
+      margin-top: 4px;
       transition: font-size 0.35s ease;
       max-width: 84%;
       text-align: center;
@@ -89,7 +89,7 @@ $saving-glow: #63ffd0;
       transform-origin: center;
 
       .label {
-        font-size: 22px;
+        font-size: 18px;
       }
 
       .value {
@@ -231,5 +231,5 @@ $saving-glow: #63ffd0;
   }
 }
 .circle-wrapper.active .history-list { 
-  margin-top: var(--active-panel-gap, 92px);
+  margin-top: 108px;
 }

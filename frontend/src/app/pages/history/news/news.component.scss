@@ -7,12 +7,12 @@
    align-items: center;
  
    .main-circle {
-     width: 154px;
-     height: 154px;
+     width: 116px;
+     height: 116px;
      border-radius: 50%;
      background: radial-gradient(circle at 55% 18%, #efc8ff 0%, #d18bff 18%, #7b2ac7 56%, #2c0a47 100%);
      border: 2px solid rgba($news-glow, 0.9);
-     box-shadow: 0 0 22px rgba($news-glow, 0.5), inset 0 -17px 28px rgba(0, 0, 0, 0.42);
+     box-shadow: 0 0 18px rgba($news-glow, 0.5), inset 0 -14px 22px rgba(0, 0, 0, 0.42);
      color: #fff;
      display: flex;
      justify-content: center;
@@ -21,7 +21,7 @@
     transition: transform 0.35s ease;
  
      .label {
-       font-size: 24px;
+       font-size: 19px;
        font-weight: 600;
      }
    }
@@ -47,5 +47,5 @@
  }
 
 .circle-wrapper.active .news-panel {
-  margin-top: var(--active-panel-gap, 92px);
+  margin-top: 102px;
 }

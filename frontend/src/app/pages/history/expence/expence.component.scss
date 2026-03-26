@@ -11,12 +11,12 @@ $expense-glow: #ffb060;
 
   .main-circle {
     --category-ring: conic-gradient(rgba(127, 70, 85, 0.35) 0deg, rgba(127, 70, 85, 0.35) 360deg);
-    width: 180px;
-    height: 180px;
+    width: 135px;
+    height: 135px;
     border-radius: 50%;
     background: radial-gradient(circle at 50% 18%, #ffd27f 0%, #f2a24f 16%, #9f5b18 50%, #341700 100%);
     border: 2px solid rgba($expense-glow, 0.9);
-    box-shadow: 0 0 25px rgba($expense-glow, 0.5), inset 0 -20px 32px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 0 20px rgba($expense-glow, 0.5), inset 0 -16px 26px rgba(0, 0, 0, 0.45);
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -38,12 +38,12 @@ $expense-glow: #ffb060;
       pointer-events: none;
     }
 
-    .label { font-size: 22px; opacity: 0.95; }
+    .label { font-size: 18px; opacity: 0.95; }
     .value {
-      font-size: clamp(20px, 7.5vw, 44px);
+      font-size: clamp(17px, 5.8vw, 34px);
       font-weight: 600;
       line-height: 1;
-      margin-top: 8px;
+      margin-top: 6px;
       max-width: 84%;
       text-align: center;
       overflow: hidden;
@@ -56,13 +56,13 @@ $expense-glow: #ffb060;
     .value { font-size: clamp(18px, 7vw, 36px); }
   }
   &.active {
-    padding-top: 70px;
+    padding-top: 48px;
   }
 }
 
 .sticker-row {
   position: absolute;
-  top: 168px; // Центр відносно якого будуть "орбіти"
+  top: 128px; // Центр відносно якого будуть "орбіти"
   left: 50%;
   width: 0;
   height: 0;
@@ -70,13 +70,13 @@ $expense-glow: #ffb060;
 
   .mini-circle {
     position: absolute;
-    width: 54px;
-    height: 54px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     border: 1px solid rgba($expense-glow, 0.7);
     background: rgba(45, 24, 7, 0.95);
     color: #fff;
-    font-size: 20px;
+    font-size: 16px;
     cursor: grab;
     transform: translate(-50%, -50%);
     touch-action: none;
@@ -97,11 +97,11 @@ $expense-glow: #ffb060;
 }
 
 .add-category-circle {
-  left: 148px;
-  top: 124px;
-  width: 68px;
-  height: 68px;
-  font-size: 30px;
+  left: 114px;
+  top: 92px;
+  width: 50px;
+  height: 50px;
+  font-size: 22px;
   border-style: dashed;
   font-weight: 700;
 }

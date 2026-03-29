@@ -104,6 +104,7 @@ $recent-glow: #ff78c7;
   background: radial-gradient(circle at 40% 20%, rgba(255, 179, 223, 0.25) 0%, rgba(95, 16, 59, 0.96) 70%);
   color: #ffe5f4;
   $recent-glow: #ff78c7;
+}
 
 .circle-wrapper {
   position: relative;
@@ -177,6 +178,7 @@ $recent-glow: #ff78c7;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
 .recent-groups {
   display: grid;
   gap: 10px;
@@ -218,6 +220,8 @@ $recent-glow: #ff78c7;
   border-radius: 50%;
   border: 1px solid rgba(255, 181, 224, 0.7);
   background: rgba(89, 14, 55, 0.92);
+}
+
 .recent-bubbles {
   display: flex;
   flex-wrap: wrap;

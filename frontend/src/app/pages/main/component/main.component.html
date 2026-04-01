@@ -1,4 +1,4 @@
- <div class="dashboard-container" [class.has-active]="activeTab !== null" [class.fullscreen-panel-active]="isFullscreenPanelTab()" (click)="closeActiveTab()">
+  <div class="dashboard-container" [class.has-active]="activeTab !== null" [class.edit-mode]="isEditMode" [class.fullscreen-panel-active]="isFullscreenPanelTab()" (click)="closeActiveTab()">
    <div class="layout-controls" *ngIf="canEditLayout">
     <button
       type="button"

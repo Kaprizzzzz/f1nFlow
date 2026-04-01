@@ -185,11 +185,10 @@ $recent-glow: #ff78c7;
   border-bottom: 1px solid rgba(255, 170, 220, 0.2);
   padding-bottom: 8px;
 }
-
-  &:last-child {
-    border-bottom: 0;
-    padding-bottom: 0;
-  }
+.recent-groups:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
 .recent-group-card {
   border: 1px solid rgba(255, 170, 220, 0.22);
   border-radius: 14px;

@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHash, randomBytes } from 'crypto';
-import { QueryFailedError, Repository } from 'typeorm';
+import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { Transaction } from '../entities/transaction.entity';
 import { SaveStateDto } from '../common/dto';
 
-
+const MAX_TRANSACTIONS_PER_SAVE = 1000;
 
 interface EnsureUserPayload {
   telegramId: string;
@@ -20,7 +20,8 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     @InjectRepository(Transaction)
-    private transactionsRepository: Repository<Transaction>
+    private transactionsRepository: Repository<Transaction>,
+    private dataSource: DataSource
    ) {}
  
    async findOrCreateUser(telegramId: string, userName: string, referredBy?: string): Promise<User> {
@@ -89,34 +90,46 @@ export class UsersService {
   async saveUserState(telegramId: string, payload: SaveStateDto) {
     const user = await this.ensureUser({ telegramId });
 
-    user.currency = payload.currency ?? user.currency;
-    user.incomeCategories = payload.incomeCategories ?? user.incomeCategories ?? [];
-    user.expenseCategories = payload.expenseCategories ?? user.expenseCategories ?? [];
-    user.sphereLayout = payload.sphereLayout ?? user.sphereLayout;
-    user.quickTransactionsLimit = payload.quickTransactionsLimit ?? user.quickTransactionsLimit ?? 3;
-    user.news = payload.news ?? user.news ?? [];
-    user.goalsPreferences = payload.goalsPreferences ?? user.goalsPreferences ?? { theme: 'default', visualizationMode: 'amount' };
-    user.lastSeenAt = new Date();
-
-    await this.usersRepository.save(user);
-
-    if (payload.transactions) {
-      await this.transactionsRepository.delete({ userId: user.id });
-      if (payload.transactions.length > 0) {
-        const nextTransactions = payload.transactions.map((tx) =>
-          this.transactionsRepository.create({
-            amount: tx.amount,
-            category: tx.category,
-            type: tx.type,
-            date: new Date(tx.date),
-            label: tx.label,
-            userId: user.id
-          })
-        );
-        await this.transactionsRepository.save(nextTransactions);
-      }
+    if (payload.transactions && payload.transactions.length > MAX_TRANSACTIONS_PER_SAVE) {
+      throw new BadRequestException(`Too many transactions in one request. Max allowed: ${MAX_TRANSACTIONS_PER_SAVE}`);
     }
 
+    await this.dataSource.transaction(async (manager) => {
+      const txUsersRepository = manager.getRepository(User);
+      const txTransactionsRepository = manager.getRepository(Transaction);
+      const userToUpdate = await txUsersRepository.findOne({ where: { id: user.id } });
+
+    if (!userToUpdate) {
+        throw new NotFoundException('User not found');
+      }
+    userToUpdate.currency = payload.currency ?? userToUpdate.currency;
+      userToUpdate.incomeCategories = payload.incomeCategories ?? userToUpdate.incomeCategories ?? [];
+      userToUpdate.expenseCategories = payload.expenseCategories ?? userToUpdate.expenseCategories ?? [];
+      userToUpdate.sphereLayout = payload.sphereLayout ?? userToUpdate.sphereLayout;
+      userToUpdate.quickTransactionsLimit = payload.quickTransactionsLimit ?? userToUpdate.quickTransactionsLimit ?? 3;
+      userToUpdate.news = payload.news ?? userToUpdate.news ?? [];
+      userToUpdate.goalsPreferences = payload.goalsPreferences ?? userToUpdate.goalsPreferences ?? { theme: 'default', visualizationMode: 'amount' };
+      userToUpdate.lastSeenAt = new Date();
+
+      await txUsersRepository.save(userToUpdate);
+
+      if (payload.transactions) {
+        await txTransactionsRepository.delete({ userId: user.id });
+        if (payload.transactions.length > 0) {
+          const nextTransactions = payload.transactions.map((tx) =>
+            txTransactionsRepository.create({
+              amount: tx.amount,
+              category: tx.category,
+              type: tx.type,
+              date: new Date(tx.date),
+              label: tx.label,
+              userId: user.id
+            })
+          );
+          await txTransactionsRepository.save(nextTransactions);
+        }
+      }
+    });
     return this.getUserState(telegramId);
   }
 

@@ -49,3 +49,23 @@
 .circle-wrapper.active .news-panel {
   margin-top: 102px;
 }
+
+.circle-wrapper.active .main-circle {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.85);
+}
+
+.circle-wrapper.active .news-panel {
+  position: fixed;
+  top: 74px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(360px, calc(100vw - 18px));
+  height: calc(100vh - 148px);
+  margin-top: 0;
+  overflow-y: auto;
+  border-radius: 26px;
+  padding: 16px;
+  z-index: 120;
+}

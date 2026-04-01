@@ -1,4 +1,4 @@
- <div class="dashboard-container" [class.has-active]="activeTab !== null" (click)="closeActiveTab()">
+ <div class="dashboard-container" [class.has-active]="activeTab !== null" [class.fullscreen-panel-active]="isFullscreenPanelTab()" (click)="closeActiveTab()">
    <div class="layout-controls" *ngIf="canEditLayout">
     <button
       type="button"
@@ -31,6 +31,7 @@
      #layoutRef
      class="circles-layout"
      [class.editing]="isEditMode"
+     [class.fullscreen-panel-active]="isFullscreenPanelTab()"
      (pointermove)="onDragMove($event)"
      (click)="$event.stopPropagation(); closeActiveTab()"
    >

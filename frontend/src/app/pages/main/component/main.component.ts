@@ -37,9 +37,6 @@ const ROUTING_PANEL_BOTTOM_OFFSET = 0;
 // ОСЬ ТАК: тут ти сам редагуєш, наскільки сферу можна витягнути вище верхньої межі на мобілці.
 const MOBILE_SPHERE_TOP_OVERSHOOT = 500;
 const MOBILE_LAYOUT_BREAKPOINT = 560;
-const LAYOUT_EDITOR_STORAGE_KEY = 'f1nflow-layout-editor';
-const LAYOUT_EDITOR_IDS = ['guest-me'];
-const LAYOUT_EDITOR_NAMES = ['@your_admin_username']
 
 @Component({
   selector: 'app-main',
@@ -462,12 +459,10 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     return [...grouped.values()].sort((a, b) => b.repeatCount - a.repeatCount || b.totalAmount - a.totalAmount);
   }
 
-  private resolveCanEditLayout(): boolean {
-    const user = this.sessionService.userSnapshot;
-    const id = user?.telegramId?.trim() ?? '';
-    const userName = user?.userName?.trim() ?? '';
-    const hasStorageOverride = typeof localStorage !== 'undefined' && localStorage.getItem(LAYOUT_EDITOR_STORAGE_KEY) === '1';
-
-    return hasStorageOverride || LAYOUT_EDITOR_IDS.includes(id) || LAYOUT_EDITOR_NAMES.includes(userName);
+ isFullscreenPanelTab(tab: MainTab = this.activeTab): boolean {
+    return tab === 'news' || tab === 'saving' || tab === 'recent';
+  }
+    private resolveCanEditLayout(): boolean {
+    return true;
   }
 }

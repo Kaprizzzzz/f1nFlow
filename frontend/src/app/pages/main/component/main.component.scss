@@ -269,3 +269,11 @@
     max-width: calc(100vw - 24px);
   }
 }
+
+.dashboard-container.fullscreen-panel-active {
+  overflow: hidden;
+}
+
+.circles-layout.fullscreen-panel-active {
+  min-height: calc(100vh - var(--dashboard-top-offset));
+}

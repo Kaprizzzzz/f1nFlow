@@ -118,7 +118,7 @@ export class IncomeComponent implements OnInit, OnDestroy {
     const endAngle = 335;
     const angle = total <= 1 ? singleItemArcAngle : startAngle + ((endAngle - startAngle) * index) / (total - 1);
     const radians = (angle * Math.PI) / 180;
-    const radius = 148;
+    const radius = 176;
 
     return {
       left: `${Math.cos(radians) * radius}px`,

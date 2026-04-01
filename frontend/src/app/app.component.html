@@ -1,6 +1,12 @@
 <app-loading *ngIf="showSplash"></app-loading>
  
-<div class="app-container" *ngIf="!showSplash">
+<div
+  class="app-container"
+  *ngIf="!showSplash"
+  [class.keyboard-open]="isKeyboardOpen"
+  (focusin)="onFieldFocusIn()"
+  (focusout)="onFieldFocusOut()"
+>
   <div class="app-bg-orb one" aria-hidden="true"></div>
   <div class="app-bg-orb two" aria-hidden="true"></div>
   <div class="top-controls">

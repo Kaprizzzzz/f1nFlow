@@ -14,6 +14,12 @@ export class SphereLayoutDto {
   expense: SpherePositionDto;
   saving: SpherePositionDto;
   news: SpherePositionDto;
+    recent: SpherePositionDto;
+}
+
+export class GoalsPreferencesDto {
+  theme: 'default' | 'girly';
+  visualizationMode: 'amount' | 'segments';
 }
 
 export class TransactionDto {
@@ -43,4 +49,5 @@ export class SaveStateDto {
   transactions?: TransactionDto[];
   quickTransactionsLimit?: number;
   news?: Array<{ id: string; title: string; isRead: boolean }>;
+  goalsPreferences?: GoalsPreferencesDto;
 }

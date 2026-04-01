@@ -18,6 +18,7 @@ export class InitSchema1710000000000 implements MigrationInterface {
       "sphereLayout" jsonb,
       "quickTransactionsLimit" integer NOT NULL DEFAULT 3,
       "news" jsonb NOT NULL DEFAULT '[]'::jsonb,
+      "goalsPreferences" jsonb NOT NULL DEFAULT '{"theme":"default","visualizationMode":"amount"}'::jsonb,
       "sessionTokenHash" character varying,
       "isOnline" boolean NOT NULL DEFAULT false,
       "firstSeenAt" TIMESTAMP NOT NULL DEFAULT now(),

@@ -8,7 +8,11 @@ import {
 } from 'typeorm';
  import { Transaction } from './transaction.entity';
  
-export type SphereLayout = Record<'income' | 'expense' | 'saving' | 'news', { left: number; top: number }>;
+  export type SphereLayout = Record<'income' | 'expense' | 'saving' | 'news' | 'recent', { left: number; top: number }>;
+  export type GoalsPreferences = {
+    theme: 'default' | 'girly';
+    visualizationMode: 'amount' | 'segments';
+  };
 
  @Entity()
  export class User {
@@ -44,6 +48,12 @@ export type SphereLayout = Record<'income' | 'expense' | 'saving' | 'news', { le
 
   @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
   news: Array<{ id: string; title: string; isRead: boolean }>;
+
+  @Column({
+    type: 'jsonb',
+    default: () => '\'{"theme":"default","visualizationMode":"amount"}\'::jsonb'
+  })
+  goalsPreferences: GoalsPreferences;
 
   @Column({ nullable: true })
   sessionTokenHash: string | null;

@@ -23,6 +23,10 @@
    background: #060b17;
  }
  
+ .app-container.keyboard-open {
+  --bottom-nav-offset: 0px;
+}
+
  .top-controls {
    position: absolute;
    top: 4px;
@@ -143,6 +147,12 @@
     }
   }
  }
+ 
+ .app-container.keyboard-open .bottom-nav {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(120%);
+}
 
  .app-bg-orb {
   position: absolute;

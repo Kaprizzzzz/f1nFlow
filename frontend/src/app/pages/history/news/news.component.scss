@@ -57,12 +57,13 @@
 }
 
 .circle-wrapper.active .news-panel {
+  --panel-top-offset: 82px;
   position: fixed;
-  top: 74px;
+  top: var(--panel-top-offset);
   left: 50%;
   transform: translateX(-50%);
   width: min(360px, calc(100vw - 18px));
-  height: calc(100vh - 148px);
+  height: calc(100dvh - var(--panel-top-offset) - var(--bottom-nav-offset, 94px) - 8px);
   margin-top: 0;
   overflow-y: auto;
   border-radius: 26px;

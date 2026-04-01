@@ -95,6 +95,7 @@ export class UsersService {
     user.sphereLayout = payload.sphereLayout ?? user.sphereLayout;
     user.quickTransactionsLimit = payload.quickTransactionsLimit ?? user.quickTransactionsLimit ?? 3;
     user.news = payload.news ?? user.news ?? [];
+    user.goalsPreferences = payload.goalsPreferences ?? user.goalsPreferences ?? { theme: 'default', visualizationMode: 'amount' };
     user.lastSeenAt = new Date();
 
     await this.usersRepository.save(user);

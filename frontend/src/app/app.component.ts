@@ -35,8 +35,11 @@ export class AppComponent implements OnInit, OnDestroy {
   showSplash = true;
   userName = '...';
   isMainRoute = true;
+  isKeyboardOpen = false;
 
   private subscription = new Subscription();
+  private viewportBaseHeight = 0;
+  private readonly viewportResizeHandler = () => this.updateKeyboardState();
 
   constructor(
     private sessionService: SessionService,
@@ -64,6 +67,7 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       })
     );
+    this.setupViewportKeyboardDetection();
   }
 
    private setupTelegramWebApp(): void {
@@ -88,7 +92,41 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (typeof window !== 'undefined' && window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', this.viewportResizeHandler);
+    }
     this.subscription.unsubscribe();
     this.sessionService.sendPresence(false);
+  }
+  onFieldFocusIn(): void {
+    this.updateKeyboardState();
+  }
+
+  onFieldFocusOut(): void {
+    setTimeout(() => this.updateKeyboardState(), 40);
+  }
+
+  private setupViewportKeyboardDetection(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    this.viewportBaseHeight = window.visualViewport?.height || window.innerHeight;
+    window.visualViewport?.addEventListener('resize', this.viewportResizeHandler);
+  }
+
+  private updateKeyboardState(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const viewportHeight = window.visualViewport?.height || window.innerHeight;
+    this.viewportBaseHeight = Math.max(this.viewportBaseHeight, viewportHeight);
+    const heightLoss = this.viewportBaseHeight - viewportHeight;
+    const hasFocusedInput =
+      typeof document !== 'undefined' &&
+      !!document.activeElement?.closest('input, textarea, [contenteditable="true"], [contenteditable=""]');
+
+    this.isKeyboardOpen = hasFocusedInput && heightLoss > 120;
   }
 }

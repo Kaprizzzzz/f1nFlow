@@ -50,6 +50,18 @@
   margin-top: 102px;
 }
 
+ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+}
+
+li.unread {
+  color: #f4dbff;
+  font-weight: 600;
+}
+
 .circle-wrapper.active .main-circle {
   opacity: 0;
   pointer-events: none;

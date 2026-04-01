@@ -19,10 +19,18 @@
  }
  
  export interface NewsItem {
-   id: string;
-   title: string;
-   isRead: boolean;
+  id: string;
+  title: string;
+  isRead: boolean;
  }
+
+ export interface WeeklyChallenge {
+  category: string;
+  limit: number;
+  spent: number;
+  weekStart: string;
+  completed: boolean;
+}
 
 export type SphereTab = 'income' | 'expense' | 'saving' | 'news' | 'recent';
 export type SphereLayout = Record<SphereTab, { left: number; top: number }>;
@@ -41,6 +49,10 @@ interface PersistedStatePayload {
     quickTransactionsLimit?: number;
     news?: NewsItem[];
     goalsPreferences?: GoalsPreferences;
+    streakCurrent?: number;
+    streakBest?: number;
+    badges?: string[];
+    weeklyChallenge?: WeeklyChallenge | null;
   };
 }
 
@@ -62,6 +74,10 @@ interface PersistedStatePayload {
     { id: '2', title: 'Budget tip of the week', isRead: false },
     { id: '3', title: 'Saving challenge', isRead: true }
    ]);
+   private streakCurrentSubject = new BehaviorSubject<number>(0);
+   private streakBestSubject = new BehaviorSubject<number>(0);
+   private badgesSubject = new BehaviorSubject<string[]>([]);
+   private weeklyChallengeSubject = new BehaviorSubject<WeeklyChallenge | null>(null);
  
    private isHydrating = false;
    private isCurrencyConverting = false;
@@ -75,6 +91,10 @@ interface PersistedStatePayload {
    quickTransactionsLimit$ = this.quickTransactionsLimitSubject.asObservable();
    goalsPreferences$ = this.goalsPreferencesSubject.asObservable();
    news$ = this.newsSubject.asObservable();
+   streakCurrent$ = this.streakCurrentSubject.asObservable();
+   streakBest$ = this.streakBestSubject.asObservable();
+   badges$ = this.badgesSubject.asObservable();
+   weeklyChallenge$ = this.weeklyChallengeSubject.asObservable();
  
    constructor(
     @Inject(PLATFORM_ID) platformId: Object,
@@ -109,6 +129,10 @@ interface PersistedStatePayload {
           this.quickTransactionsLimitSubject.next(this.normalizeQuickLimit(state.user?.quickTransactionsLimit));
           this.goalsPreferencesSubject.next(this.normalizeGoalsPreferences(state.user?.goalsPreferences));
           this.newsSubject.next(this.normalizeNews(state.user?.news));
+          this.streakCurrentSubject.next(this.normalizeStreakValue(state.user?.streakCurrent));
+          this.streakBestSubject.next(this.normalizeStreakValue(state.user?.streakBest));
+          this.badgesSubject.next(this.normalizeBadges(state.user?.badges));
+          this.weeklyChallengeSubject.next(this.normalizeWeeklyChallenge(state.user?.weeklyChallenge));
           this.syncBalanceAndTransactions(false);
           this.isHydrating = false;
         },
@@ -349,6 +373,10 @@ interface PersistedStatePayload {
           quickTransactionsLimit?: number;
           news?: NewsItem[];
           goalsPreferences?: GoalsPreferences;
+          streakCurrent?: number;
+          streakBest?: number;
+          badges?: string[];
+          weeklyChallenge?: WeeklyChallenge | null;
        };
  
        this.transactions = (parsed.transactions ?? []).map((tx) => ({
@@ -363,6 +391,10 @@ interface PersistedStatePayload {
        this.quickTransactionsLimitSubject.next(this.normalizeQuickLimit(parsed.quickTransactionsLimit));
        this.goalsPreferencesSubject.next(this.normalizeGoalsPreferences(parsed.goalsPreferences));
        this.newsSubject.next(this.normalizeNews(parsed.news));
+       this.streakCurrentSubject.next(this.normalizeStreakValue(parsed.streakCurrent));
+       this.streakBestSubject.next(this.normalizeStreakValue(parsed.streakBest));
+       this.badgesSubject.next(this.normalizeBadges(parsed.badges));
+       this.weeklyChallengeSubject.next(this.normalizeWeeklyChallenge(parsed.weeklyChallenge));
       } catch {
        localStorage.removeItem(this.storageKey);
      }
@@ -381,7 +413,11 @@ interface PersistedStatePayload {
        sphereLayout: this.sphereLayoutSubject.value,
        quickTransactionsLimit: this.quickTransactionsLimitSubject.value,
        goalsPreferences: this.goalsPreferencesSubject.value,
-       news: this.newsSubject.value
+       news: this.newsSubject.value,
+       streakCurrent: this.streakCurrentSubject.value,
+       streakBest: this.streakBestSubject.value,
+       badges: this.badgesSubject.value,
+       weeklyChallenge: this.weeklyChallengeSubject.value
      };
  
      localStorage.setItem(this.storageKey, JSON.stringify(payload));
@@ -474,6 +510,35 @@ interface PersistedStatePayload {
       title: item.title || 'News',
       isRead: !!item.isRead
     }));
+  }
+
+  private normalizeStreakValue(value?: number | null): number {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || numeric < 0) {
+      return 0;
+    }
+    return Math.round(numeric);
+  }
+
+  private normalizeBadges(badges?: string[] | null): string[] {
+    if (!badges || badges.length === 0) {
+      return [];
+    }
+    return Array.from(new Set(badges.filter((item) => !!item)));
+  }
+
+  private normalizeWeeklyChallenge(challenge?: WeeklyChallenge | null): WeeklyChallenge | null {
+    if (!challenge || !challenge.category || !challenge.weekStart) {
+      return null;
+    }
+
+    return {
+      category: challenge.category,
+      limit: this.roundToCents(Number(challenge.limit) || 0),
+      spent: this.roundToCents(Number(challenge.spent) || 0),
+      weekStart: challenge.weekStart,
+      completed: !!challenge.completed
+    };
   }
 
   private async fetchConversionRate(

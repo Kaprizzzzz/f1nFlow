@@ -57,6 +57,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   canEditLayout = false;
   recentCategoryGroups: RecentCategoryGroup[] = [];
   quickTransactionsLimit = 3;
+  weeklyChallengeText = '';
 
   spherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
   private savedSpherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
@@ -120,6 +121,13 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       this.balanceService.quickTransactionsLimit$.subscribe((limit) => {
         this.quickTransactionsLimit = limit;
         this.recentCategoryGroups = this.buildRecentCategoryGroups(this.transactionsCache);
+      })
+    );
+    this.subscription.add(
+      this.balanceService.weeklyChallenge$.subscribe((challenge) => {
+        this.weeklyChallengeText = challenge
+          ? `Weekly challenge: тримай "${challenge.category}" до ${challenge.limit.toFixed(2)}`
+          : '';
       })
     );
   }

@@ -41,6 +41,21 @@
   pointer-events: none;
 }
 
+.challenge-banner {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1002;
+  border: 1px solid rgba(114, 193, 255, 0.5);
+  background: rgba(6, 19, 37, 0.92);
+  color: #cfe6ff;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .layout-controls button {
   pointer-events: auto;
 }

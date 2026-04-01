@@ -4,6 +4,16 @@
   </div>
 
   <div class="news-panel" *ngIf="isFullView">
-    <p>Latest updates and finance tips will appear here.</p>
+    <div *ngIf="news$ | async as newsItems">
+      @if (newsItems.length === 0) {
+        <p>Персональні інсайти з'являться після активності.</p>
+      } @else {
+        <ul>
+          @for (item of newsItems; track item.id) {
+            <li [class.unread]="!item.isRead">{{ item.title }}</li>
+          }
+        </ul>
+      }
+    </div>
   </div>
 </div>

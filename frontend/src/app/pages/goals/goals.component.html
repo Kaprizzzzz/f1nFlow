@@ -70,6 +70,37 @@
   </section>
 
   <section class="card">
+    <h3>Streak</h3>
+    <p class="metric">Current streak: <strong>{{ streakCurrent }}</strong> днів</p>
+    <p class="metric">Best streak: <strong>{{ streakBest }}</strong> днів</p>
+  </section>
+
+  <section class="card">
+    <h3>Weekly challenge</h3>
+    @if (weeklyChallenge) {
+      <p class="metric">
+        Утримати витрати в категорії <strong>{{ weeklyChallenge.category }}</strong> до
+        <strong>{{ weeklyChallenge.limit | number:'1.2-2' }}</strong>.
+      </p>
+      <p class="metric">
+        Поточні витрати: <strong>{{ weeklyChallenge.spent | number:'1.2-2' }}</strong>
+        ({{ weeklyChallenge.completed ? '✅ виконано' : '⏳ в процесі' }}).
+      </p>
+    } @else {
+      <p class="metric">Ще недостатньо даних для формування challenge.</p>
+    }
+  </section>
+
+  <section class="card">
+    <h3>Badges</h3>
+    @if (badges.length === 0) {
+      <p class="metric">Поки немає бейджів.</p>
+    } @else {
+      <p class="metric">{{ badges.join(' · ') }}</p>
+    }
+  </section>
+
+  <section class="card">
     <h3>Deadline planner</h3>
     <label>Deadline date <input type="date" [(ngModel)]="deadline" [min]="todayDate" (change)="recalculate()" /></label>
     <p class="metric">Recommended daily spending limit: <strong>{{ safeSpendPerDay | number:'1.2-2' }}</strong></p>

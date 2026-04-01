@@ -22,7 +22,7 @@ export class UsersService {
     private usersRepository: Repository<User>,
     @InjectRepository(Transaction)
     private transactionsRepository: Repository<Transaction>,
-    private dataSource: DataSource
+    private dataSource: DataSource,
     private userEngagementService: UserEngagementService
    ) {}
  
@@ -112,6 +112,24 @@ export class UsersService {
       userToUpdate.news = payload.news ?? userToUpdate.news ?? [];
       userToUpdate.goalsPreferences = payload.goalsPreferences ?? userToUpdate.goalsPreferences ?? { theme: 'default', visualizationMode: 'amount' };
       userToUpdate.lastSeenAt = new Date();
+
+      const incomingTransactions: IncomingTransaction[] = payload.transactions
+        ? payload.transactions.map((tx) => ({
+            amount: tx.amount,
+            category: tx.category,
+            type: tx.type,
+            date: tx.date,
+            label: tx.label
+          }))
+        : (await txTransactionsRepository.find({ where: { userId: user.id } })).map((tx) => ({
+            amount: Number(tx.amount),
+            category: tx.category,
+            type: tx.type,
+            date: tx.date,
+            label: tx.label
+          }));
+
+      this.userEngagementService.applyEngagementState(userToUpdate, incomingTransactions);
 
       await txUsersRepository.save(userToUpdate);
 

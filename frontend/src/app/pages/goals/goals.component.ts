@@ -26,6 +26,11 @@ export class GoalsComponent implements OnInit, OnDestroy {
   spentPerWeek = 0;
   spentPerMonth = 0;
   safeSpendPerDay = 0;
+  streakCurrent = 0;
+  streakBest = 0;
+  badges: string[] = [];
+  weeklyChallenge: { category: string; limit: number; spent: number; completed: boolean } | null = null;
+
 
   incomeSummary: CategorySummary[] = [];
   expenseSummary: CategorySummary[] = [];
@@ -57,6 +62,30 @@ export class GoalsComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.balanceService.goalsPreferences$.subscribe((preferences) => {
         this.applyGoalsPreferences(preferences);
+      })
+    );
+
+    this.subscription.add(
+      this.balanceService.streakCurrent$.subscribe((streak) => {
+        this.streakCurrent = streak;
+      })
+    );
+
+    this.subscription.add(
+      this.balanceService.streakBest$.subscribe((streak) => {
+        this.streakBest = streak;
+      })
+    );
+
+    this.subscription.add(
+      this.balanceService.badges$.subscribe((badges) => {
+        this.badges = badges;
+      })
+    );
+
+    this.subscription.add(
+      this.balanceService.weeklyChallenge$.subscribe((challenge) => {
+        this.weeklyChallenge = challenge;
       })
     );
   }

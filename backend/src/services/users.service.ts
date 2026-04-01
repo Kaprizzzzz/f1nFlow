@@ -5,6 +5,7 @@ import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { Transaction } from '../entities/transaction.entity';
 import { SaveStateDto } from '../common/dto';
+import { IncomingTransaction, UserEngagementService } from './user-engagement.service';
 
 const MAX_TRANSACTIONS_PER_SAVE = 1000;
 
@@ -22,6 +23,7 @@ export class UsersService {
     @InjectRepository(Transaction)
     private transactionsRepository: Repository<Transaction>,
     private dataSource: DataSource
+    private userEngagementService: UserEngagementService
    ) {}
  
    async findOrCreateUser(telegramId: string, userName: string, referredBy?: string): Promise<User> {

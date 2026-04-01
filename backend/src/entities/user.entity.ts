@@ -14,6 +14,14 @@ import {
     visualizationMode: 'amount' | 'segments';
   };
 
+  export type WeeklyChallenge = {
+  category: string;
+  limit: number;
+  spent: number;
+  weekStart: string;
+  completed: boolean;
+};
+
  @Entity()
  export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -48,6 +56,18 @@ import {
 
   @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
   news: Array<{ id: string; title: string; isRead: boolean }>;
+
+  @Column({ type: 'int', default: 0 })
+  streakCurrent: number;
+
+  @Column({ type: 'int', default: 0 })
+  streakBest: number;
+
+  @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
+  badges: string[];
+
+  @Column({ type: 'jsonb', nullable: true })
+  weeklyChallenge: WeeklyChallenge | null;
 
   @Column({
     type: 'jsonb',

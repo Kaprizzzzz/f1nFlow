@@ -1,0 +1,195 @@
+import { Injectable } from '@nestjs/common';
+import { User, WeeklyChallenge } from '../entities/user.entity';
+
+export type IncomingTransaction = {
+  amount: number;
+  category: string;
+  type: 'plus' | 'minus';
+  date: string | Date;
+  label?: string;
+};
+
+@Injectable()
+export class UserEngagementService {
+  applyEngagementState(user: User, transactions: IncomingTransaction[]): void {
+    const normalized = transactions
+      .map((tx) => ({
+        ...tx,
+        amount: Number(tx.amount),
+        date: new Date(tx.date)
+      }))
+      .filter((tx) => Number.isFinite(tx.amount) && !Number.isNaN(tx.date.getTime()))
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    const { currentStreak, bestStreak } = this.calculateStreak(normalized.map((tx) => tx.date));
+    user.streakCurrent = currentStreak;
+    user.streakBest = Math.max(user.streakBest ?? 0, bestStreak);
+
+    user.weeklyChallenge = this.buildWeeklyChallenge(normalized, user.weeklyChallenge ?? null);
+    user.news = this.buildPersonalizedNews(user.news ?? [], normalized);
+    user.badges = this.buildBadges(user, normalized);
+  }
+
+  private calculateStreak(dates: Date[]): { currentStreak: number; bestStreak: number } {
+    if (dates.length === 0) {
+      return { currentStreak: 0, bestStreak: 0 };
+    }
+
+    const uniqueDays = Array.from(new Set(dates.map((date) => this.toDayKey(date)))).sort();
+
+    let best = 0;
+    let run = 0;
+
+    for (let index = 0; index < uniqueDays.length; index += 1) {
+      if (index === 0 || this.dayDiff(uniqueDays[index - 1], uniqueDays[index]) === 1) {
+        run += 1;
+      } else {
+        run = 1;
+      }
+      best = Math.max(best, run);
+    }
+
+    let current = 1;
+    for (let index = uniqueDays.length - 1; index > 0; index -= 1) {
+      if (this.dayDiff(uniqueDays[index - 1], uniqueDays[index]) !== 1) {
+        break;
+      }
+      current += 1;
+    }
+
+    const todayKey = this.toDayKey(new Date());
+    const lastDay = uniqueDays[uniqueDays.length - 1];
+    if (this.dayDiff(lastDay, todayKey) > 1) {
+      current = 0;
+    }
+
+    return { currentStreak: current, bestStreak: best };
+  }
+
+  private buildWeeklyChallenge(
+    transactions: Array<IncomingTransaction & { date: Date }>,
+    current: WeeklyChallenge | null
+  ): WeeklyChallenge | null {
+    const weekStart = this.getWeekStart(new Date());
+    const weekStartKey = this.toDayKey(weekStart);
+
+    if (current?.weekStart === weekStartKey) {
+      const spent = transactions
+        .filter((tx) => tx.type === 'minus' && tx.category === current.category && tx.date >= weekStart)
+        .reduce((sum, tx) => sum + tx.amount, 0);
+
+      return {
+        ...current,
+        spent: Number(spent.toFixed(2)),
+        completed: spent <= current.limit
+      };
+    }
+
+    const previousWeekStart = new Date(weekStart);
+    previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+
+    const previousWeekEnd = new Date(weekStart);
+    previousWeekEnd.setMilliseconds(-1);
+
+    const grouped = new Map<string, number>();
+    for (const tx of transactions) {
+      if (tx.type !== 'minus' || tx.date < previousWeekStart || tx.date > previousWeekEnd) {
+        continue;
+      }
+      grouped.set(tx.category, (grouped.get(tx.category) ?? 0) + tx.amount);
+    }
+
+    const top = Array.from(grouped.entries()).sort((a, b) => b[1] - a[1])[0];
+    if (!top) {
+      return null;
+    }
+
+    const [category, prevWeekSpent] = top;
+    const limit = Number((prevWeekSpent * 0.9).toFixed(2));
+    const currentSpent = transactions
+      .filter((tx) => tx.type === 'minus' && tx.category === category && tx.date >= weekStart)
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    return {
+      category,
+      limit,
+      spent: Number(currentSpent.toFixed(2)),
+      weekStart: weekStartKey,
+      completed: currentSpent <= limit
+    };
+  }
+
+  private buildPersonalizedNews(
+    currentNews: Array<{ id: string; title: string; isRead: boolean }>,
+    transactions: Array<IncomingTransaction & { date: Date }>
+  ): Array<{ id: string; title: string; isRead: boolean }> {
+    const weekStart = this.getWeekStart(new Date());
+    const previousWeekStart = new Date(weekStart);
+    previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+    const previousWeekEnd = new Date(weekStart);
+    previousWeekEnd.setMilliseconds(-1);
+
+    const currentWeekExpense = transactions
+      .filter((tx) => tx.type === 'minus' && tx.date >= weekStart)
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const previousWeekExpense = transactions
+      .filter((tx) => tx.type === 'minus' && tx.date >= previousWeekStart && tx.date <= previousWeekEnd)
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    if (previousWeekExpense <= 0) {
+      return currentNews;
+    }
+
+    const deltaPercent = ((currentWeekExpense - previousWeekExpense) / previousWeekExpense) * 100;
+    const absDelta = Math.round(Math.abs(deltaPercent));
+    const trend = deltaPercent <= 0 ? 'менше' : 'більше';
+    const insightId = `weekly-insight-${this.toDayKey(weekStart)}`;
+
+    const withoutOldInsight = currentNews.filter((item) => item.id !== insightId);
+    const insight = {
+      id: insightId,
+      title: `Персональний інсайт: ти витратив на ${absDelta}% ${trend}, ніж минулого тижня.`,
+      isRead: false
+    };
+
+    return [insight, ...withoutOldInsight].slice(0, 20);
+  }
+
+  private buildBadges(user: User, transactions: IncomingTransaction[]): string[] {
+    const badges = new Set<string>(user.badges ?? []);
+
+    if (transactions.length > 0) {
+      badges.add('first-goal');
+    }
+    if ((user.streakBest ?? 0) >= 7) {
+      badges.add('streak-7');
+    }
+    if ((user.streakBest ?? 0) >= 30) {
+      badges.add('streak-30');
+    }
+
+    return Array.from(badges);
+  }
+
+  private getWeekStart(date: Date): Date {
+    const copy = new Date(date);
+    copy.setHours(0, 0, 0, 0);
+    const day = copy.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    copy.setDate(copy.getDate() + diff);
+    return copy;
+  }
+
+  private toDayKey(date: Date): string {
+    const copy = new Date(date);
+    copy.setHours(0, 0, 0, 0);
+    return copy.toISOString().slice(0, 10);
+  }
+
+  private dayDiff(fromKey: string, toKey: string): number {
+    const from = new Date(fromKey);
+    const to = new Date(toKey);
+    return Math.round((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
+  }
+}

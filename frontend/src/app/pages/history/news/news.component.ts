@@ -12,9 +12,11 @@ import { BalanceService } from '../balance.service';
 export class NewsComponent {
   @Input() isFullView = false;
   @Output() onSelect = new EventEmitter<void>();
-  news$ = this.balanceService.news$;
+  readonly news$;
 
-  constructor(private readonly balanceService: BalanceService) {}
+  constructor(private readonly balanceService: BalanceService) {
+    this.news$ = this.balanceService.news$;
+  }
 
   handleCircleClick(): void {
     this.onSelect.emit();

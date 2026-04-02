@@ -99,9 +99,9 @@ class TinyRedisClient {
       const port = this.url.port ? Number(this.url.port) : 6379;
       const host = this.url.hostname;
       const useTls = this.url.protocol === 'rediss:';
-      const connector = useTls ? connectTls : connectTcp;
-
-      const socket = connector({ host, port }, () => resolve(socket));
+      const socket = useTls
+        ? connectTls({ host, port }, () => resolve(socket))
+        : connectTcp({ host, port }, () => resolve(socket));
       socket.once('error', (error) => reject(error));
       socket.setTimeout(3000, () => {
         socket.destroy(new Error('Redis socket timeout'));

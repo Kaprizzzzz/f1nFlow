@@ -11,6 +11,7 @@ import { BalanceService } from '../balance.service';
 })
 export class NewsComponent {
   @Input() isFullView = false;
+  @Input() panelAnchorBottom = 0;
   @Output() onSelect = new EventEmitter<void>();
   readonly news$;
 

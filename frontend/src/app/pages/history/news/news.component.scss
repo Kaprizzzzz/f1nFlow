@@ -69,13 +69,18 @@ li.unread {
 }
 
 .circle-wrapper.active .news-panel {
-  --panel-top-offset: 82px;
+  --news-panel-anchor-bottom: 0px;
+  --news-panel-gap-top: 1px;
+  --news-panel-gap-bottom: 1px;
   position: fixed;
-  top: var(--panel-top-offset);
+  top: calc(var(--news-panel-anchor-bottom) + var(--news-panel-gap-top));
   left: 50%;
   transform: translateX(-50%);
   width: min(360px, calc(100vw - 18px));
-  height: calc(100dvh - var(--panel-top-offset) - var(--bottom-nav-offset, 94px) - 8px);
+  height: calc(
+    100dvh - (var(--news-panel-anchor-bottom) + var(--news-panel-gap-top)) - var(--bottom-nav-offset, 94px) -
+      var(--news-panel-gap-bottom) - env(safe-area-inset-bottom, 0px)
+  );
   margin-top: 0;
   overflow-y: auto;
   border-radius: 26px;

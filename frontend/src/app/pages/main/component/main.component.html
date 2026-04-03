@@ -99,6 +99,7 @@
      >
        <app-news
          [isFullView]="activeTab === 'news'"
+         [panelAnchorBottom]="newsPanelAnchorBottom"
          (onSelect)="setActiveTab('news')"
        ></app-news>
      </div>

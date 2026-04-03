@@ -58,6 +58,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   recentCategoryGroups: RecentCategoryGroup[] = [];
   quickTransactionsLimit = 3;
   weeklyChallengeText = '';
+  newsPanelAnchorBottom = 0;
 
   spherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
   private savedSpherePositions: Record<SphereTab, SpherePosition> = this.clonePositions(DEFAULT_SPHERE_POSITIONS);
@@ -145,6 +146,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       this.measureSphereSizes();
       this.spherePositions = this.clampAllSpherePositions(this.spherePositions);
       this.savedSpherePositions = this.clampAllSpherePositions(this.savedSpherePositions);
+      this.updateNewsPanelAnchorBottom();
     });
   }
 
@@ -159,6 +161,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const nextTab = this.activeTab === tab ? null : tab;
     this.activeTab = nextTab;
+    this.updateNewsPanelAnchorBottom();
     if (nextTab === 'news') {
       this.balanceService.markAllNewsRead();
     }
@@ -190,6 +193,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.spherePositions = this.clampAllSpherePositions(this.spherePositions);
     this.savedSpherePositions = this.clampAllSpherePositions(this.savedSpherePositions);
+    this.updateNewsPanelAnchorBottom();
   }
 
   toggleEditMode(): void {
@@ -315,6 +319,25 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       top: `${this.clamp(top, this.getSphereTopLimit(), maxTop)}px`,
       left: `${this.clamp(left, 0, maxLeft)}px`
     };
+  }
+
+  private updateNewsPanelAnchorBottom(): void {
+    if (this.activeTab !== 'news') {
+      return;
+    }
+
+    const raf =
+      globalThis.requestAnimationFrame ?? ((callback: FrameRequestCallback) => setTimeout(() => callback(0), 0));
+
+    raf(() => {
+      const layout = this.layoutRef?.nativeElement;
+      const newsCircle = layout?.querySelector<HTMLElement>('.sphere-wrapper[data-tab="news"] .main-circle');
+      if (!newsCircle) {
+        return;
+      }
+
+      this.newsPanelAnchorBottom = Math.ceil(newsCircle.getBoundingClientRect().bottom);
+    });
   }
 
   getOrderedSphereCoordinates(): Array<{ tab: SphereTab; top: number; left: number; isDragging: boolean }> {

@@ -3,7 +3,11 @@
     <span class="label">News</span>
   </div>
 
-  <div class="news-panel" *ngIf="isFullView">
+  <div
+    class="news-panel"
+    *ngIf="isFullView"
+    [style.--news-panel-anchor-bottom.px]="panelAnchorBottom"
+  >
     <div *ngIf="news$ | async as newsItems">
       @if (newsItems.length === 0) {
         <p>Персональні інсайти з'являться після активності.</p>

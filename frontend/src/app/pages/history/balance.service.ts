@@ -37,6 +37,9 @@ export type SphereLayout = Record<SphereTab, { left: number; top: number }>;
 export type GoalsPreferences = {
   theme: 'default' | 'girly';
   visualizationMode: 'amount' | 'segments';
+  periodStart?: string;
+  periodEnd?: string;
+  deadline?: string;
 };
 
 interface PersistedStatePayload {
@@ -493,7 +496,33 @@ interface PersistedStatePayload {
   private normalizeGoalsPreferences(preferences?: Partial<GoalsPreferences> | null): GoalsPreferences {
     const theme = preferences?.theme === 'girly' ? 'girly' : 'default';
     const visualizationMode = preferences?.visualizationMode === 'segments' ? 'segments' : 'amount';
-    return { theme, visualizationMode };
+    const periodStart = this.normalizeIsoDate(preferences?.periodStart);
+    const periodEnd = this.normalizeIsoDate(preferences?.periodEnd);
+    const deadline = this.normalizeIsoDate(preferences?.deadline);
+
+    return {
+      theme,
+      visualizationMode,
+      ...(periodStart ? { periodStart } : {}),
+      ...(periodEnd ? { periodEnd } : {}),
+      ...(deadline ? { deadline } : {})
+    };
+  }
+
+  private normalizeIsoDate(value: string | undefined): string | undefined {
+    if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return undefined;
+    }
+
+    const [year, month, day] = value.split('-').map((part) => Number(part));
+    const parsed = new Date(year, month - 1, day);
+    const isValidDate =
+      Number.isFinite(parsed.getTime()) &&
+      parsed.getFullYear() === year &&
+      parsed.getMonth() === month - 1 &&
+      parsed.getDate() === day;
+
+    return isValidDate ? value : undefined;
   }
   
   private normalizeNews(news?: NewsItem[]): NewsItem[] {

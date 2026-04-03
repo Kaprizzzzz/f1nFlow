@@ -12,6 +12,9 @@ import {
   export type GoalsPreferences = {
     theme: 'default' | 'girly';
     visualizationMode: 'amount' | 'segments';
+    periodStart?: string;
+    periodEnd?: string;
+    deadline?: string;
   };
 
   export type WeeklyChallenge = {

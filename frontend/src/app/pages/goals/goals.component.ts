@@ -94,6 +94,16 @@ export class GoalsComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  onPeriodChange(): void {
+    this.recalculate();
+    this.persistGoalsPreferences();
+  }
+
+  onDeadlineChange(): void {
+    this.recalculate();
+    this.persistGoalsPreferences();
+  }
+
   setVisualizationMode(mode: ViewMode): void {
     this.visualizationMode = mode;
     this.persistGoalsPreferences();
@@ -169,13 +179,20 @@ export class GoalsComponent implements OnInit, OnDestroy {
   private persistGoalsPreferences(): void {
     this.balanceService.setGoalsPreferences({
       theme: this.theme,
-      visualizationMode: this.visualizationMode
+      visualizationMode: this.visualizationMode,
+      periodStart: this.periodStart,
+      periodEnd: this.periodEnd,
+      deadline: this.deadline
     });
   }
 
   private applyGoalsPreferences(preferences: GoalsPreferences): void {
     this.theme = preferences.theme;
     this.visualizationMode = preferences.visualizationMode;
+     this.periodStart = preferences.periodStart ?? this.periodStart;
+    this.periodEnd = preferences.periodEnd ?? this.periodEnd;
+    this.deadline = preferences.deadline ?? this.deadline;
+    this.recalculate();
   }
 
   private buildSummary(periodTransactions: Transaction[], type: 'plus' | 'minus'): CategorySummary[] {

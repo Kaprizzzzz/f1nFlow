@@ -20,6 +20,9 @@ export class SphereLayoutDto {
 export class GoalsPreferencesDto {
   theme: 'default' | 'girly';
   visualizationMode: 'amount' | 'segments';
+  periodStart?: string;
+  periodEnd?: string;
+  deadline?: string;
 }
 
 export class TransactionDto {

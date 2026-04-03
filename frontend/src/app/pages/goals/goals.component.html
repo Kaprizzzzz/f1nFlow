@@ -14,8 +14,8 @@
   <section class="card">
     <h3>Period categories</h3>
     <div class="row">
-      <label>From <input type="date" [(ngModel)]="periodStart" [max]="periodEnd" (change)="recalculate()" /></label>
-      <label>To <input type="date" [(ngModel)]="periodEnd" [min]="periodStart" [max]="todayDate" (change)="recalculate()" /></label>
+      <label>From <input type="date" [(ngModel)]="periodStart" [max]="periodEnd" (change)="onPeriodChange()" /></label>
+      <label>To <input type="date" [(ngModel)]="periodEnd" [min]="periodStart" [max]="todayDate" (change)="onPeriodChange()" /></label>
     </div>
 
     <div class="category-columns">
@@ -102,7 +102,7 @@
 
   <section class="card">
     <h3>Deadline planner</h3>
-    <label>Deadline date <input type="date" [(ngModel)]="deadline" [min]="todayDate" (change)="recalculate()" /></label>
+    <label>Deadline date <input type="date" [(ngModel)]="deadline" [min]="todayDate" (change)="onDeadlineChange()" /></label>
     <p class="metric">Recommended daily spending limit: <strong>{{ safeSpendPerDay | number:'1.2-2' }}</strong></p>
   </section>
 </section>

@@ -254,3 +254,12 @@
 .circles-layout.fullscreen-panel-active {
   min-height: calc(100vh - var(--dashboard-top-offset));
 }
+
+.circles-layout.fullscreen-panel-active .sphere-wrapper.is-active {
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  transform: none !important;
+}

@@ -263,3 +263,12 @@
   max-width: none !important;
   transform: none !important;
 }
+
+:host-context(body.category-modal-open) {
+  .layout-controls,
+  .challenge-banner,
+  .fullscreen-close-btn {
+    opacity: 0;
+    pointer-events: none;
+  }
+}

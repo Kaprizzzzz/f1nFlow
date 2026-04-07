@@ -46,8 +46,9 @@
       </div>
 
       </div>
-        <div class="amount-modal-backdrop" *ngIf="editModeCategory && panelMode === 'name'" (click)="cancelEdit($event)">
+      <div class="amount-modal-backdrop" *ngIf="editModeCategory && panelMode === 'name'" (click)="cancelEdit($event)">
         <div class="amount-modal" (click)="$event.stopPropagation()">
+        <button type="button" class="modal-close-btn" (click)="cancelEdit($event)" aria-label="Close modal">✕</button>
         <div class="amount-modal-title">Edit category name</div>
           <input type="text" [(ngModel)]="editedCategoryName" placeholder="New category name" />
         <div class="amount-modal-actions">
@@ -59,6 +60,7 @@
 
      <div class="amount-modal-backdrop" *ngIf="selectedCategoryData && panelMode === 'amount'" (click)="closeAmountPanel()">
       <div class="amount-modal" (click)="$event.stopPropagation()">
+        <button type="button" class="modal-close-btn" (click)="closeAmountPanel($event)" aria-label="Close modal">✕</button>
         <div class="amount-modal-title">{{ selectedCategoryData.name }}</div>
           <input type="text" [(ngModel)]="amountInput" placeholder="0,00" inputmode="decimal" autocomplete="off" />
         <div class="amount-modal-actions">
@@ -69,6 +71,7 @@
     </div>
      <div class="category-modal-backdrop" *ngIf="isCreateCategoryOpen" (click)="closeCreateCategory()">
       <div class="category-modal" (click)="$event.stopPropagation()">
+        <button type="button" class="modal-close-btn" (click)="closeCreateCategory($event)" aria-label="Close modal">✕</button>
         <div class="amount-modal-title">Create category</div>
         <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
         <select [(ngModel)]="newCategoryIcon" aria-label="Category icon">

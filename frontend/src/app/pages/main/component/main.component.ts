@@ -61,11 +61,9 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   weeklyChallengeText = '';
   newsPanelAnchorBottom = 0;
 
-  spherePositions: Record<SphereTab, SpherePosition> = this.sphereLayoutService.clonePositions(DEFAULT_SPHERE_POSITIONS);
-  private savedSpherePositions: Record<SphereTab, SpherePosition> = this.sphereLayoutService.clonePositions(
-    DEFAULT_SPHERE_POSITIONS
-  );
-  private sphereSizes: Record<SphereTab, SphereSize> = this.sphereLayoutService.createFallbackSphereSizes();
+  spherePositions!: Record<SphereTab, SpherePosition>;
+  private savedSpherePositions!: Record<SphereTab, SpherePosition>;
+  private sphereSizes!: Record<SphereTab, SphereSize>;
   private dragState: DragState | null = null;
 
   private readonly isEditMode$ = new BehaviorSubject<boolean>(this.isEditMode);
@@ -74,31 +72,37 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly globalPointerMoveHandler = (event: PointerEvent): void => this.onDragMove(event);
   private readonly globalPointerUpHandler = (event: PointerEvent): void => this.onGlobalPointerStop(event);
 
-  private readonly vm$ = combineLatest([
-    this.sessionService.user$,
-    this.balanceService.quickTransactionsLimit$,
-    this.balanceService.transactions$,
-    this.balanceService.weeklyChallenge$,
-    this.balanceService.sphereLayout$,
-    this.isEditMode$
-  ]).pipe(
-    map(([_user, quickTransactionsLimit, transactions, weeklyChallenge, sphereLayout, _isEditMode]): MainViewModel => ({
-      canEditLayout: true,
-      quickTransactionsLimit,
-      recentCategoryGroups: this.recentFacade.buildRecentCategoryGroups(transactions, quickTransactionsLimit),
-      weeklyChallengeText: weeklyChallenge
-        ? `Weekly challenge: тримай "${weeklyChallenge.category}" до ${weeklyChallenge.limit.toFixed(2)}`
-        : '',
-      sphereLayout
-    }))
-  );
+  private readonly vm$;
 
   constructor(
     private balanceService: BalanceService,
     private sessionService: SessionService,
     private sphereLayoutService: SphereLayoutService,
     private recentFacade: RecentFacadeService
-  ) {}
+  ) {
+    this.spherePositions = this.sphereLayoutService.clonePositions(DEFAULT_SPHERE_POSITIONS);
+    this.savedSpherePositions = this.sphereLayoutService.clonePositions(DEFAULT_SPHERE_POSITIONS);
+    this.sphereSizes = this.sphereLayoutService.createFallbackSphereSizes();
+
+    this.vm$ = combineLatest([
+      this.sessionService.user$,
+      this.balanceService.quickTransactionsLimit$,
+      this.balanceService.transactions$,
+      this.balanceService.weeklyChallenge$,
+      this.balanceService.sphereLayout$,
+      this.isEditMode$
+    ]).pipe(
+      map(([_user, quickTransactionsLimit, transactions, weeklyChallenge, sphereLayout, _isEditMode]): MainViewModel => ({
+        canEditLayout: true,
+        quickTransactionsLimit,
+        recentCategoryGroups: this.recentFacade.buildRecentCategoryGroups(transactions, quickTransactionsLimit),
+        weeklyChallengeText: weeklyChallenge
+          ? `Weekly challenge: тримай "${weeklyChallenge.category}" до ${weeklyChallenge.limit.toFixed(2)}`
+          : '',
+        sphereLayout
+      }))
+    );
+  }
 
   ngOnInit(): void {
     const initialLayout = this.balanceService.getSphereLayout();

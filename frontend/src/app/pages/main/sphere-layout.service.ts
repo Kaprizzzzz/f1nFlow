@@ -1,5 +1,5 @@
 import { ElementRef, Injectable, QueryList } from '@angular/core';
-import { SphereLayout, SphereTab } from '../history/balance.service';
+import { SphereLayout, SphereTab } from '../history/models/finance.models';
 
 export type SpherePosition = { left: number; top: number };
 export type SphereSize = { width: number; height: number };
@@ -30,11 +30,11 @@ const MOBILE_LAYOUT_BREAKPOINT = 560;
 export class SphereLayoutService {
   clonePositions(positions: Record<SphereTab, SpherePosition>): Record<SphereTab, SpherePosition> {
     return {
-      income: { ...positions.income },
-      expense: { ...positions.expense },
-      saving: { ...positions.saving },
-      news: { ...positions.news },
-      recent: { ...positions.recent }
+      income: { ...positions['income'] },
+      expense: { ...positions['expense'] },
+      saving: { ...positions['saving'] },
+      news: { ...positions['news'] },
+      recent: { ...positions['recent'] }
     };
   }
 
@@ -141,11 +141,11 @@ export class SphereLayoutService {
     }
 
     return {
-      income: this.clampSpherePosition('income', positions.income, layout, sphereSizes),
-      expense: this.clampSpherePosition('expense', positions.expense, layout, sphereSizes),
-      saving: this.clampSpherePosition('saving', positions.saving, layout, sphereSizes),
-      news: this.clampSpherePosition('news', positions.news, layout, sphereSizes),
-      recent: this.clampSpherePosition('recent', positions.recent, layout, sphereSizes)
+      income: this.clampSpherePosition('income', positions['income'], layout, sphereSizes),
+      expense: this.clampSpherePosition('expense', positions['expense'], layout, sphereSizes),
+      saving: this.clampSpherePosition('saving', positions['saving'], layout, sphereSizes),
+      news: this.clampSpherePosition('news', positions['news'], layout, sphereSizes),
+      recent: this.clampSpherePosition('recent', positions['recent'], layout, sphereSizes)
     };
   }
 

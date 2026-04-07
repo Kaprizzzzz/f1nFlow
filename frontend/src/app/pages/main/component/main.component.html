@@ -1,8 +1,8 @@
-  <div class="dashboard-container" [class.has-active]="activeTab !== null" [class.edit-mode]="isEditMode" [class.fullscreen-panel-active]="isFullscreenPanelTab()" (click)="closeActiveTab()">
-    @if (weeklyChallengeText) {
+<div class="dashboard-container" [class.has-active]="activeTab !== null" [class.edit-mode]="isEditMode" [class.fullscreen-panel-active]="isFullscreenPanelTab()" (click)="closeActiveTab()">
+  @if (weeklyChallengeText) {
     <div class="challenge-banner">{{ weeklyChallengeText }}</div>
-   }
-    <div class="layout-controls" *ngIf="canEditLayout">
+  }
+  <div class="layout-controls" *ngIf="canEditLayout">
     <button
       type="button"
       class="edit-hex"
@@ -19,108 +19,97 @@
         <button type="button" class="action-hex option visible" (click)="saveLayout()" aria-label="Save layout">💾</button>
         <button type="button" class="action-hex option visible secondary" (click)="resetToDefaultLayout()" aria-label="Reset layout">↺</button>
       </div>
-       <aside class="coords-panel" aria-label="Sphere coordinates">
-        <div class="coords-title">Sphere coords</div>
-        @for (item of getOrderedSphereCoordinates(); track item.tab) {
-          <div class="coord-row" [class.dragging]="item.isDragging">
-            <span class="coord-name">{{ item.tab }}</span>
-            <code>top: {{ item.top }} / left: {{ item.left }}</code>
-          </div>
-        }
-      </aside>
+      <app-sphere-debug-panel [coordinates]="getOrderedSphereCoordinates()"></app-sphere-debug-panel>
     }
-    </div>
-   <div
-     #layoutRef
-     class="circles-layout"
-     [class.editing]="isEditMode"
-     [class.fullscreen-panel-active]="isFullscreenPanelTab()"
-     (pointermove)="onDragMove($event)"
-     (click)="$event.stopPropagation(); closeActiveTab()"
-   >
-     <div
+  </div>
+  <div
+    #layoutRef
+    class="circles-layout"
+    [class.editing]="isEditMode"
+    [class.fullscreen-panel-active]="isFullscreenPanelTab()"
+    (pointermove)="onDragMove($event)"
+    (click)="$event.stopPropagation(); closeActiveTab()"
+  >
+    <div
       #sphereRef
-       class="sphere-wrapper"
+      class="sphere-wrapper"
       data-tab="income"
-       [class.is-active]="activeTab === 'income'"
-       [class.is-hidden]="isHidden('income')"
-       [ngStyle]="getSphereStyle('income')"
-       (pointerdown)="onDragStart($event, 'income')"
-       (click)="$event.stopPropagation()"
-     >
-       <app-income
-         [isFullView]="activeTab === 'income'"
-         [showCategoryPanel]="activeTab === 'income' || activeTab === 'expense'"
-         (onSelect)="setActiveTab('income')"
-       ></app-income>
-      </div>
-  
-     <div
+      [class.is-active]="activeTab === 'income'"
+      [class.is-hidden]="isHidden('income')"
+      [ngStyle]="getSphereStyle('income')"
+      (pointerdown)="onDragStart($event, 'income')"
+      (click)="$event.stopPropagation()"
+    >
+      <app-income
+        [isFullView]="activeTab === 'income'"
+        [showCategoryPanel]="activeTab === 'income' || activeTab === 'expense'"
+        (onSelect)="setActiveTab('income')"
+      ></app-income>
+    </div>
+
+    <div
       #sphereRef
-       class="sphere-wrapper"
+      class="sphere-wrapper"
       data-tab="expense"
-       [class.is-active]="activeTab === 'expense'"
-       [class.is-hidden]="isHidden('expense')"
-       [ngStyle]="getSphereStyle('expense')"
-       (pointerdown)="onDragStart($event, 'expense')"
-       (click)="$event.stopPropagation()"
-     >
-       <app-expence
-         [isFullView]="activeTab === 'expense'"
-         [showCategoryPanel]="activeTab === 'income' || activeTab === 'expense'"
-         (onSelect)="setActiveTab('expense')"
-       ></app-expence>
-      </div>
-  
-     <div
+      [class.is-active]="activeTab === 'expense'"
+      [class.is-hidden]="isHidden('expense')"
+      [ngStyle]="getSphereStyle('expense')"
+      (pointerdown)="onDragStart($event, 'expense')"
+      (click)="$event.stopPropagation()"
+    >
+      <app-expence
+        [isFullView]="activeTab === 'expense'"
+        [showCategoryPanel]="activeTab === 'income' || activeTab === 'expense'"
+        (onSelect)="setActiveTab('expense')"
+      ></app-expence>
+    </div>
+
+    <div
       #sphereRef
-       class="sphere-wrapper"
+      class="sphere-wrapper"
       data-tab="saving"
-       [class.is-active]="activeTab === 'saving'"
-       [class.is-hidden]="isHidden('saving')"
-       [ngStyle]="getSphereStyle('saving')"
-       (pointerdown)="onDragStart($event, 'saving')"
-       (click)="$event.stopPropagation()"
-     >
-       <app-saving
-         [isFullView]="activeTab === 'saving'"
-         (onSelect)="setActiveTab('saving')"
-       ></app-saving>
-       </div>
-     <div
+      [class.is-active]="activeTab === 'saving'"
+      [class.is-hidden]="isHidden('saving')"
+      [ngStyle]="getSphereStyle('saving')"
+      (pointerdown)="onDragStart($event, 'saving')"
+      (click)="$event.stopPropagation()"
+    >
+      <app-saving [isFullView]="activeTab === 'saving'" (onSelect)="setActiveTab('saving')"></app-saving>
+    </div>
+    <div
       #sphereRef
-       class="sphere-wrapper"
+      class="sphere-wrapper"
       data-tab="news"
-       [class.is-active]="activeTab === 'news'"
-       [class.is-hidden]="isHidden('news')"
-       [ngStyle]="getSphereStyle('news')"
-       (pointerdown)="onDragStart($event, 'news')"
-       (click)="$event.stopPropagation()"
-     >
-       <app-news
-         [isFullView]="activeTab === 'news'"
-         [panelAnchorBottom]="newsPanelAnchorBottom"
-         (onSelect)="setActiveTab('news')"
-       ></app-news>
-     </div>
-     <div
+      [class.is-active]="activeTab === 'news'"
+      [class.is-hidden]="isHidden('news')"
+      [ngStyle]="getSphereStyle('news')"
+      (pointerdown)="onDragStart($event, 'news')"
+      (click)="$event.stopPropagation()"
+    >
+      <app-news
+        [isFullView]="activeTab === 'news'"
+        [panelAnchorBottom]="newsPanelAnchorBottom"
+        (onSelect)="setActiveTab('news')"
+      ></app-news>
+    </div>
+    <div
       #sphereRef
-       class="sphere-wrapper"
+      class="sphere-wrapper"
       data-tab="recent"
-       [class.is-active]="activeTab === 'recent'"
-       [class.is-hidden]="isHidden('recent')"
-       [ngStyle]="getSphereStyle('recent')"
-       (pointerdown)="onDragStart($event, 'recent')"
-       (click)="$event.stopPropagation()"
-     >
-       <app-recent
-         [isFullView]="activeTab === 'recent'"
-         [items]="recentCategoryGroups"
-         [quickLimit]="quickTransactionsLimit"
-         (onSelect)="setActiveTab('recent')"
-         (onRepeat)="repeatTransaction($event.category, $event.amount)"
-         (quickLimitChange)="setQuickTransactionsLimit($event)"
-       ></app-recent>
-     </div>
-   </div>
- </div>
+      [class.is-active]="activeTab === 'recent'"
+      [class.is-hidden]="isHidden('recent')"
+      [ngStyle]="getSphereStyle('recent')"
+      (pointerdown)="onDragStart($event, 'recent')"
+      (click)="$event.stopPropagation()"
+    >
+      <app-recent
+        [isFullView]="activeTab === 'recent'"
+        [items]="recentCategoryGroups"
+        [quickLimit]="quickTransactionsLimit"
+        (onSelect)="setActiveTab('recent')"
+        (onRepeat)="repeatTransaction($event.category, $event.amount)"
+        (quickLimitChange)="setQuickTransactionsLimit($event)"
+      ></app-recent>
+    </div>
+  </div>
+</div>

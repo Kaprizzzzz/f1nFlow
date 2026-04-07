@@ -70,8 +70,8 @@ li.unread {
 
 .circle-wrapper.active .news-panel {
   --news-panel-anchor-bottom: 0px;
-  --news-panel-gap-top: 1px;
-  --news-panel-gap-bottom: 1px;
+  --news-panel-gap-top: calc(env(safe-area-inset-top, 0px) + 64px);
+  --news-panel-gap-bottom: 10px;
   position: fixed;
   top: calc(var(--news-panel-anchor-bottom) + var(--news-panel-gap-top));
   left: 50%;

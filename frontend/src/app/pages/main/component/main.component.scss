@@ -33,6 +33,22 @@
   }
 }
 
+.fullscreen-close-btn {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  right: calc(50% - min(430px, 100vw) / 2 + 12px);
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(126, 163, 236, 0.5);
+  background: rgba(8, 16, 32, 0.82);
+  color: #dbe9ff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1305;
+}
+
 .layout-controls {
   position: fixed;
   top: 4px;

@@ -20,7 +20,7 @@ $recent-glow: #ff78c7;
     justify-content: center;
     align-items: center;
     transform: scale(1);
-    transition: transform 0.35s ease;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.42s ease;
 
     &::after {
       content: '';
@@ -180,16 +180,29 @@ $recent-glow: #ff78c7;
 }
 
 .circle-wrapper.active .recent-panel {
-  --panel-top-offset: calc(env(safe-area-inset-top, 0px) + 64px);
+  --panel-top-offset: calc(env(safe-area-inset-top, 0px) + 58px);
+  --panel-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + 10px);
   position: fixed;
   top: var(--panel-top-offset);
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(360px, calc(100vw - 18px));
-  height: calc(100dvh - var(--panel-top-offset) - 10px);
+  left: 9px;
+  right: 9px;
+  width: auto;
+  height: calc(100dvh - var(--panel-top-offset) - var(--panel-bottom-offset));
   margin-top: 0;
   overflow-y: auto;
   border-radius: 24px;
   padding: 16px;
   z-index: 120;
+  animation: recent-panel-appear 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes recent-panel-appear {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

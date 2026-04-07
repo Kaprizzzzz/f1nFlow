@@ -1,14 +1,19 @@
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { AppValidationPipe } from './common/validation.pipe';
 
 async function bootstrap() {
-   const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
   const logger = new Logger('Bootstrap');
 
   app.useLogger(['error', 'warn', 'log']);
-  app.useGlobalPipes(new AppValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true
+    })
+  );
 
   const allowedOrigins = (process.env.CORS_ORIGINS || '')
     .split(',')

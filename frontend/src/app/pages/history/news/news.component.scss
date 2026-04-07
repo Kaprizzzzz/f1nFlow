@@ -18,7 +18,7 @@
      justify-content: center;
      align-items: center;
     transform: scale(1);
-    transition: transform 0.35s ease;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.42s ease;
  
      .label {
        font-size: 19px;
@@ -69,21 +69,29 @@ li.unread {
 }
 
 .circle-wrapper.active .news-panel {
-  --news-panel-anchor-bottom: 0px;
-  --news-panel-gap-top: calc(env(safe-area-inset-top, 0px) + 64px);
-  --news-panel-gap-bottom: 10px;
+  --news-panel-gap-top: calc(env(safe-area-inset-top, 0px) + 58px);
+  --news-panel-gap-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
   position: fixed;
-  top: calc(var(--news-panel-anchor-bottom) + var(--news-panel-gap-top));
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(360px, calc(100vw - 18px));
-  height: calc(
-    100dvh - (var(--news-panel-anchor-bottom) + var(--news-panel-gap-top)) - var(--bottom-nav-offset, 94px) -
-      var(--news-panel-gap-bottom) - env(safe-area-inset-bottom, 0px)
-  );
+  top: var(--news-panel-gap-top);
+  left: 9px;
+  right: 9px;
+  width: auto;
+  height: calc(100dvh - var(--news-panel-gap-top) - var(--news-panel-gap-bottom));
   margin-top: 0;
   overflow-y: auto;
   border-radius: 26px;
   padding: 16px;
   z-index: 120;
+  animation: panel-appear 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes panel-appear {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

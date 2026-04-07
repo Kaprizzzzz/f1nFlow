@@ -22,7 +22,7 @@ $saving-glow: #63ffd0;
     align-items: center;
     transform: scale(1);
     transform-origin: center;
-    transition: transform 0.35s ease;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.42s ease;
     position: relative;
 
     &::before {
@@ -241,17 +241,30 @@ $saving-glow: #63ffd0;
 }
 
 .circle-wrapper.active .history-list {
-  --panel-top-offset: calc(env(safe-area-inset-top, 0px) + 64px);
+  --panel-top-offset: calc(env(safe-area-inset-top, 0px) + 58px);
+  --panel-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + 10px);
   position: fixed;
   top: var(--panel-top-offset);
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(360px, calc(100vw - 18px));
-  height: calc(100dvh - var(--panel-top-offset) - 10px);
+  left: 9px;
+  right: 9px;
+  width: auto;
+  height: calc(100dvh - var(--panel-top-offset) - var(--panel-bottom-offset));
   margin-top: 0;
   max-height: none;
   overflow-y: auto;
   border-radius: 26px;
   padding: 16px;
   z-index: 120;
+  animation: saving-panel-appear 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes saving-panel-appear {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

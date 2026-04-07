@@ -208,8 +208,6 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.activeTab = null;
-    this.syncFullscreenUiState(null);
     this.isEditMode = true;
     this.isEditMode$.next(true);
     this.stopDrag();

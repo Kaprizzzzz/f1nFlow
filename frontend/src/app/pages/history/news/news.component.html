@@ -6,6 +6,7 @@
   <div
     class="news-panel"
     *ngIf="isFullView"
+    (click)="$event.stopPropagation()"
     [style.--news-panel-anchor-bottom.px]="panelAnchorBottom"
   >
     <div *ngIf="news$ | async as newsItems">

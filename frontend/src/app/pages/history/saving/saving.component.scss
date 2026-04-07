@@ -22,7 +22,7 @@ $saving-glow: #63ffd0;
     align-items: center;
     transform: scale(1);
     transform-origin: center;
-    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.42s ease;
+    transition: transform 0.82s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.62s ease;
     position: relative;
 
     &::before {
@@ -255,7 +255,7 @@ $saving-glow: #63ffd0;
   border-radius: 26px;
   padding: 16px;
   z-index: 120;
-  animation: saving-panel-appear 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: saving-panel-appear 0.68s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes saving-panel-appear {

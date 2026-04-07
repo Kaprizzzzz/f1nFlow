@@ -23,10 +23,16 @@ export class RateLimitGuard implements CanActivate, OnModuleDestroy {
   private readonly isProd = process.env.NODE_ENV === 'production';
   private readonly windowMs = Number(process.env.THROTTLE_TTL_MS ?? (this.isProd ? 60_000 : 15_000));
   private readonly limit = Number(process.env.THROTTLE_LIMIT ?? (this.isProd ? 60 : 300));
+  private readonly failOpen = (process.env.RATE_LIMIT_FAIL_OPEN ?? 'false').toLowerCase() === 'true';
+  private readonly degradedLogIntervalMs = Number(
+    process.env.RATE_LIMIT_DEGRADED_LOG_INTERVAL_MS ?? this.windowMs
+  );
   private readonly redisUrl = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
   private readonly redis = new TinyRedisClient(this.redisUrl);
+  private readonly fallbackCounters = new Map<string, { count: number; expiresAt: number }>();
+  private lastDegradationLogAt = 0;
 
- async canActivate(context: ExecutionContext): Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
     const ip = request.ip || 'unknown';
     const userId = request.user?.id || 'anonymous';
@@ -41,6 +47,7 @@ export class RateLimitGuard implements CanActivate, OnModuleDestroy {
     return true;
   }
   async onModuleDestroy(): Promise<void> {
+    this.fallbackCounters.clear();
     await this.redis.close();
   }
 
@@ -56,9 +63,38 @@ export class RateLimitGuard implements CanActivate, OnModuleDestroy {
 
       return typeof result === 'number' ? result : Number(result);
     } catch (error) {
-      this.logger.warn(`Rate-limit Redis unavailable, bypassing throttling. ${(error as Error).message}`);
+      if (this.failOpen) {
+        this.logDegradation('Rate-limit Redis unavailable, bypassing throttling.', error);
+        return 1;
+      }
+
+      this.logDegradation('Rate-limit Redis unavailable, using in-memory fallback.', error);
+      return this.incrementFallback(key);
+    }
+  }
+
+  private incrementFallback(key: string): number {
+    const now = Date.now();
+    const current = this.fallbackCounters.get(key);
+
+    if (!current || current.expiresAt <= now) {
+      this.fallbackCounters.set(key, { count: 1, expiresAt: now + this.windowMs });
       return 1;
     }
+
+    const nextCount = current.count + 1;
+    this.fallbackCounters.set(key, { count: nextCount, expiresAt: current.expiresAt });
+    return nextCount;
+  }
+
+  private logDegradation(message: string, error: unknown): void {
+    const now = Date.now();
+    if (now - this.lastDegradationLogAt < this.degradedLogIntervalMs) {
+      return;
+    }
+
+    this.lastDegradationLogAt = now;
+    this.logger.warn(`${message} ${(error as Error).message}`);
   }
 }
 

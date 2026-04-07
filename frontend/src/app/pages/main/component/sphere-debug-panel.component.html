@@ -1,0 +1,9 @@
+<aside class="coords-panel" aria-label="Sphere coordinates">
+  <div class="coords-title">Sphere coords</div>
+  @for (item of coordinates; track item.tab) {
+    <div class="coord-row" [class.dragging]="item.isDragging">
+      <span class="coord-name">{{ item.tab }}</span>
+      <code>top: {{ item.top }} / left: {{ item.left }}</code>
+    </div>
+  }
+</aside>

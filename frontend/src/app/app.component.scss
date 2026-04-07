@@ -15,11 +15,12 @@
    flex-direction: column;
    height: 100dvh;
    min-height: 100dvh;
-   max-width: 430px;
-   margin: 0 auto;
-   border-left: 1px solid rgba(122, 151, 209, 0.18);
-   border-right: 1px solid rgba(122, 151, 209, 0.18);
-   box-shadow: 0 0 45px rgba(0, 0, 0, 0.35);
+   width: 100%;
+   max-width: none;
+   margin: 0;
+   border-left: 0;
+   border-right: 0;
+   box-shadow: none;
    background: #060b17;
  }
  

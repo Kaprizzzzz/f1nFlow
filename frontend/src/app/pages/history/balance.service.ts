@@ -1,602 +1,223 @@
- import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
- import { isPlatformBrowser } from '@angular/common';
- import { BehaviorSubject } from 'rxjs';
- import { SessionService } from '../user/service/user.service';
- 
- export interface Transaction {
-   id: string;
-   amount: number;
-   category: string;
-   type: 'plus' | 'minus';
-   date: Date;
-   label?: string;
- }
- 
- export interface CategoryItem {
-   name: string;
-   amount: number;
-   icon?: string;
- }
- 
- export interface NewsItem {
-  id: string;
-  title: string;
-  isRead: boolean;
- }
+import { Injectable } from '@angular/core';
+import { GoalsPreferences, SphereLayout, Transaction, WeeklyChallenge } from './models/finance.models';
+import { CategoryItem, Currency, NewsItem } from './models/history-shared.models';
+import { CategoriesService } from './services/categories.service';
+import { EngagementService } from './services/engagement.service';
+import { PreferencesService } from './services/preferences.service';
+import { PersistedStatePayload, StateSyncService } from './services/state-sync.service';
+import { TransactionsService } from './services/transactions.service';
 
- export interface WeeklyChallenge {
-  category: string;
-  limit: number;
-  spent: number;
-  weekStart: string;
-  completed: boolean;
-}
+export type { GoalsPreferences, SphereLayout, Transaction, WeeklyChallenge };
+export type { CategoryItem, NewsItem };
 
-export type SphereTab = 'income' | 'expense' | 'saving' | 'news' | 'recent';
-export type SphereLayout = Record<SphereTab, { left: number; top: number }>;
-export type GoalsPreferences = {
-  theme: 'default' | 'girly';
-  visualizationMode: 'amount' | 'segments';
-  periodStart?: string;
-  periodEnd?: string;
-  deadline?: string;
-};
+@Injectable({ providedIn: 'root' })
+export class BalanceService {
+  private isHydrating = false;
+  private isCurrencyConverting = false;
 
-interface PersistedStatePayload {
-  transactions?: Array<Omit<Transaction, 'date'> & { date: string }>;
-  user?: {
-    incomeCategories?: CategoryItem[];
-    expenseCategories?: CategoryItem[];
-    currency?: 'EUR' | 'USD' | 'UAH';
-    sphereLayout?: SphereLayout | null;
-    quickTransactionsLimit?: number;
-    news?: NewsItem[];
-    goalsPreferences?: GoalsPreferences;
-    streakCurrent?: number;
-    streakBest?: number;
-    badges?: string[];
-    weeklyChallenge?: WeeklyChallenge | null;
-  };
-}
+  balance$ = this.transactionsService.balance$;
+  transactions$ = this.transactionsService.transactions$;
+  incomeCategories$ = this.categoriesService.incomeCategories$;
+  expenseCategories$ = this.categoriesService.expenseCategories$;
+  currency$ = this.preferencesService.currency$;
+  sphereLayout$ = this.preferencesService.sphereLayout$;
+  quickTransactionsLimit$ = this.preferencesService.quickTransactionsLimit$;
+  goalsPreferences$ = this.preferencesService.goalsPreferences$;
+  news$ = this.engagementService.news$;
+  streakCurrent$ = this.engagementService.streakCurrent$;
+  streakBest$ = this.engagementService.streakBest$;
+  badges$ = this.engagementService.badges$;
+  weeklyChallenge$ = this.engagementService.weeklyChallenge$;
 
- @Injectable({ providedIn: 'root' })
- export class BalanceService {
-   private readonly storageKey = 'f1nflow-balance-state';
-   private readonly isBrowser: boolean;
- 
-   private transactions: Transaction[] = [];
-   private balanceSubject = new BehaviorSubject<number>(0);
-   private incomeCategoriesSubject = new BehaviorSubject<CategoryItem[]>([]);
-   private expenseCategoriesSubject = new BehaviorSubject<CategoryItem[]>([]);
-   private currencySubject = new BehaviorSubject<'EUR' | 'USD' | 'UAH'>('EUR');
-   private sphereLayoutSubject = new BehaviorSubject<SphereLayout | null>(null);
-   private quickTransactionsLimitSubject = new BehaviorSubject<number>(3);
-   private goalsPreferencesSubject = new BehaviorSubject<GoalsPreferences>({ theme: 'default', visualizationMode: 'amount' });
-   private newsSubject = new BehaviorSubject<NewsItem[]>([
-    { id: '1', title: 'Market update', isRead: false },
-    { id: '2', title: 'Budget tip of the week', isRead: false },
-    { id: '3', title: 'Saving challenge', isRead: true }
-   ]);
-   private streakCurrentSubject = new BehaviorSubject<number>(0);
-   private streakBestSubject = new BehaviorSubject<number>(0);
-   private badgesSubject = new BehaviorSubject<string[]>([]);
-   private weeklyChallengeSubject = new BehaviorSubject<WeeklyChallenge | null>(null);
- 
-   private isHydrating = false;
-   private isCurrencyConverting = false;
- 
-   balance$ = this.balanceSubject.asObservable();
-   transactions$ = new BehaviorSubject<Transaction[]>([]);
-   incomeCategories$ = this.incomeCategoriesSubject.asObservable();
-   expenseCategories$ = this.expenseCategoriesSubject.asObservable();
-   currency$ = this.currencySubject.asObservable();
-   sphereLayout$ = this.sphereLayoutSubject.asObservable();
-   quickTransactionsLimit$ = this.quickTransactionsLimitSubject.asObservable();
-   goalsPreferences$ = this.goalsPreferencesSubject.asObservable();
-   news$ = this.newsSubject.asObservable();
-   streakCurrent$ = this.streakCurrentSubject.asObservable();
-   streakBest$ = this.streakBestSubject.asObservable();
-   badges$ = this.badgesSubject.asObservable();
-   weeklyChallenge$ = this.weeklyChallengeSubject.asObservable();
- 
-   constructor(
-    @Inject(PLATFORM_ID) platformId: Object,
-    private sessionService: SessionService
+  constructor(
+    private readonly transactionsService: TransactionsService,
+    private readonly categoriesService: CategoriesService,
+    private readonly preferencesService: PreferencesService,
+    private readonly engagementService: EngagementService,
+    private readonly stateSyncService: StateSyncService
   ) {
-     this.isBrowser = isPlatformBrowser(platformId);
-     this.restoreState();
-    this.syncBalanceAndTransactions(false);
-
-    this.sessionService.user$.subscribe((user) => {
-      if (!user) {
-        return;
-      }
-
-      this.sessionService.fetchState().subscribe({
-        next: (payload) => {
-          const state = payload as PersistedStatePayload;
-
-          this.isHydrating = true;
-          this.transactions = (state.transactions ?? []).map(
-            (tx: Omit<Transaction, 'date'> & { date: string }) => ({
-              ...tx,
-              date: new Date(tx.date)
-            })
-          );
-          this.incomeCategoriesSubject.next(this.normalizeCategories(state.user?.incomeCategories ?? []));
-          this.expenseCategoriesSubject.next(this.normalizeCategories(state.user?.expenseCategories ?? []));
-          this.currencySubject.next(state.user?.currency ?? 'EUR');
-          const remoteLayout = this.normalizeSphereLayout(state.user?.sphereLayout ?? null);
-          const localLayout = this.sphereLayoutSubject.value;
-          this.sphereLayoutSubject.next(localLayout ?? remoteLayout);
-          this.quickTransactionsLimitSubject.next(this.normalizeQuickLimit(state.user?.quickTransactionsLimit));
-          this.goalsPreferencesSubject.next(this.normalizeGoalsPreferences(state.user?.goalsPreferences));
-          this.newsSubject.next(this.normalizeNews(state.user?.news));
-          this.streakCurrentSubject.next(this.normalizeStreakValue(state.user?.streakCurrent));
-          this.streakBestSubject.next(this.normalizeStreakValue(state.user?.streakBest));
-          this.badgesSubject.next(this.normalizeBadges(state.user?.badges));
-          this.weeklyChallengeSubject.next(this.normalizeWeeklyChallenge(state.user?.weeklyChallenge));
-          this.syncBalanceAndTransactions(false);
-          this.isHydrating = false;
-        },
-        error: () => {
-          this.isHydrating = false;
-        }
-      });
+    this.restoreState();
+    this.stateSyncService.fetchRemoteState((payload) => this.hydrateFromRemote(payload), () => {
+      this.isHydrating = false;
     });
-   }
- 
-   addTransaction(amount: number, category: string, type: 'plus' | 'minus'): void {
-     const normalizedAmount = this.roundToCents(Number(amount));
- 
-     if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
-       return;
-     }
- 
-     const newTx: Transaction = {
-      id: crypto.randomUUID(),
-       amount: normalizedAmount,
-       category,
-       type,
-       date: new Date(),
-       label: category
-     };
- 
-     this.transactions = [...this.transactions, newTx];
-     this.adjustCategoryAmount(type, category, normalizedAmount);
-     this.syncBalanceAndTransactions();
-   }
- 
-  removeTransaction(transactionId: string): void {
-     const removedTransaction = this.transactions.find((item) => item.id === transactionId);
-     if (!removedTransaction) {
-       return;
-    }
+  }
 
-     this.transactions = this.transactions.filter((item) => item.id !== transactionId);
-     this.adjustCategoryAmount(removedTransaction.type, removedTransaction.category, -removedTransaction.amount);
-     this.syncBalanceAndTransactions();
-   }
- 
-  async setCurrency(currency: 'EUR' | 'USD' | 'UAH'): Promise<void> {
-    const currentCurrency = this.currencySubject.value;
+  addTransaction(amount: number, category: string, type: 'plus' | 'minus'): void {
+    const transaction = this.transactionsService.addTransaction(amount, category, type);
+    if (!transaction) {
+      return;
+    }
+    this.categoriesService.adjustCategoryAmount(type, category, transaction.amount);
+    this.persistState();
+  }
+
+  removeTransaction(transactionId: string): void {
+    const removed = this.transactionsService.removeTransaction(transactionId);
+    if (!removed) {
+      return;
+    }
+    this.categoriesService.adjustCategoryAmount(removed.type, removed.category, -removed.amount);
+    this.persistState();
+  }
+
+  async setCurrency(currency: Currency): Promise<void> {
+    const currentCurrency = this.preferencesService.currency;
     if (currency === currentCurrency || this.isCurrencyConverting) {
       return;
     }
 
     this.isCurrencyConverting = true;
-
     try {
-      const conversionRate = await this.fetchConversionRate(currentCurrency, currency);
-      const safeRate = conversionRate ?? 1;
-
-      this.transactions = this.transactions.map((transaction) => ({
-        ...transaction,
-        amount: this.roundToCents(transaction.amount * safeRate)
-      }));
-
-      this.incomeCategoriesSubject.next(this.scaleCategories(this.incomeCategoriesSubject.value, safeRate));
-      this.expenseCategoriesSubject.next(this.scaleCategories(this.expenseCategoriesSubject.value, safeRate));
-      this.balanceSubject.next(this.roundToCents(this.balanceSubject.value * safeRate));
-      this.currencySubject.next(currency);
-      this.syncBalanceAndTransactions(false);
+      const rate = await this.transactionsService.convertCurrency(currentCurrency, currency, this.stateSyncService.isBrowser);
+      this.categoriesService.setCategories('plus', this.transactionsService.scaleCategories(this.categoriesService.getCategories('plus'), rate));
+      this.categoriesService.setCategories('minus', this.transactionsService.scaleCategories(this.categoriesService.getCategories('minus'), rate));
+      this.preferencesService.setCurrency(currency);
+      this.persistState();
     } finally {
       this.isCurrencyConverting = false;
     }
   }
 
   setSphereLayout(layout: SphereLayout): void {
-    this.sphereLayoutSubject.next(this.normalizeSphereLayout(layout));
+    this.preferencesService.setSphereLayout(layout);
     this.persistState();
   }
 
   getSphereLayout(): SphereLayout | null {
-    return this.normalizeSphereLayout(this.sphereLayoutSubject.value);
+    return this.preferencesService.sphereLayout;
   }
 
   setQuickTransactionsLimit(limit: number): void {
-    this.quickTransactionsLimitSubject.next(this.normalizeQuickLimit(limit));
+    this.preferencesService.setQuickTransactionsLimit(limit);
     this.persistState();
   }
 
   markAllNewsRead(): void {
-    this.newsSubject.next(this.newsSubject.value.map((item) => ({ ...item, isRead: true })));
+    this.engagementService.markAllNewsRead();
     this.persistState();
   }
 
   setGoalsPreferences(preferences: Partial<GoalsPreferences>): void {
-    const current = this.goalsPreferencesSubject.value;
-    this.goalsPreferencesSubject.next(this.normalizeGoalsPreferences({ ...current, ...preferences }));
+    this.preferencesService.setGoalsPreferences(preferences);
     this.persistState();
   }
 
-  private normalizeSphereLayout(layout: SphereLayout | null): SphereLayout | null {
-    if (!layout) {
-      return null;
+  addCategory(type: 'plus' | 'minus', categoryName: string, icon = '📁'): void {
+    if (this.categoriesService.addCategory(type, categoryName, icon)) {
+      this.persistState();
     }
-
-    return {
-      income: layout.income,
-      expense: layout.expense,
-      saving: layout.saving,
-      news: layout.news,
-      recent: layout.recent ?? { top: 330, left: 250 }
-    };
   }
 
-   addCategory(type: 'plus' | 'minus', categoryName: string, icon = '📁'): void {
-     const normalized = categoryName.trim();
-     if (!normalized) {
-       return;
-     }
- 
-     const list = this.getCategoriesByType(type);
-    if (list.some((item) => item.name.toLowerCase() === normalized.toLowerCase())) {
-       return;
-     }
- 
-    this.setCategoriesByType(type, [...list, { name: normalized, amount: 0, icon }]);
-   }
- 
-   renameCategory(type: 'plus' | 'minus', oldName: string, newName: string): void {
-     const normalized = newName.trim();
-     if (!normalized || oldName === normalized) {
-       return;
-     }
- 
-     const list = this.getCategoriesByType(type);
-     const oldLower = oldName.toLowerCase();
- 
-    if (!list.some((item) => item.name.toLowerCase() === oldLower)) {
-       return;
-     }
- 
-    if (list.some((item) => item.name.toLowerCase() === normalized.toLowerCase())) {
-       return;
-     }
- 
-    const nextList = list.map((item) =>
-      item.name.toLowerCase() === oldLower ? { ...item, name: normalized } : item
-    );
-     this.setCategoriesByType(type, nextList);
- 
-     this.transactions = this.transactions.map((tx) => {
-       if (tx.type === type && tx.category.toLowerCase() === oldLower) {
-         return { ...tx, category: normalized, label: normalized };
-       }
-       return tx;
-     });
-     this.syncBalanceAndTransactions(false);
-   }
- 
-   deleteCategory(type: 'plus' | 'minus', categoryName: string): void {
-     const targetLower = categoryName.toLowerCase();
-     const list = this.getCategoriesByType(type);
-    const nextList = list.filter((item) => item.name.toLowerCase() !== targetLower);
-     if (nextList.length === list.length) {
-       return;
-     }
- 
-     this.setCategoriesByType(type, nextList);
-     this.transactions = this.transactions.filter(
-       (tx) => !(tx.type === type && tx.category.toLowerCase() === targetLower)
-     );
-     this.syncBalanceAndTransactions();
-   }
- 
-   swapCategories(type: 'plus' | 'minus', firstIndex: number, secondIndex: number): void {
-     if (firstIndex === secondIndex) {
-       return;
-     }
- 
-     const list = this.getCategoriesByType(type);
-     const isOutOfBounds =
-       firstIndex < 0 ||
-       secondIndex < 0 ||
-       firstIndex >= list.length ||
-       secondIndex >= list.length;
- 
-     if (isOutOfBounds) {
-       return;
-     }
- 
-     const nextList = [...list];
-     [nextList[firstIndex], nextList[secondIndex]] = [nextList[secondIndex], nextList[firstIndex]];
-     this.setCategoriesByType(type, nextList);
-   }
- 
-  private getCategoriesByType(type: 'plus' | 'minus'): CategoryItem[] {
-    return type === 'plus' ? this.incomeCategoriesSubject.value : this.expenseCategoriesSubject.value;
-   }
- 
-  private setCategoriesByType(type: 'plus' | 'minus', categories: CategoryItem[]): void {
-     if (type === 'plus') {
-       this.incomeCategoriesSubject.next(categories);
-       this.persistState();
-       return;
-     }
- 
-     this.expenseCategoriesSubject.next(categories);
-     this.persistState();
-   }
- 
-   private adjustCategoryAmount(type: 'plus' | 'minus', categoryName: string, delta: number): void {
-     const targetLower = categoryName.toLowerCase();
-     const list = this.getCategoriesByType(type);
- 
-     const nextList = list.map((item) => {
-       if (item.name.toLowerCase() !== targetLower) {
-         return item;
-       }
- 
-       const nextAmount = Math.max(0, item.amount + delta);
-       return { ...item, amount: Number(nextAmount.toFixed(2)) };
-     });
- 
-     this.setCategoriesByType(type, nextList);
-   }
- 
-   private restoreState(): void {
-     if (!this.isBrowser) {
-       return;
-     }
- 
-     const rawState = localStorage.getItem(this.storageKey);
-     if (!rawState) {
-       return;
-     }
- 
-     try {
-       const parsed = JSON.parse(rawState) as {
-          transactions?: Array<Omit<Transaction, 'date'> & { date: string }>;
-          incomeCategories?: CategoryItem[];
-          expenseCategories?: CategoryItem[];
-          currency?: 'EUR' | 'USD' | 'UAH';
-          sphereLayout?: SphereLayout;
-          quickTransactionsLimit?: number;
-          news?: NewsItem[];
-          goalsPreferences?: GoalsPreferences;
-          streakCurrent?: number;
-          streakBest?: number;
-          badges?: string[];
-          weeklyChallenge?: WeeklyChallenge | null;
-       };
- 
-       this.transactions = (parsed.transactions ?? []).map((tx) => ({
-         ...tx,
-         date: new Date(tx.date)
-       }));
- 
-       this.incomeCategoriesSubject.next(this.normalizeCategories(parsed.incomeCategories ?? []));
-       this.expenseCategoriesSubject.next(this.normalizeCategories(parsed.expenseCategories ?? []));
-       this.currencySubject.next(parsed.currency ?? 'EUR');
-       this.sphereLayoutSubject.next(this.normalizeSphereLayout(parsed.sphereLayout ?? null));
-       this.quickTransactionsLimitSubject.next(this.normalizeQuickLimit(parsed.quickTransactionsLimit));
-       this.goalsPreferencesSubject.next(this.normalizeGoalsPreferences(parsed.goalsPreferences));
-       this.newsSubject.next(this.normalizeNews(parsed.news));
-       this.streakCurrentSubject.next(this.normalizeStreakValue(parsed.streakCurrent));
-       this.streakBestSubject.next(this.normalizeStreakValue(parsed.streakBest));
-       this.badgesSubject.next(this.normalizeBadges(parsed.badges));
-       this.weeklyChallengeSubject.next(this.normalizeWeeklyChallenge(parsed.weeklyChallenge));
-      } catch {
-       localStorage.removeItem(this.storageKey);
-     }
-   }
- 
-   private persistState(): void {
-    if (!this.isBrowser || this.isHydrating) {
-       return;
-     }
- 
-     const payload = {
-       transactions: this.transactions,
-       incomeCategories: this.incomeCategoriesSubject.value,
-       expenseCategories: this.expenseCategoriesSubject.value,
-       currency: this.currencySubject.value,
-       sphereLayout: this.sphereLayoutSubject.value,
-       quickTransactionsLimit: this.quickTransactionsLimitSubject.value,
-       goalsPreferences: this.goalsPreferencesSubject.value,
-       news: this.newsSubject.value,
-       streakCurrent: this.streakCurrentSubject.value,
-       streakBest: this.streakBestSubject.value,
-       badges: this.badgesSubject.value,
-       weeklyChallenge: this.weeklyChallengeSubject.value
-     };
- 
-     localStorage.setItem(this.storageKey, JSON.stringify(payload));
+  renameCategory(type: 'plus' | 'minus', oldName: string, newName: string): void {
+    if (!this.categoriesService.renameCategory(type, oldName, newName)) {
+      return;
+    }
+    this.transactionsService.renameCategoryTransactions(type, oldName, newName);
+    this.persistState();
+  }
 
-    const currentUser = this.sessionService.userSnapshot;
-    if (!currentUser) {
+  deleteCategory(type: 'plus' | 'minus', categoryName: string): void {
+    if (!this.categoriesService.deleteCategory(type, categoryName)) {
+      return;
+    }
+    this.transactionsService.deleteCategoryTransactions(type, categoryName);
+    this.persistState();
+  }
+
+  swapCategories(type: 'plus' | 'minus', firstIndex: number, secondIndex: number): void {
+    if (this.categoriesService.swapCategories(type, firstIndex, secondIndex)) {
+      this.persistState();
+    }
+  }
+
+  private hydrateFromRemote(payload: PersistedStatePayload): void {
+    this.isHydrating = true;
+
+    const remoteTransactions = (payload.transactions ?? []).map((tx) => ({ ...tx, date: new Date(tx.date) }));
+    const localLayout = this.preferencesService.sphereLayout;
+
+    this.transactionsService.setTransactions(remoteTransactions);
+    this.categoriesService.setCategories('plus', payload.user?.incomeCategories ?? []);
+    this.categoriesService.setCategories('minus', payload.user?.expenseCategories ?? []);
+    this.preferencesService.hydrate({
+      currency: payload.user?.currency,
+      sphereLayout: localLayout ?? payload.user?.sphereLayout ?? null,
+      quickTransactionsLimit: payload.user?.quickTransactionsLimit,
+      goalsPreferences: payload.user?.goalsPreferences
+    });
+    this.engagementService.hydrate({
+      news: payload.user?.news,
+      streakCurrent: payload.user?.streakCurrent,
+      streakBest: payload.user?.streakBest,
+      badges: payload.user?.badges,
+      weeklyChallenge: payload.user?.weeklyChallenge
+    });
+
+    this.persistState();
+  }
+
+  private restoreState(): void {
+    const parsed = this.stateSyncService.restoreLocalState() as {
+      transactions?: Array<Omit<Transaction, 'date'> & { date: string }>;
+      incomeCategories?: CategoryItem[];
+      expenseCategories?: CategoryItem[];
+      currency?: Currency;
+      sphereLayout?: SphereLayout;
+      quickTransactionsLimit?: number;
+      news?: NewsItem[];
+      goalsPreferences?: GoalsPreferences;
+      streakCurrent?: number;
+      streakBest?: number;
+      badges?: string[];
+      weeklyChallenge?: WeeklyChallenge | null;
+    } | null;
+
+    if (!parsed) {
       return;
     }
 
-    this.sessionService.saveState({
-      ...payload,
-      transactions: this.transactions.map((item) => ({
-        ...item,
-        date: item.date.toISOString()
-      }))
+    this.transactionsService.setTransactions((parsed.transactions ?? []).map((tx) => ({ ...tx, date: new Date(tx.date) })));
+    this.categoriesService.setCategories('plus', parsed.incomeCategories ?? []);
+    this.categoriesService.setCategories('minus', parsed.expenseCategories ?? []);
+    this.preferencesService.hydrate({
+      currency: parsed.currency,
+      sphereLayout: parsed.sphereLayout ?? null,
+      quickTransactionsLimit: parsed.quickTransactionsLimit,
+      goalsPreferences: parsed.goalsPreferences
     });
-   }
- 
-   private syncBalanceAndTransactions(recalculateBalance = true): void {
-     if (recalculateBalance) {
-       const newBalance = this.transactions.reduce(
-         (acc, tx) => (tx.type === 'plus' ? acc + tx.amount : acc - tx.amount),
-         0
-       );
-       this.balanceSubject.next(this.roundToCents(newBalance));
-     }
- 
-    this.transactions$.next([...this.transactions]);
-     this.persistState();
+    this.engagementService.hydrate({
+      news: parsed.news,
+      streakCurrent: parsed.streakCurrent,
+      streakBest: parsed.streakBest,
+      badges: parsed.badges,
+      weeklyChallenge: parsed.weeklyChallenge
+    });
   }
 
-  private roundToCents(value: number): number {
-     return Number(value.toFixed(2));
-   }
+  private persistState(): void {
+    if (this.isHydrating) {
+      return;
+    }
 
-  private normalizeCategories(categories: CategoryItem[]): CategoryItem[] {
-     return categories.map((item) => ({
-       name: item.name,
-       amount: Number.isFinite(item.amount) ? this.roundToCents(item.amount) : 0,
-       icon: item.icon || '📁'
-     }));
-   }
-   private scaleCategories(categories: CategoryItem[], rate: number): CategoryItem[] {
-    return categories.map((item) => ({
-      ...item,
-      amount: this.roundToCents(item.amount * rate)
-    }));
-  }
-
-  private getFallbackRate(
-    fromCurrency: 'EUR' | 'USD' | 'UAH',
-    toCurrency: 'EUR' | 'USD' | 'UAH'
-  ): number {
-    const ratesInUsd: Record<'EUR' | 'USD' | 'UAH', number> = {
-      USD: 1,
-      EUR: 1.09,
-      UAH: 1 / 41
+    const payload = {
+      transactions: this.transactionsService.getTransactions(),
+      incomeCategories: this.categoriesService.getCategories('plus'),
+      expenseCategories: this.categoriesService.getCategories('minus'),
+      currency: this.preferencesService.currency,
+      sphereLayout: this.preferencesService.sphereLayout,
+      quickTransactionsLimit: this.preferencesService.quickTransactionsLimit,
+      goalsPreferences: this.preferencesService.goalsPreferences,
+      news: this.engagementService.news,
+      streakCurrent: this.engagementService.streakCurrent,
+      streakBest: this.engagementService.streakBest,
+      badges: this.engagementService.badges,
+      weeklyChallenge: this.engagementService.weeklyChallenge
     };
 
-    const fromInUsd = ratesInUsd[fromCurrency];
-    const toInUsd = ratesInUsd[toCurrency];
-    return fromInUsd / toInUsd;
+    this.stateSyncService.persistLocalState(payload);
+    this.stateSyncService.saveRemoteState({
+      ...payload,
+      transactions: this.transactionsService.getTransactions().map((item) => ({ ...item, date: item.date.toISOString() }))
+    });
   }
-
-  private normalizeQuickLimit(limit: number | undefined): number {
-    const raw = Number(limit);
-    if (!Number.isFinite(raw)) {
-      return 5;
-    }
-    return Math.min(10, Math.max(3, Math.round(raw)));
-  }
-
-  private normalizeGoalsPreferences(preferences?: Partial<GoalsPreferences> | null): GoalsPreferences {
-    const theme = preferences?.theme === 'girly' ? 'girly' : 'default';
-    const visualizationMode = preferences?.visualizationMode === 'segments' ? 'segments' : 'amount';
-    const periodStart = this.normalizeIsoDate(preferences?.periodStart);
-    const periodEnd = this.normalizeIsoDate(preferences?.periodEnd);
-    const deadline = this.normalizeIsoDate(preferences?.deadline);
-
-    return {
-      theme,
-      visualizationMode,
-      ...(periodStart ? { periodStart } : {}),
-      ...(periodEnd ? { periodEnd } : {}),
-      ...(deadline ? { deadline } : {})
-    };
-  }
-
-  private normalizeIsoDate(value: string | undefined): string | undefined {
-    if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      return undefined;
-    }
-
-    const [year, month, day] = value.split('-').map((part) => Number(part));
-    const parsed = new Date(year, month - 1, day);
-    const isValidDate =
-      Number.isFinite(parsed.getTime()) &&
-      parsed.getFullYear() === year &&
-      parsed.getMonth() === month - 1 &&
-      parsed.getDate() === day;
-
-    return isValidDate ? value : undefined;
-  }
-  
-  private normalizeNews(news?: NewsItem[]): NewsItem[] {
-    if (!news || news.length === 0) {
-      return [
-        { id: '1', title: 'Market update', isRead: false },
-        { id: '2', title: 'Budget tip of the week', isRead: false },
-        { id: '3', title: 'Saving challenge', isRead: true }
-      ];
-    }
-
-    return news.map((item, index) => ({
-      id: item.id || String(index + 1),
-      title: item.title || 'News',
-      isRead: !!item.isRead
-    }));
-  }
-
-  private normalizeStreakValue(value?: number | null): number {
-    const numeric = Number(value);
-    if (!Number.isFinite(numeric) || numeric < 0) {
-      return 0;
-    }
-    return Math.round(numeric);
-  }
-
-  private normalizeBadges(badges?: string[] | null): string[] {
-    if (!badges || badges.length === 0) {
-      return [];
-    }
-    return Array.from(new Set(badges.filter((item) => !!item)));
-  }
-
-  private normalizeWeeklyChallenge(challenge?: WeeklyChallenge | null): WeeklyChallenge | null {
-    if (!challenge || !challenge.category || !challenge.weekStart) {
-      return null;
-    }
-
-    return {
-      category: challenge.category,
-      limit: this.roundToCents(Number(challenge.limit) || 0),
-      spent: this.roundToCents(Number(challenge.spent) || 0),
-      weekStart: challenge.weekStart,
-      completed: !!challenge.completed
-    };
-  }
-
-  private async fetchConversionRate(
-    fromCurrency: 'EUR' | 'USD' | 'UAH',
-    toCurrency: 'EUR' | 'USD' | 'UAH'
-  ): Promise<number | null> {
-    if (!this.isBrowser) {
-      return null;
-    }
-
-    const endpoint = new URL('https://api.exchangerate.host/convert');
-    endpoint.searchParams.set('from', fromCurrency);
-    endpoint.searchParams.set('to', toCurrency);
-    endpoint.searchParams.set('amount', '1');
-
-    try {
-      const response = await fetch(endpoint.toString());
-      if (!response.ok) {
-        return this.getFallbackRate(fromCurrency, toCurrency);
-      }
-
-      const payload = (await response.json()) as { result?: number };
-      if (!Number.isFinite(payload.result) || !payload.result || payload.result <= 0) {
-        return this.getFallbackRate(fromCurrency, toCurrency);
-      }
-
-      return payload.result;
-    } catch {
-      return this.getFallbackRate(fromCurrency, toCurrency);
-    }
-  }
- }
+}

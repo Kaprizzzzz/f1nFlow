@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GoalsPreferences, SphereLayout, Transaction, WeeklyChallenge } from './models/finance.models';
+import { GoalsPreferences, SphereLayout, SphereTab, Transaction, WeeklyChallenge } from './models/finance.models';
 import { CategoryItem, Currency, NewsItem } from './models/history-shared.models';
 import { CategoriesService } from './services/categories.service';
 import { EngagementService } from './services/engagement.service';
@@ -7,7 +7,7 @@ import { PreferencesService } from './services/preferences.service';
 import { PersistedStatePayload, StateSyncService } from './services/state-sync.service';
 import { TransactionsService } from './services/transactions.service';
 
-export type { GoalsPreferences, SphereLayout, Transaction, WeeklyChallenge };
+export type { GoalsPreferences, SphereLayout, SphereTab, Transaction, WeeklyChallenge };
 export type { CategoryItem, NewsItem };
 
 @Injectable({ providedIn: 'root' })
@@ -15,19 +15,57 @@ export class BalanceService {
   private isHydrating = false;
   private isCurrencyConverting = false;
 
-  balance$ = this.transactionsService.balance$;
-  transactions$ = this.transactionsService.transactions$;
-  incomeCategories$ = this.categoriesService.incomeCategories$;
-  expenseCategories$ = this.categoriesService.expenseCategories$;
-  currency$ = this.preferencesService.currency$;
-  sphereLayout$ = this.preferencesService.sphereLayout$;
-  quickTransactionsLimit$ = this.preferencesService.quickTransactionsLimit$;
-  goalsPreferences$ = this.preferencesService.goalsPreferences$;
-  news$ = this.engagementService.news$;
-  streakCurrent$ = this.engagementService.streakCurrent$;
-  streakBest$ = this.engagementService.streakBest$;
-  badges$ = this.engagementService.badges$;
-  weeklyChallenge$ = this.engagementService.weeklyChallenge$;
+  get balance$() {
+    return this.transactionsService.balance$;
+  }
+
+  get transactions$() {
+    return this.transactionsService.transactions$;
+  }
+
+  get incomeCategories$() {
+    return this.categoriesService.incomeCategories$;
+  }
+
+  get expenseCategories$() {
+    return this.categoriesService.expenseCategories$;
+  }
+
+  get currency$() {
+    return this.preferencesService.currency$;
+  }
+
+  get sphereLayout$() {
+    return this.preferencesService.sphereLayout$;
+  }
+
+  get quickTransactionsLimit$() {
+    return this.preferencesService.quickTransactionsLimit$;
+  }
+
+  get goalsPreferences$() {
+    return this.preferencesService.goalsPreferences$;
+  }
+
+  get news$() {
+    return this.engagementService.news$;
+  }
+
+  get streakCurrent$() {
+    return this.engagementService.streakCurrent$;
+  }
+
+  get streakBest$() {
+    return this.engagementService.streakBest$;
+  }
+
+  get badges$() {
+    return this.engagementService.badges$;
+  }
+
+  get weeklyChallenge$() {
+    return this.engagementService.weeklyChallenge$;
+  }
 
   constructor(
     private readonly transactionsService: TransactionsService,

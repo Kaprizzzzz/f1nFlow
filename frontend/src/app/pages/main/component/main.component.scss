@@ -35,18 +35,18 @@
 
 .fullscreen-close-btn {
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 14px);
-  right: calc(env(safe-area-inset-right, 0px) + 12px);
+  top: calc(env(safe-area-inset-top, 0px) + 66px);
+  right: calc(env(safe-area-inset-right, 0px) + 18px);
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  border: 1px solid rgba(126, 163, 236, 0.5);
-  background: rgba(8, 16, 32, 0.82);
-  color: #dbe9ff;
+  border: 1px solid rgba(178, 206, 255, 0.45);
+  background: rgba(13, 24, 44, 0.92);
+  color: #eef5ff;
   font-size: 24px;
   line-height: 1;
   cursor: pointer;
-  z-index: 1305;
+  z-index: 2300;
 }
 
 .layout-controls {
@@ -249,6 +249,12 @@
 
 .dashboard-container.fullscreen-panel-active {
   overflow: hidden;
+
+  .layout-controls,
+  .challenge-banner {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 .circles-layout.fullscreen-panel-active {

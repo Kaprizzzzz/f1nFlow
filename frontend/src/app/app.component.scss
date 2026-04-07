@@ -216,3 +216,10 @@
     height: 100dvh;
   }
 }
+
+:host-context(body.category-modal-open) {
+  .top-controls {
+    opacity: 0;
+    pointer-events: none;
+  }
+}

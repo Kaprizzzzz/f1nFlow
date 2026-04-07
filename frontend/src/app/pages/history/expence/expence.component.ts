@@ -72,6 +72,7 @@ export class ExpenceComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.syncModalUiState();
     this.subscriptions.unsubscribe();
   }
 
@@ -145,6 +146,7 @@ export class ExpenceComponent implements OnInit, OnDestroy {
       this.balanceService.addTransaction(amount, this.selectedCategory, 'minus');
       this.amountInput = '';
       this.panelMode = null;
+      this.syncModalUiState();
     }
   }
 
@@ -153,6 +155,7 @@ export class ExpenceComponent implements OnInit, OnDestroy {
     this.amountInput = '';
     if (this.panelMode === 'amount') {
       this.panelMode = null;
+      this.syncModalUiState();
     }
   }
 
@@ -176,17 +179,20 @@ export class ExpenceComponent implements OnInit, OnDestroy {
     this.newCategoryName = '';
     this.newCategoryIcon = this.emojiOptions[0];
      this.isCreateCategoryOpen = false;
+    this.syncModalUiState();
   }
 
   openCreateCategory(event: Event): void {
     event.stopPropagation();
     this.isCreateCategoryOpen = true;
     this.panelMode = null;
+    this.syncModalUiState();
   }
 
   closeCreateCategory(event?: Event): void {
     event?.stopPropagation();
     this.isCreateCategoryOpen = false;
+    this.syncModalUiState();
   }
 
   onMiniPointerDown(index: number, event: PointerEvent): void {
@@ -269,6 +275,7 @@ export class ExpenceComponent implements OnInit, OnDestroy {
     this.editModeCategory = category.name;
     this.panelMode = isSameCategory && this.panelMode === 'name' ? null : 'name';
     this.editedCategoryName = category.name;
+    this.syncModalUiState();
   }
 
   saveEdit(event: Event): void {
@@ -329,5 +336,14 @@ export class ExpenceComponent implements OnInit, OnDestroy {
     this.panelMode = null;
     this.editedCategoryName = '';
     this.amountInput = '';
+    this.syncModalUiState();
+  }
+
+  private syncModalUiState(): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.body.classList.toggle('category-modal-open', this.panelMode !== null || this.isCreateCategoryOpen);
   }
 }

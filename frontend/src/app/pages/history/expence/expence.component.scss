@@ -190,11 +190,12 @@ select {
 .amount-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: transparent;
+  background: rgba(18, 8, 2, 0.82);
+  backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 80;
+  z-index: 2500;
   padding: 16px;
 }
 
@@ -205,9 +206,24 @@ select {
   border: 1px solid rgba($expense-glow, 0.6);
   border-radius: 16px;
   padding: 14px;
+  position: relative;
   display: grid;
   gap: 10px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  border: 1px solid rgba($expense-glow, 0.6);
+  background: rgba(65, 32, 5, 0.9);
+  color: #ffedda;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .amount-modal-title {

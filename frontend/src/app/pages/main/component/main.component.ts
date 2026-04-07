@@ -149,6 +149,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.syncFullscreenUiState(null);
     this.detachGlobalPointerListeners();
     this.subscription.unsubscribe();
   }
@@ -159,6 +160,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const nextTab = this.activeTab === tab ? null : tab;
     this.activeTab = nextTab;
+    this.syncFullscreenUiState(nextTab);
     this.updateNewsPanelAnchorBottom();
     if (nextTab === 'news') {
       this.balanceService.markAllNewsRead();
@@ -170,6 +172,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     this.activeTab = null;
+    this.syncFullscreenUiState(null);
   }
 
   repeatTransaction(category: string, amount: number): void {
@@ -206,6 +209,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.activeTab = null;
+    this.syncFullscreenUiState(null);
     this.isEditMode = true;
     this.isEditMode$.next(true);
     this.stopDrag();
@@ -283,6 +287,14 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isFullscreenPanelTab(tab: MainTab = this.activeTab): boolean {
     return tab === 'news' || tab === 'saving' || tab === 'recent';
+  }
+
+  private syncFullscreenUiState(tab: MainTab): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.body.classList.toggle('panel-fullscreen-active', this.isFullscreenPanelTab(tab));
   }
 
   private measureSphereSizes(): void {

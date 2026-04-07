@@ -1,4 +1,7 @@
 <div class="dashboard-container" [class.has-active]="activeTab !== null" [class.edit-mode]="isEditMode" [class.fullscreen-panel-active]="isFullscreenPanelTab()" (click)="closeActiveTab()">
+  @if (isFullscreenPanelTab()) {
+    <button class="fullscreen-close-btn" type="button" (click)="$event.stopPropagation(); closeActiveTab()" aria-label="Close panel">✕</button>
+  }
   @if (weeklyChallengeText) {
     <div class="challenge-banner">{{ weeklyChallengeText }}</div>
   }

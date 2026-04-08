@@ -180,7 +180,7 @@ $recent-glow: #ff78c7;
 }
 
 .circle-wrapper.active .recent-panel {
-  --panel-top-offset: calc(env(safe-area-inset-top, 0px) + 58px);
+  --panel-top-offset: calc(env(safe-area-inset-top, 0px) + 12px);
   --panel-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + 10px);
   position: fixed;
   top: var(--panel-top-offset);

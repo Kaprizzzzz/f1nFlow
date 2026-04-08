@@ -69,7 +69,7 @@ li.unread {
 }
 
 .circle-wrapper.active .news-panel {
-  --news-panel-gap-top: calc(env(safe-area-inset-top, 0px) + 58px);
+  --news-panel-gap-top: calc(env(safe-area-inset-top, 0px) + 12px);
   --news-panel-gap-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
   position: fixed;
   top: var(--news-panel-gap-top);

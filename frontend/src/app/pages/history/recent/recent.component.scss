@@ -209,16 +209,17 @@ $recent-glow: #ff78c7;
   border-radius: 24px;
   padding: 16px;
   z-index: 2200;
+  transform: translateY(-300px);
   animation: recent-panel-appear 0.68s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes recent-panel-appear {
   from {
     opacity: 0;
-    transform: translateY(16px) scale(0.98);
+    transform: translateY(-284px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(-300px) scale(1);
   }
 }

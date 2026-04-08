@@ -35,7 +35,7 @@
 
 .fullscreen-close-btn {
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 66px);
+  top: calc(env(safe-area-inset-top, 0px) + 8px);
   right: calc(env(safe-area-inset-right, 0px) + 18px);
   width: 42px;
   height: 42px;
@@ -46,7 +46,7 @@
   font-size: 24px;
   line-height: 1;
   cursor: pointer;
-  z-index: 2300;
+  z-index: 2600;
 }
 
 .layout-controls {
@@ -196,7 +196,7 @@
   transform: translateX(-50%) !important;
 }
 
-.dashboard-container.has-active .sphere-wrapper.is-active {
+.dashboard-container.has-active:not(.fullscreen-panel-active) .sphere-wrapper.is-active {
   animation: active-sphere-pop 1.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -268,4 +268,6 @@
   width: 100% !important;
   max-width: none !important;
   transform: none !important;
+  transition: none !important;
+  animation: none !important;
 }

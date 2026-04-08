@@ -24,6 +24,8 @@ export class ExpenceComponent implements OnInit, OnDestroy {
   totalExpense = 0;
   totalIncome = 0;
   amountInput = '';
+  isAmountInvalid = false;
+  isAmountShakeActive = false;
   selectedCategory = '';
 
   categories: CategoryItem[] = [];
@@ -145,18 +147,43 @@ export class ExpenceComponent implements OnInit, OnDestroy {
     if (amount !== null && amount > 0 && this.selectedCategory) {
       this.balanceService.addTransaction(amount, this.selectedCategory, 'minus');
       this.amountInput = '';
+      this.isAmountInvalid = false;
       this.panelMode = null;
       this.syncModalUiState();
+      return;
     }
+
+    this.triggerInvalidAmountUi();
   }
 
   closeAmountPanel(event?: Event): void {
     event?.stopPropagation();
     this.amountInput = '';
+    this.isAmountInvalid = false;
+    this.isAmountShakeActive = false;
     if (this.panelMode === 'amount') {
       this.panelMode = null;
       this.syncModalUiState();
     }
+  }
+
+
+  onAmountInputChange(): void {
+    if (this.isAmountInvalid) {
+      this.isAmountInvalid = false;
+    }
+  }
+
+  private triggerInvalidAmountUi(): void {
+    this.isAmountInvalid = true;
+    this.isAmountShakeActive = false;
+
+    requestAnimationFrame(() => {
+      this.isAmountShakeActive = true;
+      setTimeout(() => {
+        this.isAmountShakeActive = false;
+      }, 260);
+    });
   }
 
   private parseAmountInput(rawValue: string): number | null {

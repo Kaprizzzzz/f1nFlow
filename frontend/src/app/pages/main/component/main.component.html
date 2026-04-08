@@ -30,9 +30,6 @@
     (pointermove)="onDragMove($event)"
     (click)="$event.stopPropagation(); closeActiveTab()"
   >
-    @if (isFullscreenPanelTab()) {
-      <button class="fullscreen-close-btn" type="button" (click)="$event.stopPropagation(); closeActiveTab()" aria-label="Close panel">✕</button>
-    }
     <div
       #sphereRef
       class="sphere-wrapper"

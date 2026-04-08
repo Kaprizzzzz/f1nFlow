@@ -51,7 +51,7 @@
       <button type="button" class="modal-close-btn" (click)="cancelEdit($event)" aria-label="Close modal">✕</button>
       <div class="amount-modal-title">Edit category name</div>
       <input type="text" [(ngModel)]="editedCategoryName" placeholder="New category name" />
-      <div class="amount-modal-actions">
+        <div class="amount-modal-actions">
         <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
         <button type="button" class="small-btn" (click)="saveEdit($event)">Save</button>
       </div>
@@ -59,10 +59,11 @@
   </div>
 
   <div class="amount-modal-backdrop" *ngIf="selectedCategoryData && panelMode === 'amount'" (click)="closeAmountPanel()">
-    <div class="amount-modal" (click)="$event.stopPropagation()">
+    <div class="amount-modal" [class.shake]="isAmountShakeActive" (click)="$event.stopPropagation()">
       <button type="button" class="modal-close-btn" (click)="closeAmountPanel($event)" aria-label="Close modal">✕</button>
       <div class="amount-modal-title">{{ selectedCategoryData.name }}</div>
-        <input type="text" [(ngModel)]="amountInput" placeholder="0,00" inputmode="decimal" autocomplete="off" />
+        <input type="text" [(ngModel)]="amountInput" (ngModelChange)="onAmountInputChange()" placeholder="0,00" inputmode="decimal" autocomplete="off" />
+      <div class="amount-error" *ngIf="isAmountInvalid">invalid</div>
       
         <div class="amount-modal-actions">
           <button type="button" class="small-btn ghost" (click)="closeAmountPanel($event)">Cancel</button>

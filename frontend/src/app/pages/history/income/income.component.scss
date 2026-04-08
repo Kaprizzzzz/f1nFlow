@@ -282,3 +282,34 @@ select {
     transform: translateY(-84px) scale(1);
   }
 }
+
+
+.amount-modal.shake {
+  animation: modal-shake 0.24s ease-in-out;
+}
+
+.amount-error {
+  color: #ff6f86;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+
+@keyframes modal-shake {
+  0%,
+  100% {
+    transform: translateY(-84px) translateX(0);
+  }
+  20% {
+    transform: translateY(-84px) translateX(-5px);
+  }
+  40% {
+    transform: translateY(-84px) translateX(5px);
+  }
+  60% {
+    transform: translateY(-84px) translateX(-4px);
+  }
+  80% {
+    transform: translateY(-84px) translateX(4px);
+  }
+}

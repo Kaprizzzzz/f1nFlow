@@ -20,9 +20,10 @@ import { combineLatest, Subscription } from 'rxjs';
    templateUrl: './saving.component.html',
    styleUrl: './saving.component.scss'
  })
- export class SavingComponent implements OnInit, OnDestroy {
+export class SavingComponent implements OnInit, OnDestroy {
   @Input() isFullView = false;
-   @Output() onSelect = new EventEmitter<void>();
+  @Output() onSelect = new EventEmitter<void>();
+  @Output() onClose = new EventEmitter<void>();
  
    savings = 0;
    incomeTotal = 0;
@@ -60,7 +61,12 @@ import { combineLatest, Subscription } from 'rxjs';
  
   handleCircleClick(): void {
     this.onSelect.emit();
-   }
+  }
+
+  handleClose(event: Event): void {
+    event.stopPropagation();
+    this.onClose.emit();
+  }
  
   removeTransaction(transactionId: string | number, event: Event): void {
     event.stopPropagation();

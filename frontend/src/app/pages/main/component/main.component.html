@@ -77,7 +77,7 @@
       (pointerdown)="onDragStart($event, 'saving')"
       (click)="$event.stopPropagation()"
     >
-      <app-saving [isFullView]="activeTab === 'saving'" (onSelect)="setActiveTab('saving')"></app-saving>
+      <app-saving [isFullView]="activeTab === 'saving'" (onSelect)="setActiveTab('saving')" (onClose)="closeActiveTab()"></app-saving>
     </div>
     <div
       #sphereRef
@@ -93,6 +93,7 @@
         [isFullView]="activeTab === 'news'"
         [panelAnchorBottom]="newsPanelAnchorBottom"
         (onSelect)="setActiveTab('news')"
+        (onClose)="closeActiveTab()"
       ></app-news>
     </div>
     <div
@@ -110,6 +111,7 @@
         [items]="recentCategoryGroups"
         [quickLimit]="quickTransactionsLimit"
         (onSelect)="setActiveTab('recent')"
+        (onClose)="closeActiveTab()"
         (onRepeat)="repeatTransaction($event.category, $event.amount)"
         (quickLimitChange)="setQuickTransactionsLimit($event)"
       ></app-recent>

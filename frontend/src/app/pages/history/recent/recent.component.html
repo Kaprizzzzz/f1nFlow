@@ -4,6 +4,7 @@
   </div>
 
   <div class="recent-panel" *ngIf="isFullView" (click)="$event.stopPropagation()">
+    <button type="button" class="panel-close-btn" (click)="handleClose($event)" aria-label="Close recent panel">✕</button>
     <div class="quick-limit-row">
       <span>Quick tx count:</span>
       <div class="quick-limit-actions">

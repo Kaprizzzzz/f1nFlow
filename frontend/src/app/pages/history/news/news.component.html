@@ -9,6 +9,7 @@
     (click)="$event.stopPropagation()"
     [style.--news-panel-anchor-bottom.px]="panelAnchorBottom"
   >
+    <button type="button" class="panel-close-btn" (click)="handleClose($event)" aria-label="Close news panel">✕</button>
     <div *ngIf="news$ | async as newsItems">
       @if (newsItems.length === 0) {
         <p>Персональні інсайти з'являться після активності.</p>

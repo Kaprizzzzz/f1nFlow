@@ -5,6 +5,7 @@
   </div>
 
   <div class="history-list" *ngIf="isFullView" (click)="$event.stopPropagation()">
+    <button type="button" class="panel-close-btn" (click)="handleClose($event)" aria-label="Close history panel">✕</button>
     <h4>Income / Expense / Difference history</h4>
 
     <div class="history-row" *ngFor="let item of historyRows">

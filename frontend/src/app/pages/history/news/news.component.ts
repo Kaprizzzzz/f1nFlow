@@ -13,6 +13,7 @@ export class NewsComponent {
   @Input() isFullView = false;
   @Input() panelAnchorBottom = 0;
   @Output() onSelect = new EventEmitter<void>();
+  @Output() onClose = new EventEmitter<void>();
   readonly news$;
 
   constructor(private readonly balanceService: BalanceService) {
@@ -21,5 +22,10 @@ export class NewsComponent {
 
   handleCircleClick(): void {
     this.onSelect.emit();
+  }
+
+  handleClose(event: Event): void {
+    event.stopPropagation();
+    this.onClose.emit();
   }
 }

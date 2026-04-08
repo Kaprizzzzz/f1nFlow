@@ -25,6 +25,7 @@ export class RecentComponent {
   @Input() items: RecentCategoryGroup[] = [];
   @Input() quickLimit = 3;
   @Output() onSelect = new EventEmitter<void>();
+  @Output() onClose = new EventEmitter<void>();
   @Output() onRepeat = new EventEmitter<RecentTransactionBubble>();
   @Output() quickLimitChange = new EventEmitter<number>();
 
@@ -33,6 +34,11 @@ export class RecentComponent {
 
   handleCircleClick(): void {
     this.onSelect.emit();
+  }
+
+  handleClose(event: Event): void {
+    event.stopPropagation();
+    this.onClose.emit();
   }
 
    repeat(category: string, amount: number, event: Event): void {

@@ -100,12 +100,14 @@ $saving-glow: #63ffd0;
 } // КІНЕЦЬ .circle-wrapper
 
 .history-list {
+  position: relative;
   width: 320px;
   margin-top: 24px;
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(5, 33, 28, 0.72);
+  padding: 12px 12px 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(53, 24, 96, 0.84) 0%, rgba(30, 12, 61, 0.9) 100%);
   border: 1px solid rgba($saving-glow, 0.45);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(228, 255, 244, 0.12);
   max-height: 230px;
   overflow: auto;
   transition: margin-top 0.35s ease;
@@ -230,6 +232,20 @@ $saving-glow: #63ffd0;
     font-size: 13px;
   }
 }
+
+.panel-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  border: 1px solid rgba(220, 204, 255, 0.48);
+  background: rgba(11, 21, 40, 0.7);
+  color: #f0f5ff;
+  font-size: 20px;
+  line-height: 1;
+}
 .circle-wrapper.active .history-list { 
   margin-top: 108px;
 }
@@ -241,7 +257,7 @@ $saving-glow: #63ffd0;
 }
 
 .circle-wrapper.active .history-list {
-  --panel-top-offset: calc(env(safe-area-inset-top, 0px) + 12px);
+  --panel-top-offset: calc(env(safe-area-inset-top, 0px) + 2px);
   --panel-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + 10px);
   position: fixed;
   top: var(--panel-top-offset);

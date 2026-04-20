@@ -140,9 +140,9 @@
     z-index: 1;
     position: absolute;
     transition:
-      top 0.48s cubic-bezier(0.22, 1, 0.36, 1),
-      left 0.48s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 1.08s cubic-bezier(0.22, 1, 0.36, 1),
+      top 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      left 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 1.13s cubic-bezier(0.22, 1, 0.36, 1),
       opacity 0.7s ease;
     will-change: transform, top, left, opacity;
     pointer-events: none;
@@ -176,24 +176,26 @@
 .sphere-wrapper.is-active {
   z-index: 20 !important;
   top: var(--dashboard-top-offset) !important;
-  left: 50% !important;
-  right: auto !important;
-  transform: translateX(-50%) !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: fit-content;
+  margin-inline: auto;
+  transform: none !important;
 }
 
 .dashboard-container.has-active:not(.fullscreen-panel-active) .sphere-wrapper.is-active {
-  animation: active-sphere-pop 1.35s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: active-sphere-pop 1.42s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes active-sphere-pop {
   0% {
-    transform: translateX(-50%) scale(0.86);
+    transform: scale(0.88);
   }
   55% {
-    transform: translateX(-50%) scale(1.02);
+    transform: scale(1.02);
   }
   100% {
-    transform: translateX(-50%) scale(1);
+    transform: scale(1);
   }
 }
 
@@ -214,8 +216,9 @@
   }
 
   .sphere-wrapper.is-active {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
   }
 }
 @media (max-width: 560px) {

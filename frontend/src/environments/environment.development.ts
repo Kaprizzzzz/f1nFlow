@@ -1,3 +1,4 @@
 export const environment = {
-  apiUrl: '/api'
+  apiUrl: '/api',
+  allowedApiOrigins: ['http://localhost:3001']
 };

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -14,7 +14,7 @@ type PanelMode = 'amount' | 'name' | null;
   templateUrl: './income.component.html',
   styleUrl: './income.component.scss'
 })
-export class IncomeComponent implements OnInit, OnDestroy {
+export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
   @Input() isFullView = false;
   @Input() showCategoryPanel = false;
   @Output() onSelect = new EventEmitter<void>();
@@ -71,6 +71,12 @@ export class IncomeComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('isFullView' in changes && !this.isFullView) {
+      this.closeTransientUi();
+    }
   }
 
   ngOnDestroy(): void {
@@ -368,5 +374,17 @@ export class IncomeComponent implements OnInit, OnDestroy {
     }
 
     document.body.classList.toggle('category-modal-open', this.panelMode !== null || this.isCreateCategoryOpen);
+  }
+
+  private closeTransientUi(): void {
+    this.isCreateCategoryOpen = false;
+    this.panelMode = null;
+    this.amountInput = '';
+    this.isAmountInvalid = false;
+    this.isAmountShakeActive = false;
+    this.editModeCategory = '';
+    this.editedCategoryName = '';
+    this.selectedCategory = '';
+    this.syncModalUiState();
   }
 }

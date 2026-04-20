@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface RecentTransactionBubble {
@@ -20,7 +20,7 @@ export interface RecentCategoryGroup {
   templateUrl: './recent.component.html',
   styleUrl: './recent.component.scss'
 })
-export class RecentComponent {
+export class RecentComponent implements OnChanges {
   @Input() isFullView = false;
   @Input() items: RecentCategoryGroup[] = [];
   @Input() quickLimit = 3;
@@ -31,6 +31,12 @@ export class RecentComponent {
 
   readonly quickLimitOptions = [3, 4, 5, 6, 7, 8, 9, 10];
   isQuickLimitMenuOpen = false;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('isFullView' in changes && !this.isFullView) {
+      this.isQuickLimitMenuOpen = false;
+    }
+  }
 
   handleCircleClick(): void {
     this.onSelect.emit();

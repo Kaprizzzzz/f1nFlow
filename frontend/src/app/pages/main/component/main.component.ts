@@ -27,7 +27,6 @@ import {
 } from '../sphere-layout.service';
 import { RecentFacadeService } from '../recent-facade.service';
 import { MainViewModel } from '../main-view-model';
-import { SphereDebugPanelComponent } from './sphere-debug-panel.component';
 
 type MainTab = SphereTab | null;
 
@@ -40,8 +39,7 @@ type MainTab = SphereTab | null;
     ExpenceComponent,
     SavingComponent,
     NewsComponent,
-    RecentComponent,
-    SphereDebugPanelComponent
+    RecentComponent
   ],
   templateUrl: './main.component.html',
   styleUrl: './main.component.scss'
@@ -277,10 +275,6 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getSphereStyle(tab: SphereTab): Record<string, string> {
     return this.sphereLayoutService.getSphereStyle(tab, this.spherePositions, this.layoutRef?.nativeElement, this.sphereSizes);
-  }
-
-  getOrderedSphereCoordinates(): Array<{ tab: SphereTab; top: number; left: number; isDragging: boolean }> {
-    return this.sphereLayoutService.getOrderedSphereCoordinates(this.spherePositions, this.dragState);
   }
 
   isFullscreenPanelTab(tab: MainTab = this.activeTab): boolean {

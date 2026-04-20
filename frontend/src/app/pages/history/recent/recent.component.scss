@@ -58,6 +58,7 @@ $recent-glow: #ff78c7;
   border: 1px solid rgba($recent-glow, 0.45);
   box-shadow: 0 16px 42px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 220, 255, 0.15);
   display: grid;
+  align-content: start;
   gap: 12px;
 }
 
@@ -216,7 +217,7 @@ $recent-glow: #ff78c7;
 }
 
 .circle-wrapper.active .recent-panel {
-  --panel-top-offset: calc(env(safe-area-inset-top, 0px) + 2px);
+  --panel-top-offset: calc(env(safe-area-inset-top, 0px) - 23px);
   --panel-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + 10px);
   position: fixed;
   top: var(--panel-top-offset);

@@ -23,7 +23,7 @@ $expense-glow: #ffb060;
     justify-content: center;
     align-items: center;
     transform: scale(1);
-    transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
     z-index: 2;
     position: relative;
 
@@ -190,12 +190,12 @@ select {
 .amount-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(18, 8, 2, 0.82);
-  backdrop-filter: blur(3px);
+  background: rgba(18, 8, 2, 0.22);
+  backdrop-filter: blur(1px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2500;
+  z-index: 4200;
   padding: 16px;
 }
 

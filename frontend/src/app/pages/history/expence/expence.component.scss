@@ -190,8 +190,8 @@ select {
 .amount-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(18, 8, 2, 0.22);
-  backdrop-filter: blur(1px);
+  background: transparent;
+  backdrop-filter: none;
   display: flex;
   align-items: center;
   justify-content: center;

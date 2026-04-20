@@ -7,8 +7,7 @@
 ## Production-ready baseline (станом на 2026-04-20)
 
 У репозиторії додано базовий hardening:
-- вирівняні версії Angular framework/CLI;
-- стандартизовані CI-скрипти для FE/BE;
+- підготовлені стабільні CI-скрипти для frontend/backend;
 - OpenAPI JSON контракт для бекенду;
 - health/readiness endpoints + базовий metrics endpoint;
 - безпечніші HTTP security headers у bootstrap API.

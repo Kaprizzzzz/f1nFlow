@@ -50,6 +50,10 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChildren('sphereRef')
   private sphereRefs?: QueryList<ElementRef<HTMLElement>>;
+  @ViewChild(IncomeComponent)
+  private incomeComponent?: IncomeComponent;
+  @ViewChild(ExpenceComponent)
+  private expenceComponent?: ExpenceComponent;
 
   activeTab: MainTab = null;
   isEditMode = false;
@@ -169,6 +173,11 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.isEditMode || this.activeTab === null) {
       return;
     }
+
+    if (this.stepBackInActiveCategoryTab()) {
+      return;
+    }
+
     this.activeTab = null;
     this.syncFullscreenUiState(null);
   }
@@ -343,5 +352,17 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     window.removeEventListener('pointermove', this.globalPointerMoveHandler);
     window.removeEventListener('pointerup', this.globalPointerUpHandler);
     window.removeEventListener('pointercancel', this.globalPointerUpHandler);
+  }
+
+  private stepBackInActiveCategoryTab(): boolean {
+    if (this.activeTab === 'income') {
+      return this.incomeComponent?.stepBack() ?? false;
+    }
+
+    if (this.activeTab === 'expense') {
+      return this.expenceComponent?.stepBack() ?? false;
+    }
+
+    return false;
   }
 }

@@ -101,12 +101,37 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   handleCircleClick(): void {
-    if (this.isFullView && this.selectedCategory) {
-      this.selectedCategory = '';
-      this.resetEditState();
+    if (this.isFullView && this.stepBack()) {
       return;
     }
     this.onSelect.emit();
+  }
+
+  stepBack(): boolean {
+    if (this.isCreateCategoryOpen) {
+      this.closeCreateCategory();
+      return true;
+    }
+
+    if (this.panelMode === 'amount') {
+      this.closeAmountPanel();
+      return true;
+    }
+
+    if (this.panelMode === 'name' || this.editModeCategory) {
+      this.resetEditState();
+      return true;
+    }
+
+    if (this.selectedCategory) {
+      this.selectedCategory = '';
+      this.amountInput = '';
+      this.isAmountInvalid = false;
+      this.isAmountShakeActive = false;
+      return true;
+    }
+
+    return false;
   }
 
   selectCategory(category: CategoryItem, event: Event): void {

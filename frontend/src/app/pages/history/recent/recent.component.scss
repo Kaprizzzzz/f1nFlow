@@ -82,7 +82,7 @@ $recent-glow: #ff78c7;
 .recent-group-card {
   border: 1px solid rgba(255, 170, 220, 0.22);
   border-radius: 14px;
-  padding: 10px;
+  padding: 12px;
   background: rgba(63, 12, 40, 0.55);
 }
 
@@ -102,35 +102,55 @@ $recent-glow: #ff78c7;
   font-size: 11px;
 }
 
-.recent-bubbles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.recent-actions {
+  margin-bottom: 8px;
 }
 
-.recent-bubble {
-  min-width: 49px;
-  min-height: 49px;
-  border-radius: 12px;
+.repeat-latest-btn {
+  width: 100%;
+  border-radius: 11px;
   border: 1px solid rgba(255, 181, 224, 0.55);
-  background: radial-gradient(circle at 40% 20%, rgba(255, 179, 223, 0.25) 0%, rgba(95, 16, 59, 0.96) 70%);
-  color: #ffe5f4;
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 6px;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(180deg, rgba(153, 38, 95, 0.9) 0%, rgba(95, 17, 61, 0.92) 100%);
+  color: #ffeaf7;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 10px;
+  text-align: left;
 }
 
-.bubble-amount {
+.recent-sequence {
+  display: grid;
+  gap: 6px;
+}
+
+.recent-sequence-item {
+  width: 100%;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 181, 224, 0.55);
+  background: radial-gradient(circle at 30% 10%, rgba(255, 179, 223, 0.2) 0%, rgba(95, 16, 59, 0.96) 85%);
+  color: #ffe5f4;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.sequence-label {
   font-size: 11px;
+  color: rgba(255, 222, 240, 0.88);
+}
+
+.sequence-amount {
+  font-size: 12px;
   font-weight: 700;
 }
 
-.bubble-multiplier {
-  font-size: 10px;
-  opacity: 0.82;
+.sequence-action {
+  justify-self: end;
+  font-size: 11px;
+  color: #ffb9df;
 }
 
 .quick-limit-row {

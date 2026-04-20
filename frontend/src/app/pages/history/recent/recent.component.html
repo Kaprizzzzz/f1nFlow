@@ -34,12 +34,23 @@
                 <div class="recent-meta">{{ item.repeatCount }} transactions · total {{ item.totalAmount | number:'1.2-2' }}</div>
               </div>
             </div>
-
-            <div class="recent-bubbles">
+            @if (item.latestTransactions.length > 0) {
+              <div class="recent-actions">
+                <button
+                  type="button"
+                  class="repeat-latest-btn"
+                  (click)="repeat(item.category, item.latestTransactions[0], $event)"
+                >
+                  Повторити останній платіж · {{ item.latestTransactions[0] | number:'1.2-2' }}
+                </button>
+              </div>
+            }
+            <div class="recent-sequence">
               @for (amount of item.latestTransactions; track $index) {
-                <button type="button" class="recent-bubble" (click)="repeat(item.category, amount, $event)">
-                  <span class="bubble-amount">{{ amount | number:'1.2-2' }}</span>
-                  <span class="bubble-multiplier">x{{ $index + 1 }}</span>
+                <button type="button" class="recent-sequence-item" (click)="repeat(item.category, amount, $event)">
+                  <span class="sequence-label">Платіж {{ $index + 1 }}</span>
+                  <span class="sequence-amount">{{ amount | number:'1.2-2' }}</span>
+                  <span class="sequence-action">Повторити</span>
                 </button>
               }
             </div>

@@ -80,8 +80,8 @@ npm run ci
 
 Рекомендований пайплайн на кожен PR:
 1. Frontend CI: `typecheck + build:prod`
-2. Backend CI: `lint:check + build`
-3. Розширені тести (`test`, `test:ci`) запускати окремим quality gate перед release.
+2. Backend CI: `build`
+3. Розширені перевірки (`lint:check`, `test`, `test:ci`) запускати окремим quality gate перед release.
 4. Deploy only after green checks.
 
 Семантика версій:

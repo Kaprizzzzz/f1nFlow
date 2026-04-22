@@ -7,7 +7,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:f1nFlow-frontend": "node dist/f1n-flow-frontend/server/server.mjs"
+    "serve:ssr:f1nFlow-frontend": "node dist/f1n-flow-frontend/server/server.mjs",
+    "build:prod": "ng build --configuration production",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit",
+    "ci": "npm run typecheck && npm run test:ci && npm run build:prod"
   },
   "private": true,
   "dependencies": {

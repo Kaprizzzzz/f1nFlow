@@ -41,8 +41,10 @@ export class SessionService {
   private lastApiUrl: string | null = null;
   private hasBeforeUnloadListener = false;
   private readonly userSubject = new BehaviorSubject<UserProfile | null>(null);
+  private readonly errorSubject = new BehaviorSubject<string | null>(null);
 
   user$ = this.userSubject.asObservable();
+  error$ = this.errorSubject.asObservable();
 
   get userSnapshot(): UserProfile | null {
     return this.userSubject.value;
@@ -85,7 +87,7 @@ export class SessionService {
           this.hasBeforeUnloadListener = true;
         }
       }),
-      catchError(() => EMPTY)
+      catchError((error) => this.handleHttpError('login', error))
     );
   }
 
@@ -96,7 +98,7 @@ export class SessionService {
   saveState(payload: unknown): void {
     this.http
       .put(`${this.getApiUrl()}/users/me/state`, payload)
-      .pipe(catchError(() => EMPTY))
+      .pipe(catchError((error) => this.handleHttpError('saveState', error)))
       .subscribe();
    }
 
@@ -108,7 +110,7 @@ export class SessionService {
 
     this.http
       .patch(`${this.getApiUrl()}/users/me/presence`, { isOnline })
-      .pipe(catchError(() => EMPTY))
+      .pipe(catchError((error) => this.handleHttpError('sendPresence', error)))
       .subscribe();
   }
 
@@ -130,6 +132,31 @@ export class SessionService {
     return nextUrl;
   }
 
+  private normalizeUrl(rawUrl: string): string | null {
+    try {
+      const parsed = new URL(rawUrl, window.location.origin);
+      const path = parsed.pathname === '/' ? '' : parsed.pathname.replace(/\/$/, '');
+      return `${parsed.origin}${path}`;
+    } catch {
+      return null;
+    }
+  }
+
+  private isAllowedApiOrigin(urlValue: string): boolean {
+    const allowedOrigins = (environment.allowedApiOrigins ?? []).map((item) => item.trim()).filter(Boolean);
+    if (allowedOrigins.length === 0) {
+      return true;
+    }
+
+    const normalized = this.normalizeUrl(urlValue);
+    if (!normalized) {
+      return false;
+    }
+
+    const candidateOrigin = new URL(normalized).origin;
+    return allowedOrigins.includes(candidateOrigin);
+  }
+
   private refreshApiUrlIfChanged(): void {
     const nextUrl = this.resolveApiUrl();
     if (nextUrl === this.lastApiUrl) {
@@ -149,9 +176,12 @@ export class SessionService {
         return null;
       }
 
-      const parsed = new URL(queryValue, window.location.origin);
-      const path = parsed.pathname === '/' ? '' : parsed.pathname.replace(/\/$/, '');
-      const normalized = `${parsed.origin}${path}`;
+      const normalized = this.normalizeUrl(queryValue);
+      if (!normalized || !this.isAllowedApiOrigin(normalized)) {
+        console.warn('[SessionService] Ignored apiUrl query param because origin is not allowed.');
+        return null;
+      }
+
       localStorage.setItem(this.apiUrlStorageKey, normalized);
       return normalized;
     } catch {
@@ -182,14 +212,13 @@ export class SessionService {
       );
     }
 
-    try {
-      const parsed = new URL(normalized, window.location.origin);
-      const path = parsed.pathname === '/' ? '' : parsed.pathname.replace(/\/$/, '');
-      return `${parsed.origin}${path}`;
-    } catch {
-      console.error(`[SessionService] Invalid API URL in localStorage: "${fromStorageRaw}". Falling back to ${fallbackApiUrl}`);
-      return new URL(fallbackApiUrl, window.location.origin).toString().replace(/\/$/, '');
+    const normalizedApiUrl = this.normalizeUrl(normalized);
+    if (!normalizedApiUrl || !this.isAllowedApiOrigin(normalizedApiUrl)) {
+      console.error(`[SessionService] Invalid or disallowed API URL in localStorage: "${fromStorageRaw}". Falling back to ${fallbackApiUrl}`);
+      return this.normalizeUrl(fallbackApiUrl) ?? '/api';
     }
+
+    return normalizedApiUrl;
   }
 
   private getTelegramInitData(): string | undefined {
@@ -220,6 +249,14 @@ export class SessionService {
       initData: this.getTelegramInitData()
     };
    }
+
+  private handleHttpError(operation: string, error: unknown): Observable<never> {
+    const message = `Request failed during ${operation}. Please retry.`;
+    this.errorSubject.next(message);
+    console.error(`[SessionService] ${message}`, error);
+    return EMPTY;
+  }
+
    getSessionToken(): string | null {
     if (!this.isBrowser) {
       return null;

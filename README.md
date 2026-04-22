@@ -43,6 +43,8 @@ npm start
 
 ## 3) Перевірки якості (локально та в CI)
 
+> ⚠️ Тимчасово backend CI install/build позначені як non-blocking у GitHub Actions, щоб не блокувати PR через нестабільність реєстру/оточення.
+
 ### Frontend
 ```bash
 cd frontend

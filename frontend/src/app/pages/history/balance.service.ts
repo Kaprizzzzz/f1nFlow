@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GoalsPreferences, SphereLayout, SphereTab, Transaction, WeeklyChallenge } from './models/finance.models';
+import { AppLanguage, GoalsPreferences, SphereLayout, SphereTab, Transaction, WeeklyChallenge } from './models/finance.models';
 import { CategoryItem, Currency, NewsItem } from './models/history-shared.models';
 import { CategoriesService } from './services/categories.service';
 import { EngagementService } from './services/engagement.service';
@@ -45,6 +45,10 @@ export class BalanceService {
 
   get goalsPreferences$() {
     return this.preferencesService.goalsPreferences$;
+  }
+
+  get language$() {
+    return this.preferencesService.language$;
   }
 
   get news$() {
@@ -140,6 +144,11 @@ export class BalanceService {
     this.persistState();
   }
 
+  setLanguage(language: AppLanguage): void {
+    this.preferencesService.setLanguage(language);
+    this.persistState();
+  }
+
   addCategory(type: 'plus' | 'minus', categoryName: string, icon = '📁'): void {
     if (this.categoriesService.addCategory(type, categoryName, icon)) {
       this.persistState();
@@ -181,7 +190,8 @@ export class BalanceService {
       currency: payload.user?.currency,
       sphereLayout: localLayout ?? payload.user?.sphereLayout ?? null,
       quickTransactionsLimit: payload.user?.quickTransactionsLimit,
-      goalsPreferences: payload.user?.goalsPreferences
+      goalsPreferences: payload.user?.goalsPreferences,
+      language: payload.user?.language
     });
     this.engagementService.hydrate({
       news: payload.user?.news,
@@ -204,6 +214,7 @@ export class BalanceService {
       quickTransactionsLimit?: number;
       news?: NewsItem[];
       goalsPreferences?: GoalsPreferences;
+      language?: AppLanguage;
       streakCurrent?: number;
       streakBest?: number;
       badges?: string[];
@@ -221,7 +232,8 @@ export class BalanceService {
       currency: parsed.currency,
       sphereLayout: parsed.sphereLayout ?? null,
       quickTransactionsLimit: parsed.quickTransactionsLimit,
-      goalsPreferences: parsed.goalsPreferences
+      goalsPreferences: parsed.goalsPreferences,
+      language: parsed.language
     });
     this.engagementService.hydrate({
       news: parsed.news,
@@ -245,6 +257,7 @@ export class BalanceService {
       sphereLayout: this.preferencesService.sphereLayout,
       quickTransactionsLimit: this.preferencesService.quickTransactionsLimit,
       goalsPreferences: this.preferencesService.goalsPreferences,
+      language: this.preferencesService.language,
       news: this.engagementService.news,
       streakCurrent: this.engagementService.streakCurrent,
       streakBest: this.engagementService.streakBest,

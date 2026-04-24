@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { GoalsPreferences, SphereLayout } from '../models/finance.models';
+import { AppLanguage, GoalsPreferences, SphereLayout } from '../models/finance.models';
 import { Currency } from '../models/history-shared.models';
 import { normalizeGoalsPreferences, normalizeQuickLimit } from '../utils/normalization.utils';
 
@@ -13,11 +13,13 @@ export class PreferencesService {
     theme: 'default',
     visualizationMode: 'amount'
   });
+  private readonly languageSubject = new BehaviorSubject<AppLanguage>('uk');
 
   currency$ = this.currencySubject.asObservable();
   sphereLayout$ = this.sphereLayoutSubject.asObservable();
   quickTransactionsLimit$ = this.quickTransactionsLimitSubject.asObservable();
   goalsPreferences$ = this.goalsPreferencesSubject.asObservable();
+  language$ = this.languageSubject.asObservable();
 
   get currency(): Currency {
     return this.currencySubject.value;
@@ -33,6 +35,10 @@ export class PreferencesService {
 
   get goalsPreferences(): GoalsPreferences {
     return this.goalsPreferencesSubject.value;
+  }
+
+  get language(): AppLanguage {
+    return this.languageSubject.value;
   }
 
   setCurrency(currency: Currency): void {
@@ -52,16 +58,22 @@ export class PreferencesService {
     this.goalsPreferencesSubject.next(normalizeGoalsPreferences({ ...current, ...preferences }));
   }
 
+  setLanguage(language: AppLanguage): void {
+    this.languageSubject.next(language);
+  }
+
   hydrate(payload: {
     currency?: Currency;
     sphereLayout?: SphereLayout | null;
     quickTransactionsLimit?: number;
     goalsPreferences?: Partial<GoalsPreferences> | null;
+    language?: AppLanguage;
   }): void {
     this.currencySubject.next(payload.currency ?? 'EUR');
     this.sphereLayoutSubject.next(this.normalizeSphereLayout(payload.sphereLayout ?? null));
     this.quickTransactionsLimitSubject.next(normalizeQuickLimit(payload.quickTransactionsLimit));
     this.goalsPreferencesSubject.next(normalizeGoalsPreferences(payload.goalsPreferences));
+    this.languageSubject.next(payload.language ?? 'uk');
   }
 
   private normalizeSphereLayout(layout: SphereLayout | null): SphereLayout | null {

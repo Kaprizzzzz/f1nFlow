@@ -45,6 +45,9 @@ import {
   @Column({ default: 'EUR' })
   currency: string;
 
+  @Column({ default: 'uk' })
+  language: string;
+
   @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
   incomeCategories: Array<{ name: string; amount: number; icon?: string }>;
 

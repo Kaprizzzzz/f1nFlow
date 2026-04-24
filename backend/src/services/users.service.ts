@@ -105,6 +105,7 @@ export class UsersService {
         throw new NotFoundException('User not found');
       }
     userToUpdate.currency = payload.currency ?? userToUpdate.currency;
+      userToUpdate.language = payload.language ?? userToUpdate.language ?? 'uk';
       userToUpdate.incomeCategories = payload.incomeCategories ?? userToUpdate.incomeCategories ?? [];
       userToUpdate.expenseCategories = payload.expenseCategories ?? userToUpdate.expenseCategories ?? [];
       userToUpdate.sphereLayout = payload.sphereLayout ?? userToUpdate.sphereLayout;

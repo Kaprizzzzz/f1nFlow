@@ -1,7 +1,7 @@
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { SessionService } from '../../user/service/user.service';
-import { GoalsPreferences, SphereLayout, Transaction, WeeklyChallenge } from '../models/finance.models';
+import { AppLanguage, GoalsPreferences, SphereLayout, Transaction, WeeklyChallenge } from '../models/finance.models';
 import { CategoryItem, Currency, NewsItem } from '../models/history-shared.models';
 
 export interface PersistedStatePayload {
@@ -18,6 +18,7 @@ export interface PersistedStatePayload {
     streakBest?: number;
     badges?: string[];
     weeklyChallenge?: WeeklyChallenge | null;
+    language?: AppLanguage;
   };
 }
 

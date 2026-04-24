@@ -30,6 +30,16 @@ export enum Currency {
   UAH = 'UAH'
 }
 
+export enum Language {
+  UK = 'uk',
+  EN = 'en',
+  RU = 'ru',
+  ES = 'es',
+  BE = 'be',
+  FR = 'fr',
+  NL = 'nl'
+}
+
 export class CategoryDto {
   @IsString()
   name: string;
@@ -186,4 +196,8 @@ export class SaveStateDto {
   @ValidateNested()
   @Type(() => GoalsPreferencesDto)
   goalsPreferences?: GoalsPreferencesDto;
+
+  @IsOptional()
+  @IsEnum(Language)
+  language?: Language;
 }

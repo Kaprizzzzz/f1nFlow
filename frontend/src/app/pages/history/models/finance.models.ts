@@ -25,3 +25,5 @@ export type GoalsPreferences = {
   periodEnd?: string;
   deadline?: string;
 };
+
+export type AppLanguage = 'uk' | 'en' | 'ru' | 'es' | 'be' | 'fr' | 'nl';

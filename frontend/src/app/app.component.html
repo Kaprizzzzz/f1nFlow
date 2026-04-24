@@ -1,5 +1,5 @@
 <app-loading *ngIf="showSplash"></app-loading>
- 
+
 <div
   class="app-container"
   *ngIf="!showSplash"
@@ -9,39 +9,80 @@
 >
   <div class="app-bg-orb one" aria-hidden="true"></div>
   <div class="app-bg-orb two" aria-hidden="true"></div>
+
   <div class="top-controls">
-     <div class="top-spacer" aria-hidden="true"></div>
-    <div class="user-strip" aria-label="Telegram user nickname">
+    <div class="top-spacer" aria-hidden="true"></div>
+    <button type="button" class="user-strip" aria-label="Telegram user nickname" (click)="openLanguageModal()">
       <span class="hex-cap" aria-hidden="true"></span>
-      <span class="user-label">{{ userName }}</span>
+      <span class="user-label">{{ userName }} · {{ currentLanguageLabel }}</span>
       <span class="hex-cap" aria-hidden="true"></span>
-    </div>
- 
+    </button>
+
     @if (isMainRoute) {
       <app-currency-picker class="currency-slot"></app-currency-picker>
     }
   </div>
- 
-  <div class="content">
+
+  <div class="content" [class.blurred]="showOnboarding || showLanguageModal">
     <router-outlet></router-outlet>
   </div>
 
   <nav class="bottom-nav">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
       <span class="icon">🏠</span>
-      <span>Main</span>
+      <span>{{ t('nav.main') }}</span>
     </a>
     <a routerLink="/goals" routerLinkActive="active">
       <span class="icon">🎯</span>
-      <span>Goals</span>
+      <span>{{ t('nav.goals') }}</span>
     </a>
     <a routerLink="/referrals" routerLinkActive="active">
       <span class="icon">👥</span>
-      <span>Referrals</span>
+      <span>{{ t('nav.referrals') }}</span>
     </a>
     <a routerLink="/about" routerLinkActive="active">
       <span class="icon">ⓘ</span>
-      <span>About</span>
+      <span>{{ t('nav.about') }}</span>
     </a>
   </nav>
- </div>
+
+  @if (showOnboarding) {
+    <div class="overlay-backdrop" (click)="skipOnboarding()">
+      <div class="overlay-card" (click)="$event.stopPropagation()">
+        <h3>{{ t('tips.title') }}</h3>
+        <p class="overlay-subtitle">{{ t('tips.subtitle') }}</p>
+        <p class="overlay-step">{{ t(onboardingSteps[onboardingStep]) }}</p>
+        <div class="overlay-actions">
+          <button type="button" class="ghost" (click)="skipOnboarding()">{{ t('tips.skip') }}</button>
+          <button type="button" class="ghost" [disabled]="onboardingStep === 0" (click)="previousOnboardingStep()">
+            {{ t('tips.back') }}
+          </button>
+          <button type="button" class="primary" (click)="nextOnboardingStep()">
+            {{ onboardingStep === onboardingSteps.length - 1 ? t('tips.gotIt') : t('tips.next') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showLanguageModal) {
+    <div class="overlay-backdrop" (click)="closeLanguageModal()">
+      <div class="overlay-card lang" (click)="$event.stopPropagation()">
+        <h3>{{ t('lang.modalTitle') }}</h3>
+        <p class="overlay-subtitle">{{ t('lang.modalSubtitle') }}</p>
+        <p class="current-language">{{ t('lang.current') }}: <strong>{{ currentLanguageLabel }}</strong></p>
+
+        <div class="language-grid">
+          @for (option of languageOptions; track option.code) {
+            <button type="button" class="language-option" (click)="selectLanguage(option.code)">
+              <span>{{ option.flag }}</span>
+              <span>{{ t('lang.select') }}: {{ option.nativeName }}</span>
+            </button>
+          }
+        </div>
+
+        <button type="button" class="ghost close-language" (click)="closeLanguageModal()">{{ t('lang.cancel') }}</button>
+      </div>
+    </div>
+  }
+</div>

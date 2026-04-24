@@ -5,6 +5,9 @@ import { Subscription } from 'rxjs';
 import { LoadingComponent } from './pages/loading/loading.component';
 import { CurrencyPickerComponent } from './pages/currency-picker/currency-picker.component';
 import { SessionService } from './pages/user/service/user.service';
+import { I18nService } from './core/i18n.service';
+import { AppLanguage } from './pages/history/models/finance.models';
+import { BalanceService } from './pages/history/balance.service';
 
 type TelegramWindow = Window & {
   Telegram?: {
@@ -36,19 +39,29 @@ export class AppComponent implements OnInit, OnDestroy {
   userName = '...';
   isMainRoute = true;
   isKeyboardOpen = false;
+  showLanguageModal = false;
+  showOnboarding = false;
+  onboardingStep = 0;
 
+  readonly onboardingSteps = ['tips.step1', 'tips.step2', 'tips.step3'] as const;
+  readonly languageOptions = this.i18nService.options;
+
+  private readonly onboardingStorageKey = 'f1nflow-onboarding-shown';
   private subscription = new Subscription();
   private viewportBaseHeight = 0;
   private readonly viewportResizeHandler = () => this.updateKeyboardState();
 
   constructor(
     private sessionService: SessionService,
-    private router: Router
+    private router: Router,
+    readonly i18nService: I18nService,
+    private readonly balanceService: BalanceService
   ) {}
 
   ngOnInit(): void {
     setTimeout(() => {
       this.showSplash = false;
+      this.tryShowOnboarding();
     }, 2500);
 
     this.setupTelegramWebApp();
@@ -56,6 +69,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.sessionService.user$.subscribe((user) => {
         this.userName = user?.userName || 'Guest';
+      })
+    );
+
+    this.subscription.add(
+      this.balanceService.language$.subscribe((language) => {
+        this.i18nService.setLanguage(language);
       })
     );
 
@@ -70,11 +89,72 @@ export class AppComponent implements OnInit, OnDestroy {
     this.setupViewportKeyboardDetection();
   }
 
-   private setupTelegramWebApp(): void {
+  t(key: Parameters<I18nService['t']>[0]): string {
+    return this.i18nService.t(key);
+  }
+
+  get currentLanguageLabel(): string {
+    return this.i18nService.getLanguageLabel(this.i18nService.language);
+  }
+
+  openLanguageModal(): void {
+    this.showLanguageModal = true;
+  }
+
+  closeLanguageModal(): void {
+    this.showLanguageModal = false;
+  }
+
+  selectLanguage(language: AppLanguage): void {
+    this.balanceService.setLanguage(language);
+    this.closeLanguageModal();
+  }
+
+  nextOnboardingStep(): void {
+    if (this.onboardingStep < this.onboardingSteps.length - 1) {
+      this.onboardingStep += 1;
+      return;
+    }
+
+    this.finishOnboarding();
+  }
+
+  previousOnboardingStep(): void {
+    if (this.onboardingStep <= 0) {
+      return;
+    }
+
+    this.onboardingStep -= 1;
+  }
+
+  skipOnboarding(): void {
+    this.finishOnboarding();
+  }
+
+  private tryShowOnboarding(): void {
     if (typeof window === 'undefined') {
       return;
     }
-    
+
+    const alreadyShown = localStorage.getItem(this.onboardingStorageKey) === '1';
+    if (!alreadyShown) {
+      this.showOnboarding = true;
+      this.onboardingStep = 0;
+    }
+  }
+
+  private finishOnboarding(): void {
+    this.showOnboarding = false;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.onboardingStorageKey, '1');
+    }
+  }
+
+  private setupTelegramWebApp(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     const webApp = (window as TelegramWindow).Telegram?.WebApp;
     if (!webApp) {
       return;
@@ -98,6 +178,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
     this.sessionService.sendPresence(false);
   }
+
   onFieldFocusIn(): void {
     this.updateKeyboardState();
   }

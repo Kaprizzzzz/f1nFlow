@@ -44,7 +44,6 @@ export class AppComponent implements OnInit, OnDestroy {
   onboardingStep = 0;
 
   readonly onboardingSteps = ['tips.step1', 'tips.step2', 'tips.step3'] as const;
-  readonly languageOptions = this.i18nService.options;
 
   private readonly onboardingStorageKey = 'f1nflow-onboarding-shown';
   private subscription = new Subscription();
@@ -91,6 +90,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   t(key: Parameters<I18nService['t']>[0]): string {
     return this.i18nService.t(key);
+  }
+
+  get languageOptions() {
+    return this.i18nService.options;
   }
 
   get currentLanguageLabel(): string {

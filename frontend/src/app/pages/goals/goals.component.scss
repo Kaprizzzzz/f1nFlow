@@ -12,7 +12,7 @@
 .goals-ui-controls {
   position: fixed;
   top: 4px;
-  right: calc(50% - min(430px, 100vw) / 2 + 12px);
+  right: max(12px, calc(env(safe-area-inset-right, 0px) + 8px));
   z-index: 1001;
 }
 
@@ -74,6 +74,12 @@ input {
 }
 
 .metric { font-size: 13px; }
+
+.mini-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 6px 10px;
+}
 
 .category-columns {
   margin-top: 10px;

@@ -21,8 +21,8 @@ import { SessionService } from '../../user/service/user.service';
 import {
   DEFAULT_SPHERE_POSITIONS,
   DragState,
-  SphereLayoutService,
   SpherePosition,
+  SphereLayoutService,
   SphereSize
 } from '../sphere-layout.service';
 import { RecentFacadeService } from '../recent-facade.service';
@@ -70,6 +70,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private readonly isEditMode$ = new BehaviorSubject<boolean>(this.isEditMode);
   private subscription = new Subscription();
+  private lastAppliedLayoutKey = '';
   private previousBodyTouchAction = '';
   private readonly globalPointerMoveHandler = (event: PointerEvent): void => this.onDragMove(event);
   private readonly globalPointerUpHandler = (event: PointerEvent): void => this.onGlobalPointerStop(event);
@@ -111,6 +112,9 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     if (initialLayout) {
       this.spherePositions = this.sphereLayoutService.clonePositions(initialLayout);
       this.savedSpherePositions = this.sphereLayoutService.clonePositions(initialLayout);
+      this.lastAppliedLayoutKey = this.getLayoutKey(initialLayout);
+    } else {
+      this.lastAppliedLayoutKey = this.getLayoutKey(this.savedSpherePositions);
     }
 
     this.subscription.add(
@@ -120,9 +124,10 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
         this.recentCategoryGroups = vm.recentCategoryGroups;
         this.weeklyChallengeText = vm.weeklyChallengeText;
 
-        if (vm.sphereLayout) {
+        if (vm.sphereLayout && this.hasExternalLayoutUpdate(vm.sphereLayout)) {
           this.spherePositions = this.sphereLayoutService.clonePositions(vm.sphereLayout);
           this.savedSpherePositions = this.sphereLayoutService.clonePositions(vm.sphereLayout);
+          this.lastAppliedLayoutKey = this.getLayoutKey(vm.sphereLayout);
         }
 
         if (!this.canEditLayout && this.isEditMode) {
@@ -226,6 +231,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.clampAllCurrentSpherePositions();
     this.savedSpherePositions = this.sphereLayoutService.clonePositions(this.spherePositions);
     this.balanceService.setSphereLayout(this.savedSpherePositions);
+    this.lastAppliedLayoutKey = this.getLayoutKey(this.savedSpherePositions);
     this.isEditMode = false;
     this.isEditMode$.next(false);
     this.stopDrag();
@@ -239,6 +245,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       this.sphereSizes
     );
     this.balanceService.setSphereLayout(this.spherePositions);
+    this.lastAppliedLayoutKey = this.getLayoutKey(this.spherePositions);
     this.isEditMode = false;
     this.isEditMode$.next(false);
     this.stopDrag();
@@ -364,5 +371,19 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     return false;
+  }
+
+  private hasExternalLayoutUpdate(layout: Record<SphereTab, SpherePosition>): boolean {
+    const nextLayoutKey = this.getLayoutKey(layout);
+    return nextLayoutKey !== this.lastAppliedLayoutKey;
+  }
+
+  private getLayoutKey(layout: Record<SphereTab, SpherePosition>): string {
+    return ['income', 'expense', 'saving', 'news', 'recent']
+      .map((tab) => {
+        const item = layout[tab as SphereTab];
+        return `${tab}:${Math.round(item.left)}:${Math.round(item.top)}`;
+      })
+      .join('|');
   }
 }

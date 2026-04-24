@@ -12,6 +12,18 @@
   </div>
 
   <section class="card">
+    <h3>Mini stats</h3>
+    <div class="mini-stats-grid">
+      <p class="metric">Today spent: <strong>{{ todaySpent | number:'1.2-2' }}</strong></p>
+      <p class="metric">Yesterday spent: <strong>{{ yesterdaySpent | number:'1.2-2' }}</strong></p>
+      <p class="metric">Vs yesterday: <strong>{{ todayVsYesterdayPercent | number:'1.0-1' }}%</strong> ({{ todayVsYesterdayDirection }})</p>
+      <p class="metric">Vs month avg/day: <strong>{{ todayVsMonthlyAvgPercent | number:'1.0-1' }}%</strong> ({{ todayVsMonthlyDirection }})</p>
+      <p class="metric">Month avg/day: <strong>{{ monthlyAverageDaily | number:'1.2-2' }}</strong></p>
+      <p class="metric">Trend: <strong>{{ spendingTrendLabel }}</strong></p>
+    </div>
+  </section>
+
+  <section class="card">
     <h3>Period categories</h3>
     <div class="row">
       <label>From <input type="date" [(ngModel)]="periodStart" [max]="periodEnd" (change)="onPeriodChange()" /></label>
@@ -67,6 +79,14 @@
     <p class="metric">Average per day: <strong>{{ spentPerDay | number:'1.2-2' }}</strong></p>
     <p class="metric">Average per week: <strong>{{ spentPerWeek | number:'1.2-2' }}</strong></p>
     <p class="metric">Average per month: <strong>{{ spentPerMonth | number:'1.2-2' }}</strong></p>
+    <p class="metric">Today vs selected period avg: <strong>{{ todayVsSelectedAvgPercent | number:'1.0-1' }}%</strong> ({{ todayVsPeriodDirection }})</p>
+  </section>
+
+  <section class="card">
+    <h3>Smart hints</h3>
+    @for (item of smartInsights; track $index) {
+      <p class="metric">• {{ item }}</p>
+    }
   </section>
 
   <section class="card">

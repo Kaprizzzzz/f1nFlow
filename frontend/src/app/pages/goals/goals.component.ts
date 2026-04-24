@@ -26,6 +26,14 @@ export class GoalsComponent implements OnInit, OnDestroy {
   spentPerWeek = 0;
   spentPerMonth = 0;
   safeSpendPerDay = 0;
+  monthlyAverageDaily = 0;
+  todaySpent = 0;
+  yesterdaySpent = 0;
+  todayVsYesterdayPercent = 0;
+  todayVsMonthlyAvgPercent = 0;
+  todayVsSelectedAvgPercent = 0;
+  spendingTrendLabel = 'недостатньо даних';
+  smartInsights: string[] = [];
   streakCurrent = 0;
   streakBest = 0;
   badges: string[] = [];
@@ -162,6 +170,8 @@ export class GoalsComponent implements OnInit, OnDestroy {
       ? Math.max(1, Math.ceil((deadlineDate.getTime() - Date.now()) / msPerDay))
       : 1;
     this.safeSpendPerDay = this.currentBalance > 0 ? this.currentBalance / daysToDeadline : 0;
+    this.recalculateComparisons();
+    this.buildInsights(daysToDeadline);
   }
 
    trackByCategory(_: number, item: CategorySummary): string {
@@ -174,6 +184,18 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
   get todayDate(): string {
     return this.toInputDate(new Date());
+  }
+
+  get todayVsYesterdayDirection(): string {
+    return this.todayVsYesterdayPercent <= 0 ? 'менше' : 'більше';
+  }
+
+  get todayVsMonthlyDirection(): string {
+    return this.todayVsMonthlyAvgPercent <= 0 ? 'менше' : 'більше';
+  }
+
+  get todayVsPeriodDirection(): string {
+    return this.todayVsSelectedAvgPercent <= 0 ? 'менше' : 'більше';
   }
 
   private persistGoalsPreferences(): void {
@@ -227,6 +249,100 @@ export class GoalsComponent implements OnInit, OnDestroy {
     }
 
     return withSegments;
+  }
+
+  private recalculateComparisons(): void {
+    const today = this.startOfDay(new Date());
+    const yesterday = this.addDays(today, -1);
+    this.todaySpent = this.sumExpenseByDate(today);
+    this.yesterdaySpent = this.sumExpenseByDate(yesterday);
+    this.todayVsYesterdayPercent = this.getPercentDiff(this.todaySpent, this.yesterdaySpent);
+
+    const monthStart = this.startOfMonth(today);
+    const monthEnd = this.addDays(monthStart, 32);
+    monthEnd.setDate(0);
+    const monthExpenses = this.transactions.filter(
+      (item) => item.type === 'minus' && item.date >= monthStart && item.date <= this.endOfDay(monthEnd)
+    );
+    const daysInMonth = monthEnd.getDate();
+    const monthSpent = monthExpenses.reduce((sum, item) => sum + item.amount, 0);
+    this.monthlyAverageDaily = daysInMonth > 0 ? monthSpent / daysInMonth : 0;
+
+    this.todayVsMonthlyAvgPercent = this.getPercentDiff(this.todaySpent, this.monthlyAverageDaily);
+    this.todayVsSelectedAvgPercent = this.getPercentDiff(this.todaySpent, this.spentPerDay);
+
+    if (this.todaySpent === 0 && this.yesterdaySpent === 0) {
+      this.spendingTrendLabel = 'без витрат два дні поспіль';
+    } else if (this.todayVsYesterdayPercent <= -10) {
+      this.spendingTrendLabel = 'сильне покращення';
+    } else if (this.todayVsYesterdayPercent < 0) {
+      this.spendingTrendLabel = 'обережні витрати';
+    } else if (this.todayVsYesterdayPercent <= 10) {
+      this.spendingTrendLabel = 'стабільний темп';
+    } else {
+      this.spendingTrendLabel = 'витрати ростуть';
+    }
+  }
+
+  private buildInsights(daysToDeadline: number): void {
+    const insights: string[] = [];
+    if (this.safeSpendPerDay > 0) {
+      insights.push(`Щоб дотягнути до дедлайну, орієнтир ≈ ${this.safeSpendPerDay.toFixed(2)} / день.`);
+    }
+    insights.push(
+      `Сьогодні: ${this.todaySpent.toFixed(2)} (${Math.abs(this.todayVsYesterdayPercent).toFixed(1)}% ${this.todayVsYesterdayDirection} за вчора).`
+    );
+    insights.push(
+      `Відносно середнього за місяць: ${Math.abs(this.todayVsMonthlyAvgPercent).toFixed(1)}% ${this.todayVsMonthlyDirection}.`
+    );
+    if (this.spentPerDay > 0) {
+      insights.push(
+        `Відносно середнього в обраному періоді: ${Math.abs(this.todayVsSelectedAvgPercent).toFixed(1)}% ${this.todayVsPeriodDirection}.`
+      );
+    }
+    if (this.safeSpendPerDay > 0 && this.todaySpent > this.safeSpendPerDay * 1.1) {
+      insights.push(`Ризик перевищення: сьогоднішні витрати вище безпечного ліміту на ${((this.todaySpent / this.safeSpendPerDay - 1) * 100).toFixed(1)}%.`);
+    }
+    if (this.safeSpendPerDay > 0 && this.todaySpent <= this.safeSpendPerDay * 0.9) {
+      insights.push(`Клас! Ти економиш: витрати нижче безпечного ліміту щонайменше на 10%.`);
+    }
+    if (daysToDeadline <= 3) {
+      insights.push('Дедлайн вже близько: краще тримати тільки обовʼязкові витрати.');
+    }
+    this.smartInsights = insights;
+  }
+
+  private sumExpenseByDate(date: Date): number {
+    const start = this.startOfDay(date);
+    const end = this.endOfDay(date);
+    return this.transactions
+      .filter((item) => item.type === 'minus' && item.date >= start && item.date <= end)
+      .reduce((sum, item) => sum + item.amount, 0);
+  }
+
+  private getPercentDiff(current: number, baseline: number): number {
+    if (baseline <= 0) {
+      return current > 0 ? 100 : 0;
+    }
+    return ((current - baseline) / baseline) * 100;
+  }
+
+  private startOfDay(date: Date): Date {
+    const next = new Date(date);
+    next.setHours(0, 0, 0, 0);
+    return next;
+  }
+
+  private endOfDay(date: Date): Date {
+    const next = new Date(date);
+    next.setHours(23, 59, 59, 999);
+    return next;
+  }
+
+  private addDays(date: Date, days: number): Date {
+    const next = new Date(date);
+    next.setDate(next.getDate() + days);
+    return next;
   }
 
   private parseInputDate(value: string): Date | null {

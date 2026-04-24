@@ -196,8 +196,10 @@ export class I18nService {
     this.languageSubject.next(language);
   }
 
-  t(key: TranslationKey): string {
-    return TRANSLATIONS[this.language][key] ?? TRANSLATIONS.uk[key] ?? key;
+  t(key: TranslationKey | string): string {
+    const langMap = TRANSLATIONS[this.language] as Record<string, string>;
+    const fallbackMap = TRANSLATIONS.uk as Record<string, string>;
+    return langMap[key] ?? fallbackMap[key] ?? key;
   }
 
   getLanguageLabel(language: AppLanguage): string {

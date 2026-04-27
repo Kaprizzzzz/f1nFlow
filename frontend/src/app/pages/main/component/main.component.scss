@@ -1,6 +1,10 @@
 .dashboard-container {
-    --dashboard-top-offset: calc(env(safe-area-inset-top, 0px) - 20px);
+  --dashboard-top-offset: calc(env(safe-area-inset-top, 0px) - 20px);
   --active-panel-gap: 50px;
+  --sphere-transition-duration: 0.78s;
+  --sphere-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
+  --sphere-transform-duration: 0.98s;
+  --sphere-fade-duration: 0.62s;
   width: 100%;
   height: 100%;
   min-height: 100%;
@@ -190,11 +194,13 @@
     z-index: 1;
     position: absolute;
     transition:
-      top 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-      left 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 1.47s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.91s ease;
-    will-change: transform, top, left, opacity;
+      top var(--sphere-transition-duration) var(--sphere-transition-easing),
+      left var(--sphere-transition-duration) var(--sphere-transition-easing),
+      width var(--sphere-transition-duration) var(--sphere-transition-easing),
+      transform var(--sphere-transform-duration) var(--sphere-transition-easing),
+      opacity var(--sphere-fade-duration) ease,
+      filter var(--sphere-fade-duration) ease;
+    will-change: transform, top, left, width, opacity, filter;
     pointer-events: none;
 
     > * {
@@ -216,8 +222,9 @@
 
 .sphere-wrapper.is-hidden {
   opacity: 0;
+  filter: blur(8px);
   pointer-events: none;
-  transform: scale(0.72);
+  transform: scale(0.78);
   > * {
     pointer-events: none;
   }
@@ -230,22 +237,23 @@
   right: 0 !important;
   width: fit-content;
   margin-inline: auto;
-  transform: none !important;
+  transform: translateZ(0) scale(1) !important;
+  filter: blur(0);
 }
 
 .dashboard-container.has-active:not(.fullscreen-panel-active) .sphere-wrapper.is-active {
-  animation: active-sphere-pop 1.85s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: active-sphere-pop 1.05s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes active-sphere-pop {
   0% {
-    transform: scale(0.88);
+    transform: translateZ(0) scale(0.92);
   }
-  55% {
-    transform: scale(1.02);
+  60% {
+    transform: translateZ(0) scale(1.015);
   }
   100% {
-    transform: scale(1);
+    transform: translateZ(0) scale(1);
   }
 }
 
@@ -291,6 +299,7 @@
   .layout-controls,
   .challenge-banner,
   .engagement-panel {
+    transition: opacity 0.26s ease;
     opacity: 0;
     pointer-events: none;
   }

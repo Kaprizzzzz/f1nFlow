@@ -93,6 +93,14 @@
     <h3>Streak</h3>
     <p class="metric">Current streak: <strong>{{ streakCurrent }}</strong> днів</p>
     <p class="metric">Best streak: <strong>{{ streakBest }}</strong> днів</p>
+    <div class="streak-flame-strip" aria-label="Streak flames">
+      @for (_ of streakFlames; track $index) {
+        <span class="flame" [class.today]="$index === streakFlames.length - 1">🔥</span>
+      }
+    </div>
+    @if (streakFlames.length > 0) {
+      <p class="metric streak-caption">Сьогодні зайшов(ла): <strong>+1 вогник</strong></p>
+    }
   </section>
 
   <section class="card">

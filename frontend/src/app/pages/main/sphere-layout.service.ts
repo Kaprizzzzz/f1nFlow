@@ -16,7 +16,7 @@ export type DragState = {
 export const DEFAULT_SPHERE_POSITIONS: SphereLayout = {
   income: { top: 196, left: 148 },
   expense: { top: 88, left: 28 },
-  saving: { top: 158, left: 252 },
+  saving: { top: 170, left: 252 },
   news: { top: 296, left: 18 },
   recent: { top: 298, left: 256 }
 };

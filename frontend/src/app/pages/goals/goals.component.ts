@@ -198,6 +198,11 @@ export class GoalsComponent implements OnInit, OnDestroy {
     return this.todayVsSelectedAvgPercent <= 0 ? 'менше' : 'більше';
   }
 
+  get streakFlames(): number[] {
+    const count = Math.max(0, Math.min(30, this.streakCurrent));
+    return Array.from({ length: count }, (_, index) => index);
+  }
+
   private persistGoalsPreferences(): void {
     this.balanceService.setGoalsPreferences({
       theme: this.theme,

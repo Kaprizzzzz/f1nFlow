@@ -117,3 +117,27 @@ h4 {
   font-size: 12px;
   opacity: 0.75;
 }
+
+
+.streak-flame-strip {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.flame {
+  font-size: 18px;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(255, 153, 51, 0.35));
+
+  &.today {
+    transform: scale(1.12);
+    filter: drop-shadow(0 0 10px rgba(255, 128, 0, 0.55));
+  }
+}
+
+.streak-caption {
+  margin-top: 8px;
+  opacity: 0.92;
+}

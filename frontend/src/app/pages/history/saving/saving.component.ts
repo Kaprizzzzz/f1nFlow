@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { CommonModule } from '@angular/common';
 import { BalanceService, CategoryItem, NewsItem, Transaction } from '../balance.service';
 import { combineLatest, Subscription } from 'rxjs';
+import { I18nService } from '../../../core/i18n.service';
  
  interface SavingsHistoryRow {
    id: string | number;
@@ -33,7 +34,10 @@ export class SavingComponent implements OnInit, OnDestroy {
  
    private subscriptions = new Subscription();
  
-   constructor(private balanceService: BalanceService) {}
+   constructor(
+    private balanceService: BalanceService,
+    private readonly i18nService: I18nService
+  ) {}
  
     ngOnInit(): void {
      this.subscriptions.add(
@@ -185,5 +189,9 @@ export class SavingComponent implements OnInit, OnDestroy {
   }
   private formatAmount(value: number): string {
     return value.toFixed(2);
+  }
+
+  t(key: string): string {
+    return this.i18nService.t(key);
   }
 }

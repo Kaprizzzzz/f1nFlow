@@ -1,6 +1,6 @@
 <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
   <div class="main-circle">
-    <span class="label">News</span>
+    <span class="label">{{ t('tab.news') }}</span>
   </div>
 
   <div
@@ -9,10 +9,10 @@
     (click)="$event.stopPropagation()"
     [style.--news-panel-anchor-bottom.px]="panelAnchorBottom"
   >
-    <button type="button" class="panel-close-btn" (click)="handleClose($event)" aria-label="Close news panel">✕</button>
+    <button type="button" class="panel-close-btn" (pointerdown)="$event.stopPropagation()" (click)="handleClose($event)" [attr.aria-label]="t('panel.closeNews')">✕</button>
     <div *ngIf="news$ | async as newsItems">
       @if (newsItems.length === 0) {
-        <p>Персональні інсайти з'являться після активності.</p>
+        <p>{{ t('news.empty') }}</p>
       } @else {
         <ul>
           @for (item of newsItems; track item.id) {

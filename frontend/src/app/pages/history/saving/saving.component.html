@@ -1,12 +1,12 @@
 <div class="circle-wrapper" [class.active]="isFullView">
    <div class="main-circle" [class.negative]="savings < 0" [class.unread-news]="hasUnreadNews" (click)="handleCircleClick()" [style.--income-share]="incomeShare" [style.--news-ring]="newsRingGradient">
-    <span class="label">Savings</span>
+    <span class="label">{{ t('tab.savings') }}</span>
     <span class="value">{{ savings | number:'1.2-2' }}</span>
   </div>
 
   <div class="history-list" *ngIf="isFullView" (click)="$event.stopPropagation()">
-    <button type="button" class="panel-close-btn" (click)="handleClose($event)" aria-label="Close history panel">✕</button>
-    <h4>Income / Expense / Difference history</h4>
+    <button type="button" class="panel-close-btn" (pointerdown)="$event.stopPropagation()" (click)="handleClose($event)" [attr.aria-label]="t('panel.closeHistory')">✕</button>
+    <h4>{{ t('saving.historyTitle') }}</h4>
 
     <div class="history-row" *ngFor="let item of historyRows">
       <div class="history-main">
@@ -23,8 +23,8 @@
       </div>
 
       <div class="totals-row">
-        <span class="chip income">Income: {{ item.incomeTotal | number:'1.2-2' }}</span>
-        <span class="chip expense">Expense: {{ item.expenseTotal | number:'1.2-2' }}</span>
+        <span class="chip income">{{ t('saving.income') }}: {{ item.incomeTotal | number:'1.2-2' }}</span>
+        <span class="chip expense">{{ t('saving.expense') }}: {{ item.expenseTotal | number:'1.2-2' }}</span>
         <span class="chip diff" [class.positive-diff]="item.difference >= 0" [class.negative-diff]="item.difference < 0">
           Δ {{ item.difference | number:'1.2-2' }}
          </span>
@@ -36,9 +36,9 @@
         class="delete-btn"
         (click)="removeTransaction(item.id, $event)"
       >
-        Delete
+        {{ t('saving.delete') }}
       </button>
     </div>
-    <p class="empty" *ngIf="historyRows.length === 0">No records yet.</p>
+    <p class="empty" *ngIf="historyRows.length === 0">{{ t('saving.noRecords') }}</p>
   </div>
  </div>

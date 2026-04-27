@@ -13,7 +13,7 @@ export class PreferencesService {
     theme: 'default',
     visualizationMode: 'amount'
   });
-  private readonly languageSubject = new BehaviorSubject<AppLanguage>('uk');
+  private readonly languageSubject = new BehaviorSubject<AppLanguage>('en');
 
   currency$ = this.currencySubject.asObservable();
   sphereLayout$ = this.sphereLayoutSubject.asObservable();
@@ -73,7 +73,7 @@ export class PreferencesService {
     this.sphereLayoutSubject.next(this.normalizeSphereLayout(payload.sphereLayout ?? null));
     this.quickTransactionsLimitSubject.next(normalizeQuickLimit(payload.quickTransactionsLimit));
     this.goalsPreferencesSubject.next(normalizeGoalsPreferences(payload.goalsPreferences));
-    this.languageSubject.next(payload.language ?? 'uk');
+    this.languageSubject.next(payload.language ?? 'en');
   }
 
   private normalizeSphereLayout(layout: SphereLayout | null): SphereLayout | null {

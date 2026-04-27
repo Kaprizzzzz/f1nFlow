@@ -21,7 +21,35 @@ type TranslationKey =
   | 'tips.next'
   | 'tips.gotIt'
   | 'tips.skip'
-  | 'tips.back';
+  | 'tips.back'
+  | 'tab.news'
+  | 'tab.recent'
+  | 'tab.savings'
+  | 'panel.closeNews'
+  | 'panel.closeRecent'
+  | 'panel.closeHistory'
+  | 'recent.quickCount'
+  | 'recent.empty'
+  | 'recent.transactionsCount'
+  | 'recent.total'
+  | 'recent.repeatLatest'
+  | 'recent.payment'
+  | 'recent.repeat'
+  | 'saving.historyTitle'
+  | 'saving.income'
+  | 'saving.expense'
+  | 'saving.delete'
+  | 'saving.noRecords'
+  | 'news.empty'
+  | 'main.weeklyChallenge'
+  | 'main.challengeSpendLess'
+  | 'main.challengeNoSpendingDay'
+  | 'main.streakCurrent'
+  | 'main.streakBest'
+  | 'main.days'
+  | 'main.badges'
+  | 'main.weeklyMissions'
+  | 'badge.locked';
 
 export interface LanguageOption {
   code: AppLanguage;
@@ -48,7 +76,35 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'tips.next': 'Далі',
     'tips.gotIt': 'Зрозуміло',
     'tips.skip': 'Пропустити',
-    'tips.back': 'Назад'
+    'tips.back': 'Назад',
+    'tab.news': 'Новини',
+    'tab.recent': 'Останні',
+    'tab.savings': 'Заощадження',
+    'panel.closeNews': 'Закрити панель новин',
+    'panel.closeRecent': 'Закрити панель останнього',
+    'panel.closeHistory': 'Закрити панель історії',
+    'recent.quickCount': 'Швидкі транзакції',
+    'recent.empty': 'Поки немає статистики витрат',
+    'recent.transactionsCount': 'транзакцій',
+    'recent.total': 'усього',
+    'recent.repeatLatest': 'Повторити останній платіж',
+    'recent.payment': 'Платіж',
+    'recent.repeat': 'Повторити',
+    'saving.historyTitle': 'Історія доходів / витрат / різниці',
+    'saving.income': 'Дохід',
+    'saving.expense': 'Витрати',
+    'saving.delete': 'Видалити',
+    'saving.noRecords': 'Поки немає записів.',
+    'news.empty': 'Персональні інсайти зʼявляться після активності.',
+    'main.weeklyChallenge': 'Тижневий челендж',
+    'main.challengeSpendLess': 'Витратити вдвічі менше денного ліміту до дедлайну',
+    'main.challengeNoSpendingDay': 'Зробити щонайменше 1 день без витрат',
+    'main.streakCurrent': 'Поточний стрік',
+    'main.streakBest': 'Найкращий стрік',
+    'main.days': 'днів',
+    'main.badges': 'Бейджі',
+    'main.weeklyMissions': 'Тижневі місії',
+    'badge.locked': 'Заблоковано'
   },
   en: {
     'nav.main': 'Main',
@@ -68,7 +124,35 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'tips.next': 'Next',
     'tips.gotIt': 'Got it',
     'tips.skip': 'Skip',
-    'tips.back': 'Back'
+    'tips.back': 'Back',
+    'tab.news': 'News',
+    'tab.recent': 'Recent',
+    'tab.savings': 'Savings',
+    'panel.closeNews': 'Close news panel',
+    'panel.closeRecent': 'Close recent panel',
+    'panel.closeHistory': 'Close history panel',
+    'recent.quickCount': 'Quick tx count',
+    'recent.empty': 'No expense stats yet',
+    'recent.transactionsCount': 'transactions',
+    'recent.total': 'total',
+    'recent.repeatLatest': 'Repeat latest payment',
+    'recent.payment': 'Payment',
+    'recent.repeat': 'Repeat',
+    'saving.historyTitle': 'Income / Expense / Difference history',
+    'saving.income': 'Income',
+    'saving.expense': 'Expense',
+    'saving.delete': 'Delete',
+    'saving.noRecords': 'No records yet.',
+    'news.empty': 'Personal insights appear after your activity.',
+    'main.weeklyChallenge': 'Weekly challenge',
+    'main.challengeSpendLess': 'Spend 2x less than your daily limit before deadline',
+    'main.challengeNoSpendingDay': 'Complete at least 1 no-spend day',
+    'main.streakCurrent': 'Current streak',
+    'main.streakBest': 'Best streak',
+    'main.days': 'days',
+    'main.badges': 'Badges',
+    'main.weeklyMissions': 'Weekly missions',
+    'badge.locked': 'Locked'
   },
   ru: {
     'nav.main': 'Главная',
@@ -88,7 +172,35 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'tips.next': 'Далее',
     'tips.gotIt': 'Понятно',
     'tips.skip': 'Пропустить',
-    'tips.back': 'Назад'
+    'tips.back': 'Назад',
+    'tab.news': 'Новости',
+    'tab.recent': 'Недавние',
+    'tab.savings': 'Сбережения',
+    'panel.closeNews': 'Закрыть панель новостей',
+    'panel.closeRecent': 'Закрыть панель недавнего',
+    'panel.closeHistory': 'Закрыть панель истории',
+    'recent.quickCount': 'Быстрые транзакции',
+    'recent.empty': 'Пока нет статистики расходов',
+    'recent.transactionsCount': 'транзакций',
+    'recent.total': 'всего',
+    'recent.repeatLatest': 'Повторить последний платёж',
+    'recent.payment': 'Платёж',
+    'recent.repeat': 'Повторить',
+    'saving.historyTitle': 'История доходов / расходов / разницы',
+    'saving.income': 'Доход',
+    'saving.expense': 'Расход',
+    'saving.delete': 'Удалить',
+    'saving.noRecords': 'Пока нет записей.',
+    'news.empty': 'Персональные инсайты появятся после активности.',
+    'main.weeklyChallenge': 'Недельный челлендж',
+    'main.challengeSpendLess': 'Потратить вдвое меньше дневного лимита до дедлайна',
+    'main.challengeNoSpendingDay': 'Сделать минимум 1 день без трат',
+    'main.streakCurrent': 'Текущий стрик',
+    'main.streakBest': 'Лучший стрик',
+    'main.days': 'дней',
+    'main.badges': 'Бейджи',
+    'main.weeklyMissions': 'Недельные миссии',
+    'badge.locked': 'Заблокировано'
   },
   es: {
     'nav.main': 'Inicio',
@@ -174,7 +286,7 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
 
 @Injectable({ providedIn: 'root' })
 export class I18nService {
-  private readonly languageSubject = new BehaviorSubject<AppLanguage>('uk');
+  private readonly languageSubject = new BehaviorSubject<AppLanguage>('en');
 
   readonly language$ = this.languageSubject.asObservable();
 
@@ -198,7 +310,7 @@ export class I18nService {
 
   t(key: TranslationKey | string): string {
     const langMap = TRANSLATIONS[this.language] as Record<string, string>;
-    const fallbackMap = TRANSLATIONS.uk as Record<string, string>;
+    const fallbackMap = TRANSLATIONS.en as Record<string, string>;
     return langMap[key] ?? fallbackMap[key] ?? key;
   }
 

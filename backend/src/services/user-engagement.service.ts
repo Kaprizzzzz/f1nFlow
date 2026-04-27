@@ -11,7 +11,12 @@ export type IncomingTransaction = {
 
 @Injectable()
 export class UserEngagementService {
-  applyEngagementState(user: User, transactions: IncomingTransaction[]): void {
+  applyEngagementState(
+    user: User,
+    transactions: IncomingTransaction[],
+    previousLastSeenAt: Date | null,
+    now: Date
+  ): void {
     const normalized = transactions
       .map((tx) => ({
         ...tx,
@@ -21,49 +26,33 @@ export class UserEngagementService {
       .filter((tx) => Number.isFinite(tx.amount) && !Number.isNaN(tx.date.getTime()))
       .sort((a, b) => a.date.getTime() - b.date.getTime());
 
-    const { currentStreak, bestStreak } = this.calculateStreak(normalized.map((tx) => tx.date));
-    user.streakCurrent = currentStreak;
-    user.streakBest = Math.max(user.streakBest ?? 0, bestStreak);
+    const nextStreak = this.calculatePresenceStreak(previousLastSeenAt, now, user.streakCurrent ?? 0);
+    user.streakCurrent = nextStreak;
+    user.streakBest = Math.max(user.streakBest ?? 0, nextStreak);
 
     user.weeklyChallenge = this.buildWeeklyChallenge(normalized, user.weeklyChallenge ?? null);
     user.news = this.buildPersonalizedNews(user.news ?? [], normalized);
     user.badges = this.buildBadges(user, normalized);
   }
 
-  private calculateStreak(dates: Date[]): { currentStreak: number; bestStreak: number } {
-    if (dates.length === 0) {
-      return { currentStreak: 0, bestStreak: 0 };
+  private calculatePresenceStreak(previousLastSeenAt: Date | null, now: Date, currentStreak: number): number {
+    if (!previousLastSeenAt) {
+      return Math.max(1, currentStreak || 0);
     }
 
-    const uniqueDays = Array.from(new Set(dates.map((date) => this.toDayKey(date)))).sort();
+    const previousDay = this.toDayKey(previousLastSeenAt);
+    const currentDay = this.toDayKey(now);
+    const diff = this.dayDiff(previousDay, currentDay);
 
-    let best = 0;
-    let run = 0;
-
-    for (let index = 0; index < uniqueDays.length; index += 1) {
-      if (index === 0 || this.dayDiff(uniqueDays[index - 1], uniqueDays[index]) === 1) {
-        run += 1;
-      } else {
-        run = 1;
-      }
-      best = Math.max(best, run);
+    if (diff <= 0) {
+      return Math.max(1, currentStreak || 0);
     }
 
-    let current = 1;
-    for (let index = uniqueDays.length - 1; index > 0; index -= 1) {
-      if (this.dayDiff(uniqueDays[index - 1], uniqueDays[index]) !== 1) {
-        break;
-      }
-      current += 1;
+    if (diff === 1) {
+      return Math.max(1, currentStreak || 0) + 1;
     }
 
-    const todayKey = this.toDayKey(new Date());
-    const lastDay = uniqueDays[uniqueDays.length - 1];
-    if (this.dayDiff(lastDay, todayKey) > 1) {
-      current = 0;
-    }
-
-    return { currentStreak: current, bestStreak: best };
+    return 1;
   }
 
   private buildWeeklyChallenge(
@@ -162,11 +151,17 @@ export class UserEngagementService {
     if (transactions.length > 0) {
       badges.add('first-goal');
     }
-    if ((user.streakBest ?? 0) >= 7) {
-      badges.add('streak-7');
+    if ((user.streakBest ?? 0) >= 5) {
+      badges.add('streak-bronze');
+    }
+    if ((user.streakBest ?? 0) >= 14) {
+      badges.add('streak-silver');
     }
     if ((user.streakBest ?? 0) >= 30) {
-      badges.add('streak-30');
+      badges.add('streak-gold');
+    }
+    if (user.weeklyChallenge?.completed) {
+      badges.add('challenge-winner');
     }
 
     return Array.from(badges);

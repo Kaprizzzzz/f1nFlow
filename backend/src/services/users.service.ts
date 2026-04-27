@@ -104,15 +104,17 @@ export class UsersService {
     if (!userToUpdate) {
         throw new NotFoundException('User not found');
       }
-    userToUpdate.currency = payload.currency ?? userToUpdate.currency;
-      userToUpdate.language = payload.language ?? userToUpdate.language ?? 'uk';
+      const previousLastSeen = userToUpdate.lastSeenAt;
+      userToUpdate.currency = payload.currency ?? userToUpdate.currency;
+      userToUpdate.language = payload.language ?? userToUpdate.language ?? 'en';
       userToUpdate.incomeCategories = payload.incomeCategories ?? userToUpdate.incomeCategories ?? [];
       userToUpdate.expenseCategories = payload.expenseCategories ?? userToUpdate.expenseCategories ?? [];
       userToUpdate.sphereLayout = payload.sphereLayout ?? userToUpdate.sphereLayout;
       userToUpdate.quickTransactionsLimit = payload.quickTransactionsLimit ?? userToUpdate.quickTransactionsLimit ?? 3;
       userToUpdate.news = payload.news ?? userToUpdate.news ?? [];
       userToUpdate.goalsPreferences = payload.goalsPreferences ?? userToUpdate.goalsPreferences ?? { theme: 'default', visualizationMode: 'amount' };
-      userToUpdate.lastSeenAt = new Date();
+      const now = new Date();
+      userToUpdate.lastSeenAt = now;
 
       const incomingTransactions: IncomingTransaction[] = payload.transactions
         ? payload.transactions.map((tx) => ({
@@ -130,7 +132,7 @@ export class UsersService {
             label: tx.label
           }));
 
-      this.userEngagementService.applyEngagementState(userToUpdate, incomingTransactions);
+      this.userEngagementService.applyEngagementState(userToUpdate, incomingTransactions, previousLastSeen, now);
 
       await txUsersRepository.save(userToUpdate);
 
@@ -250,4 +252,3 @@ export class UsersService {
     return this.createUserSafely(telegramId, userName, referredBy);
   }
 } 
-

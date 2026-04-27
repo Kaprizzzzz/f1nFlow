@@ -27,6 +27,7 @@ import {
 } from '../sphere-layout.service';
 import { RecentFacadeService } from '../recent-facade.service';
 import { MainViewModel } from '../main-view-model';
+import { I18nService } from '../../../core/i18n.service';
 
 type MainTab = SphereTab | null;
 
@@ -61,6 +62,16 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   recentCategoryGroups: RecentCategoryGroup[] = [];
   quickTransactionsLimit = 3;
   weeklyChallengeText = '';
+  streakCurrent = 0;
+  streakBest = 0;
+  badges: string[] = [];
+  selectedBadgeDescription = '';
+  readonly badgeCatalog = [
+    { id: 'streak-bronze', title: 'Streak Bronze', color: '#b87333', descriptionKey: 'Visit app 5 days in a row' },
+    { id: 'streak-silver', title: 'Streak Silver', color: '#c0c0c0', descriptionKey: 'Visit app 14 days in a row' },
+    { id: 'streak-gold', title: 'Streak Gold', color: '#ffd700', descriptionKey: 'Visit app 30 days in a row' },
+    { id: 'challenge-winner', title: 'Challenge Winner', color: '#61dafb', descriptionKey: 'Complete weekly challenge' }
+  ];
   newsPanelAnchorBottom = 0;
 
   spherePositions!: Record<SphereTab, SpherePosition>;
@@ -81,7 +92,8 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     private balanceService: BalanceService,
     private sessionService: SessionService,
     private sphereLayoutService: SphereLayoutService,
-    private recentFacade: RecentFacadeService
+    private recentFacade: RecentFacadeService,
+    private i18nService: I18nService
   ) {
     this.spherePositions = this.sphereLayoutService.clonePositions(DEFAULT_SPHERE_POSITIONS);
     this.savedSpherePositions = this.sphereLayoutService.clonePositions(DEFAULT_SPHERE_POSITIONS);
@@ -92,17 +104,23 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       this.balanceService.quickTransactionsLimit$,
       this.balanceService.transactions$,
       this.balanceService.weeklyChallenge$,
+      this.balanceService.streakCurrent$,
+      this.balanceService.streakBest$,
+      this.balanceService.badges$,
       this.balanceService.sphereLayout$,
       this.isEditMode$
     ]).pipe(
-      map(([_user, quickTransactionsLimit, transactions, weeklyChallenge, sphereLayout, _isEditMode]): MainViewModel => ({
+      map(([_user, quickTransactionsLimit, transactions, weeklyChallenge, streakCurrent, streakBest, badges, sphereLayout, _isEditMode]): MainViewModel & { streakCurrent: number; streakBest: number; badges: string[] } => ({
         canEditLayout: true,
         quickTransactionsLimit,
         recentCategoryGroups: this.recentFacade.buildRecentCategoryGroups(transactions, quickTransactionsLimit),
         weeklyChallengeText: weeklyChallenge
-          ? `Weekly challenge: тримай "${weeklyChallenge.category}" до ${weeklyChallenge.limit.toFixed(2)}`
+          ? `${this.i18nService.t('main.weeklyChallenge')}: ${weeklyChallenge.category} ≤ ${weeklyChallenge.limit.toFixed(2)}`
           : '',
-        sphereLayout
+        sphereLayout,
+        streakCurrent: streakCurrent ?? 0,
+        streakBest: streakBest ?? 0,
+        badges: badges ?? []
       }))
     );
   }
@@ -123,6 +141,9 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
         this.quickTransactionsLimit = vm.quickTransactionsLimit;
         this.recentCategoryGroups = vm.recentCategoryGroups;
         this.weeklyChallengeText = vm.weeklyChallengeText;
+        this.streakCurrent = vm.streakCurrent;
+        this.streakBest = vm.streakBest;
+        this.badges = vm.badges;
 
         if (vm.sphereLayout && this.hasExternalLayoutUpdate(vm.sphereLayout)) {
           this.spherePositions = this.sphereLayoutService.clonePositions(vm.sphereLayout);
@@ -193,6 +214,23 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setQuickTransactionsLimit(limit: number): void {
     this.balanceService.setQuickTransactionsLimit(limit);
+  }
+
+  t(key: string): string {
+    return this.i18nService.t(key);
+  }
+
+  isBadgeUnlocked(id: string): boolean {
+    return this.badges.includes(id);
+  }
+
+  openBadgeDescription(id: string): void {
+    const badge = this.badgeCatalog.find((item) => item.id === id);
+    if (!badge) {
+      return;
+    }
+    const status = this.isBadgeUnlocked(id) ? '' : ` (${this.t('badge.locked')})`;
+    this.selectedBadgeDescription = `${badge.title}${status}: ${badge.descriptionKey}`;
   }
 
   @HostListener('window:keydown.escape')

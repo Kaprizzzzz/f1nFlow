@@ -1,5 +1,6 @@
 import { Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { I18nService } from '../../../core/i18n.service';
 
 export interface RecentTransactionBubble {
   category: string;
@@ -31,6 +32,8 @@ export class RecentComponent implements OnChanges {
 
   readonly quickLimitOptions = [3, 4, 5, 6, 7, 8, 9, 10];
   isQuickLimitMenuOpen = false;
+
+  constructor(private readonly i18nService: I18nService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('isFullView' in changes && !this.isFullView) {
@@ -81,5 +84,9 @@ export class RecentComponent implements OnChanges {
     }
 
     return `conic-gradient(${parts.join(', ')})`;
+  }
+
+  t(key: string): string {
+    return this.i18nService.t(key);
   }
 }

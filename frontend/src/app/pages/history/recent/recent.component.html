@@ -1,12 +1,12 @@
 <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
   <div class="main-circle" [style.--quick-ring]="quickRingGradient">
-    <span class="label">Recent</span>
+    <span class="label">{{ t('tab.recent') }}</span>
   </div>
 
   <div class="recent-panel" *ngIf="isFullView" (click)="$event.stopPropagation()">
-    <button type="button" class="panel-close-btn" (click)="handleClose($event)" aria-label="Close recent panel">✕</button>
+    <button type="button" class="panel-close-btn" (pointerdown)="$event.stopPropagation()" (click)="handleClose($event)" [attr.aria-label]="t('panel.closeRecent')">✕</button>
     <div class="quick-limit-row">
-      <span>Quick tx count:</span>
+      <span>{{ t('recent.quickCount') }}:</span>
       <div class="quick-limit-actions">
         <div class="quick-limit-picker" [class.open]="isQuickLimitMenuOpen">
         <button type="button" class="quick-limit-current" (click)="toggleQuickLimitMenu($event)">
@@ -23,7 +23,7 @@
       </div>
     </div>
     @if (items.length === 0) {
-      <p class="recent-empty">No expense stats yet</p>
+      <p class="recent-empty">{{ t('recent.empty') }}</p>
     } @else {
       <div class="recent-groups">
         @for (item of items; track item.category) {
@@ -31,7 +31,7 @@
             <div class="recent-group-header">
               <div>
                 <div class="recent-name">{{ item.category }}</div>
-                <div class="recent-meta">{{ item.repeatCount }} transactions · total {{ item.totalAmount | number:'1.2-2' }}</div>
+                <div class="recent-meta">{{ item.repeatCount }} {{ t('recent.transactionsCount') }} · {{ t('recent.total') }} {{ item.totalAmount | number:'1.2-2' }}</div>
               </div>
             </div>
             @if (item.latestTransactions.length > 0) {
@@ -41,16 +41,16 @@
                   class="repeat-latest-btn"
                   (click)="repeat(item.category, item.latestTransactions[0], $event)"
                 >
-                  Повторити останній платіж · {{ item.latestTransactions[0] | number:'1.2-2' }}
+                  {{ t('recent.repeatLatest') }} · {{ item.latestTransactions[0] | number:'1.2-2' }}
                 </button>
               </div>
             }
             <div class="recent-sequence">
               @for (amount of item.latestTransactions; track $index) {
                 <button type="button" class="recent-sequence-item" (click)="repeat(item.category, amount, $event)">
-                  <span class="sequence-label">Платіж {{ $index + 1 }}</span>
+                  <span class="sequence-label">{{ t('recent.payment') }} {{ $index + 1 }}</span>
                   <span class="sequence-amount">{{ amount | number:'1.2-2' }}</span>
-                  <span class="sequence-action">Повторити</span>
+                  <span class="sequence-action">{{ t('recent.repeat') }}</span>
                 </button>
               }
             </div>

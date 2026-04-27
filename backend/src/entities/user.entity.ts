@@ -45,7 +45,7 @@ import {
   @Column({ default: 'EUR' })
   currency: string;
 
-  @Column({ default: 'uk' })
+  @Column({ default: 'en' })
   language: string;
 
   @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })

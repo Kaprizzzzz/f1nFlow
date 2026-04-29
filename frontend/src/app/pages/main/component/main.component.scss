@@ -1,10 +1,10 @@
 .dashboard-container {
   --dashboard-top-offset: calc(env(safe-area-inset-top, 0px) - 20px);
   --active-panel-gap: 50px;
-  --sphere-transition-duration: 0.901s;
+  --sphere-transition-duration: 0.991s;
   --sphere-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
-  --sphere-transform-duration: 1.132s;
-  --sphere-fade-duration: 0.716s;
+  --sphere-transform-duration: 1.245s;
+  --sphere-fade-duration: 0.788s;
   width: 100%;
   height: 100%;
   min-height: 100%;
@@ -242,7 +242,7 @@
 }
 
 .dashboard-container.has-active:not(.fullscreen-panel-active) .sphere-wrapper.is-active {
-  animation: active-sphere-pop 1.268s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: active-sphere-pop 1.395s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes active-sphere-pop {

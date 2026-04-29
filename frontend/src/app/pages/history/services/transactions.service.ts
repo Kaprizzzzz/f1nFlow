@@ -112,10 +112,7 @@ export class TransactionsService {
       return null;
     }
 
-    const endpoint = new URL('https://api.exchangerate.host/convert');
-    endpoint.searchParams.set('from', fromCurrency);
-    endpoint.searchParams.set('to', toCurrency);
-    endpoint.searchParams.set('amount', '1');
+    const endpoint = new URL(`https://api.frankfurter.dev/v1/latest?base=${fromCurrency}&symbols=${toCurrency}`);
 
     try {
       const response = await fetch(endpoint.toString());
@@ -123,12 +120,13 @@ export class TransactionsService {
         return getFallbackRate(fromCurrency, toCurrency);
       }
 
-      const payload = (await response.json()) as { result?: number };
-      if (!Number.isFinite(payload.result) || !payload.result || payload.result <= 0) {
+      const payload = (await response.json()) as { rates?: Partial<Record<Currency, number>> };
+      const rate = payload.rates?.[toCurrency];
+      if (!Number.isFinite(rate) || !rate || rate <= 0) {
         return getFallbackRate(fromCurrency, toCurrency);
       }
 
-      return payload.result;
+      return rate;
     } catch {
       return getFallbackRate(fromCurrency, toCurrency);
     }

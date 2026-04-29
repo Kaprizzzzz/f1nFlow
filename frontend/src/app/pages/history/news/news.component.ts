@@ -25,6 +25,10 @@ export class NewsComponent {
   }
 
   handleCircleClick(): void {
+    if (this.isFullView) {
+      return;
+    }
+
     this.onSelect.emit();
   }
 

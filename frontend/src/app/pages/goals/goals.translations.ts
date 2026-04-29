@@ -1,0 +1,116 @@
+import { AppLanguage } from '../../core/i18n.service';
+
+type GoalsTranslationKey =
+  | 'miniStats'
+  | 'todaySpent'
+  | 'yesterdaySpent'
+  | 'vsYesterday'
+  | 'vsMonthAvgDay'
+  | 'monthAvgDay'
+  | 'trend'
+  | 'periodCategories'
+  | 'from'
+  | 'to'
+  | 'income'
+  | 'expense'
+  | 'noIncomePeriod'
+  | 'noExpensePeriod'
+  | 'spendingInPeriod'
+  | 'spentInPeriod'
+  | 'avgPerDay'
+  | 'avgPerWeek'
+  | 'avgPerMonth'
+  | 'todayVsPeriodAvg'
+  | 'smartHints'
+  | 'streak'
+  | 'currentStreak'
+  | 'bestStreak'
+  | 'days'
+  | 'todayVisited'
+  | 'weeklyChallenge'
+  | 'challengeTarget'
+  | 'challengeCurrent'
+  | 'challengeDone'
+  | 'challengeInProgress'
+  | 'challengeNotEnoughData'
+  | 'badges'
+  | 'noBadges'
+  | 'deadlinePlanner'
+  | 'deadlineDate'
+  | 'recommendedDailyLimit'
+  | 'directionLess'
+  | 'directionMore'
+  | 'trendNoSpend'
+  | 'trendStrongImprovement'
+  | 'trendCareful'
+  | 'trendStable'
+  | 'trendGrowing';
+
+export const GOALS_TRANSLATIONS: Record<AppLanguage, Record<GoalsTranslationKey, string>> = {
+  uk: {
+    miniStats: 'Міні-статистика',
+    todaySpent: 'Витрачено сьогодні',
+    yesterdaySpent: 'Витрачено вчора',
+    vsYesterday: 'Порівняно з учора',
+    vsMonthAvgDay: 'Порівняно із середнім за місяць/день',
+    monthAvgDay: 'Середнє за місяць/день',
+    trend: 'Тренд',
+    periodCategories: 'Категорії за період',
+    from: 'Від',
+    to: 'До',
+    income: 'Доходи',
+    expense: 'Витрати',
+    noIncomePeriod: 'Немає доходів за вибраний період',
+    noExpensePeriod: 'Немає витрат за вибраний період',
+    spendingInPeriod: 'Витрати у вибраному періоді',
+    spentInPeriod: 'Витрачено за період',
+    avgPerDay: 'Середнє за день',
+    avgPerWeek: 'Середнє за тиждень',
+    avgPerMonth: 'Середнє за місяць',
+    todayVsPeriodAvg: 'Сьогодні vs середнє за період',
+    smartHints: 'Розумні підказки',
+    streak: 'Стрік',
+    currentStreak: 'Поточний стрік',
+    bestStreak: 'Найкращий стрік',
+    days: 'днів',
+    todayVisited: 'Сьогодні зайшов(ла)',
+    weeklyChallenge: 'Тижневий челендж',
+    challengeTarget: 'Утримати витрати в категорії',
+    challengeCurrent: 'Поточні витрати',
+    challengeDone: 'виконано',
+    challengeInProgress: 'в процесі',
+    challengeNotEnoughData: 'Ще недостатньо даних для формування challenge.',
+    badges: 'Бейджі',
+    noBadges: 'Поки немає бейджів.',
+    deadlinePlanner: 'Планувальник дедлайну',
+    deadlineDate: 'Дата дедлайну',
+    recommendedDailyLimit: 'Рекомендований денний ліміт витрат',
+    directionLess: 'менше',
+    directionMore: 'більше',
+    trendNoSpend: 'без витрат два дні поспіль',
+    trendStrongImprovement: 'сильне покращення',
+    trendCareful: 'обережні витрати',
+    trendStable: 'стабільний темп',
+    trendGrowing: 'витрати ростуть'
+  },
+  en: {
+    miniStats: 'Mini stats', todaySpent: 'Today spent', yesterdaySpent: 'Yesterday spent', vsYesterday: 'Vs yesterday', vsMonthAvgDay: 'Vs month avg/day', monthAvgDay: 'Month avg/day', trend: 'Trend', periodCategories: 'Period categories', from: 'From', to: 'To', income: 'Income', expense: 'Expense', noIncomePeriod: 'No income in selected period', noExpensePeriod: 'No expenses in selected period', spendingInPeriod: 'Spending in selected period', spentInPeriod: 'Spent in period', avgPerDay: 'Average per day', avgPerWeek: 'Average per week', avgPerMonth: 'Average per month', todayVsPeriodAvg: 'Today vs selected period avg', smartHints: 'Smart hints', streak: 'Streak', currentStreak: 'Current Streak', bestStreak: 'Best streak', days: 'days', todayVisited: 'Visited today', weeklyChallenge: 'Weekly challenge', challengeTarget: 'Keep spending in category', challengeCurrent: 'Current spending', challengeDone: 'done', challengeInProgress: 'in progress', challengeNotEnoughData: 'Not enough data to create a challenge yet.', badges: 'Badges', noBadges: 'No badges yet.', deadlinePlanner: 'Deadline planner', deadlineDate: 'Deadline date', recommendedDailyLimit: 'Recommended daily spending limit', directionLess: 'less', directionMore: 'more', trendNoSpend: 'no spending two days in a row', trendStrongImprovement: 'strong improvement', trendCareful: 'careful spending', trendStable: 'stable pace', trendGrowing: 'spending is growing'
+  },
+  ru: {
+    miniStats: 'Мини-статистика', todaySpent: 'Потрачено сегодня', yesterdaySpent: 'Потрачено вчера', vsYesterday: 'По сравнению со вчера', vsMonthAvgDay: 'По сравнению со средним за месяц/день', monthAvgDay: 'Среднее за месяц/день', trend: 'Тренд', periodCategories: 'Категории за период', from: 'От', to: 'До', income: 'Доходы', expense: 'Расходы', noIncomePeriod: 'Нет доходов за выбранный период', noExpensePeriod: 'Нет расходов за выбранный период', spendingInPeriod: 'Траты в выбранном периоде', spentInPeriod: 'Потрачено за период', avgPerDay: 'Среднее за день', avgPerWeek: 'Среднее за неделю', avgPerMonth: 'Среднее за месяц', todayVsPeriodAvg: 'Сегодня vs среднее за период', smartHints: 'Умные подсказки', streak: 'Стрик', currentStreak: 'Текущий стрик', bestStreak: 'Лучший стрик', days: 'дней', todayVisited: 'Сегодня зашёл(ла)', weeklyChallenge: 'Недельный челлендж', challengeTarget: 'Удержать траты в категории', challengeCurrent: 'Текущие траты', challengeDone: 'выполнено', challengeInProgress: 'в процессе', challengeNotEnoughData: 'Пока недостаточно данных для челленджа.', badges: 'Бейджи', noBadges: 'Пока нет бейджей.', deadlinePlanner: 'Планировщик дедлайна', deadlineDate: 'Дата дедлайна', recommendedDailyLimit: 'Рекомендуемый дневной лимит трат', directionLess: 'меньше', directionMore: 'больше', trendNoSpend: 'без трат два дня подряд', trendStrongImprovement: 'сильное улучшение', trendCareful: 'осторожные траты', trendStable: 'стабильный темп', trendGrowing: 'траты растут'
+  },
+  es: {
+    miniStats: 'Mini estadísticas', todaySpent: 'Gastado hoy', yesterdaySpent: 'Gastado ayer', vsYesterday: 'Vs ayer', vsMonthAvgDay: 'Vs promedio mensual/día', monthAvgDay: 'Promedio mensual/día', trend: 'Tendencia', periodCategories: 'Categorías del período', from: 'Desde', to: 'Hasta', income: 'Ingresos', expense: 'Gastos', noIncomePeriod: 'Sin ingresos en el período seleccionado', noExpensePeriod: 'Sin gastos en el período seleccionado', spendingInPeriod: 'Gasto en el período seleccionado', spentInPeriod: 'Gastado en el período', avgPerDay: 'Promedio por día', avgPerWeek: 'Promedio por semana', avgPerMonth: 'Promedio por mes', todayVsPeriodAvg: 'Hoy vs promedio del período', smartHints: 'Sugerencias inteligentes', streak: 'Racha', currentStreak: 'Racha actual', bestStreak: 'Mejor racha', days: 'días', todayVisited: 'Entró hoy', weeklyChallenge: 'Desafío semanal', challengeTarget: 'Mantener gasto en la categoría', challengeCurrent: 'Gasto actual', challengeDone: 'completado', challengeInProgress: 'en progreso', challengeNotEnoughData: 'Aún no hay suficientes datos para un desafío.', badges: 'Insignias', noBadges: 'Aún no hay insignias.', deadlinePlanner: 'Planificador de plazo', deadlineDate: 'Fecha límite', recommendedDailyLimit: 'Límite diario recomendado', directionLess: 'menos', directionMore: 'más', trendNoSpend: 'sin gastos dos días seguidos', trendStrongImprovement: 'gran mejora', trendCareful: 'gasto prudente', trendStable: 'ritmo estable', trendGrowing: 'el gasto está subiendo'
+  },
+  be: {
+    miniStats: 'Міні-статыстыка', todaySpent: 'Патрачана сёння', yesterdaySpent: 'Патрачана ўчора', vsYesterday: 'У параўнанні з учора', vsMonthAvgDay: 'У параўнанні з сярэднім за месяц/дзень', monthAvgDay: 'Сярэдняе за месяц/дзень', trend: 'Трэнд', periodCategories: 'Катэгорыі за перыяд', from: 'Ад', to: 'Да', income: 'Даходы', expense: 'Выдаткі', noIncomePeriod: 'Няма даходаў за выбраны перыяд', noExpensePeriod: 'Няма выдаткаў за выбраны перыяд', spendingInPeriod: 'Выдаткі ў абраным перыядзе', spentInPeriod: 'Патрачана за перыяд', avgPerDay: 'Сярэдняе за дзень', avgPerWeek: 'Сярэдняе за тыдзень', avgPerMonth: 'Сярэдняе за месяц', todayVsPeriodAvg: 'Сёння vs сярэдняе за перыяд', smartHints: 'Разумныя падказкі', streak: 'Стрык', currentStreak: 'Бягучы стрык', bestStreak: 'Найлепшы стрык', days: 'дзён', todayVisited: 'Сёння зайшоў(ла)', weeklyChallenge: 'Тыднёвы чэлендж', challengeTarget: 'Утрымаць выдаткі ў катэгорыі', challengeCurrent: 'Бягучыя выдаткі', challengeDone: 'выканана', challengeInProgress: 'у працэсе', challengeNotEnoughData: 'Пакуль недастаткова даных для чэленджа.', badges: 'Бэйджы', noBadges: 'Пакуль няма бэйджаў.', deadlinePlanner: 'Планавальнік дэдлайну', deadlineDate: 'Дата дэдлайну', recommendedDailyLimit: 'Рэкамендаваны дзённы ліміт выдаткаў', directionLess: 'менш', directionMore: 'больш', trendNoSpend: 'без выдаткаў два дні запар', trendStrongImprovement: 'моцнае паляпшэнне', trendCareful: 'асцярожныя выдаткі', trendStable: 'стабільны тэмп', trendGrowing: 'выдаткі растуць'
+  },
+  fr: {
+    miniStats: 'Mini stats', todaySpent: 'Dépensé aujourd’hui', yesterdaySpent: 'Dépensé hier', vsYesterday: 'Vs hier', vsMonthAvgDay: 'Vs moyenne mensuelle/jour', monthAvgDay: 'Moyenne mensuelle/jour', trend: 'Tendance', periodCategories: 'Catégories de la période', from: 'De', to: 'À', income: 'Revenus', expense: 'Dépenses', noIncomePeriod: 'Aucun revenu sur la période sélectionnée', noExpensePeriod: 'Aucune dépense sur la période sélectionnée', spendingInPeriod: 'Dépenses sur la période sélectionnée', spentInPeriod: 'Dépensé sur la période', avgPerDay: 'Moyenne par jour', avgPerWeek: 'Moyenne par semaine', avgPerMonth: 'Moyenne par mois', todayVsPeriodAvg: 'Aujourd’hui vs moyenne de la période', smartHints: 'Conseils intelligents', streak: 'Série', currentStreak: 'Série actuelle', bestStreak: 'Meilleure série', days: 'jours', todayVisited: 'Visité aujourd’hui', weeklyChallenge: 'Défi hebdomadaire', challengeTarget: 'Garder les dépenses de la catégorie', challengeCurrent: 'Dépenses actuelles', challengeDone: 'terminé', challengeInProgress: 'en cours', challengeNotEnoughData: 'Pas assez de données pour créer un défi.', badges: 'Badges', noBadges: 'Aucun badge pour le moment.', deadlinePlanner: 'Planificateur d’échéance', deadlineDate: 'Date limite', recommendedDailyLimit: 'Limite quotidienne recommandée', directionLess: 'moins', directionMore: 'plus', trendNoSpend: 'aucune dépense deux jours de suite', trendStrongImprovement: 'forte amélioration', trendCareful: 'dépenses prudentes', trendStable: 'rythme stable', trendGrowing: 'les dépenses augmentent'
+  },
+  nl: {
+    miniStats: 'Mini-statistieken', todaySpent: 'Vandaag uitgegeven', yesterdaySpent: 'Gisteren uitgegeven', vsYesterday: 'Vs gisteren', vsMonthAvgDay: 'Vs maandgemiddelde/dag', monthAvgDay: 'Maandgemiddelde/dag', trend: 'Trend', periodCategories: 'Categorieën in periode', from: 'Van', to: 'Tot', income: 'Inkomsten', expense: 'Uitgaven', noIncomePeriod: 'Geen inkomsten in geselecteerde periode', noExpensePeriod: 'Geen uitgaven in geselecteerde periode', spendingInPeriod: 'Uitgaven in geselecteerde periode', spentInPeriod: 'Uitgegeven in periode', avgPerDay: 'Gemiddeld per dag', avgPerWeek: 'Gemiddeld per week', avgPerMonth: 'Gemiddeld per maand', todayVsPeriodAvg: 'Vandaag vs periodegemiddelde', smartHints: 'Slimme hints', streak: 'Reeks', currentStreak: 'Huidige reeks', bestStreak: 'Beste reeks', days: 'dagen', todayVisited: 'Vandaag bezocht', weeklyChallenge: 'Wekelijkse uitdaging', challengeTarget: 'Uitgaven in categorie houden op', challengeCurrent: 'Huidige uitgaven', challengeDone: 'voltooid', challengeInProgress: 'bezig', challengeNotEnoughData: 'Nog niet genoeg data voor een uitdaging.', badges: 'Badges', noBadges: 'Nog geen badges.', deadlinePlanner: 'Deadlineplanner', deadlineDate: 'Deadlinedatum', recommendedDailyLimit: 'Aanbevolen dagelijkse uitgavenlimiet', directionLess: 'minder', directionMore: 'meer', trendNoSpend: 'twee dagen op rij niets uitgegeven', trendStrongImprovement: 'sterke verbetering', trendCareful: 'voorzichtige uitgaven', trendStable: 'stabiel tempo', trendGrowing: 'uitgaven nemen toe'
+  }
+};
+
+export type { GoalsTranslationKey };

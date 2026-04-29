@@ -3,6 +3,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { BalanceService, GoalsPreferences, Transaction } from '../history/balance.service';
+import { I18nService } from '../../core/i18n.service';
+import { GOALS_TRANSLATIONS, GoalsTranslationKey } from './goals.translations';
 
 
 type ViewMode = 'amount' | 'segments';
@@ -32,7 +34,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
   todayVsYesterdayPercent = 0;
   todayVsMonthlyAvgPercent = 0;
   todayVsSelectedAvgPercent = 0;
-  spendingTrendLabel = 'недостатньо даних';
+  spendingTrendLabel = '';
   smartInsights: string[] = [];
   streakCurrent = 0;
   streakBest = 0;
@@ -50,7 +52,10 @@ export class GoalsComponent implements OnInit, OnDestroy {
   private currentBalance = 0;
   private subscription = new Subscription();
 
-  constructor(private readonly balanceService: BalanceService) {}
+  constructor(
+    private readonly balanceService: BalanceService,
+    private readonly i18nService: I18nService
+  ) {}
 
   ngOnInit(): void {
     this.subscription.add(
@@ -187,15 +192,21 @@ export class GoalsComponent implements OnInit, OnDestroy {
   }
 
   get todayVsYesterdayDirection(): string {
-    return this.todayVsYesterdayPercent <= 0 ? 'менше' : 'більше';
+    return this.todayVsYesterdayPercent <= 0 ? this.gt('directionLess') : this.gt('directionMore');
   }
 
   get todayVsMonthlyDirection(): string {
-    return this.todayVsMonthlyAvgPercent <= 0 ? 'менше' : 'більше';
+    return this.todayVsMonthlyAvgPercent <= 0 ? this.gt('directionLess') : this.gt('directionMore');
   }
 
   get todayVsPeriodDirection(): string {
-    return this.todayVsSelectedAvgPercent <= 0 ? 'менше' : 'більше';
+    return this.todayVsSelectedAvgPercent <= 0 ? this.gt('directionLess') : this.gt('directionMore');
+  }
+
+
+  gt(key: GoalsTranslationKey): string {
+    const language = this.i18nService.language;
+    return GOALS_TRANSLATIONS[language]?.[key] ?? GOALS_TRANSLATIONS.en[key] ?? key;
   }
 
   get streakFlames(): number[] {
@@ -277,15 +288,15 @@ export class GoalsComponent implements OnInit, OnDestroy {
     this.todayVsSelectedAvgPercent = this.getPercentDiff(this.todaySpent, this.spentPerDay);
 
     if (this.todaySpent === 0 && this.yesterdaySpent === 0) {
-      this.spendingTrendLabel = 'без витрат два дні поспіль';
+      this.spendingTrendLabel = this.gt('trendNoSpend');
     } else if (this.todayVsYesterdayPercent <= -10) {
-      this.spendingTrendLabel = 'сильне покращення';
+      this.spendingTrendLabel = this.gt('trendStrongImprovement');
     } else if (this.todayVsYesterdayPercent < 0) {
-      this.spendingTrendLabel = 'обережні витрати';
+      this.spendingTrendLabel = this.gt('trendCareful');
     } else if (this.todayVsYesterdayPercent <= 10) {
-      this.spendingTrendLabel = 'стабільний темп';
+      this.spendingTrendLabel = this.gt('trendStable');
     } else {
-      this.spendingTrendLabel = 'витрати ростуть';
+      this.spendingTrendLabel = this.gt('trendGrowing');
     }
   }
 

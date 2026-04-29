@@ -3,7 +3,7 @@
  import { Subscription } from 'rxjs';
  import { BalanceService } from '../history/balance.service';
  
- type Currency = 'EUR' | 'USD' | 'UAH';
+import { Currency } from '../history/models/history-shared.models';
  
  @Component({
    selector: 'app-currency-picker',
@@ -15,7 +15,7 @@
  export class CurrencyPickerComponent implements OnInit, OnDestroy {
    isOpen = false;
 
-   readonly currencies: readonly Currency[] = ['EUR', 'USD', 'UAH'];
+   readonly currencies: readonly Currency[] = ['EUR', 'USD', 'UAH', 'RUB', 'PLN', 'TRY', 'CAD', 'GBP', 'HRK'];
    selectedCurrency: Currency = 'EUR';
  
   private subscription = new Subscription();

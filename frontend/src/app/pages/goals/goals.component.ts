@@ -11,6 +11,9 @@ type ViewMode = 'amount' | 'segments';
 type GoalsTheme = 'default' | 'girly';
 type CategorySummary = { name: string; amount: number; segments: number };
 
+const FX_CURRENCIES = ['EUR','USD','UAH','RUB','PLN','TRY','CAD','GBP','HRK'] as const;
+type FxCurrency = typeof FX_CURRENCIES[number];
+
 @Component({
   selector: 'app-goals',
   standalone: true,
@@ -47,6 +50,12 @@ export class GoalsComponent implements OnInit, OnDestroy {
   visualizationMode: ViewMode = 'amount';
   theme: GoalsTheme = 'default';
   isUiPickerOpen = false;
+  fxBase: FxCurrency = 'USD';
+  fxTarget: FxCurrency = 'UAH';
+  fxHistory: number[] = [];
+  fxRate = 0;
+  converterAmount = 1;
+  converterResult = 0;
 
   private transactions: Transaction[] = [];
   private currentBalance = 0;
@@ -101,6 +110,8 @@ export class GoalsComponent implements OnInit, OnDestroy {
         this.weeklyChallenge = challenge;
       })
     );
+
+    void this.refreshFx();
   }
 
   ngOnDestroy(): void {
@@ -134,6 +145,27 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
   closeUiPicker(): void {
     this.isUiPickerOpen = false;
+  }
+
+  async onFxPairChange(): Promise<void> {
+    await this.refreshFx();
+  }
+
+  recalculateConverter(): void {
+    this.converterResult = this.converterAmount * this.fxRate;
+  }
+
+  get fxCurrencies(): readonly FxCurrency[] {
+    return FX_CURRENCIES;
+  }
+
+  get fxSparkline(): string {
+    if (this.fxHistory.length < 2) return '';
+    const min = Math.min(...this.fxHistory);
+    const max = Math.max(...this.fxHistory);
+    const spread = max - min || 1;
+    const stepX = 280 / (this.fxHistory.length - 1);
+    return this.fxHistory.map((v, i) => `${(i * stepX).toFixed(2)},${(70 - ((v - min) / spread) * 60).toFixed(2)}`).join(' ');
   }
 
   recalculate(): void {
@@ -265,6 +297,27 @@ export class GoalsComponent implements OnInit, OnDestroy {
     }
 
     return withSegments;
+  }
+
+  private async refreshFx(): Promise<void> {
+    try {
+      const latestResp = await fetch(`https://api.frankfurter.app/latest?from=${this.fxBase}&to=${this.fxTarget}`);
+      const latest = await latestResp.json() as { rates?: Record<string, number> };
+      this.fxRate = latest.rates?.[this.fxTarget] ?? 0;
+      this.recalculateConverter();
+
+      const end = new Date();
+      const start = new Date();
+      start.setDate(end.getDate() - 14);
+      const format = (d: Date) => d.toISOString().slice(0,10);
+      const histResp = await fetch(`https://api.frankfurter.app/${format(start)}..${format(end)}?from=${this.fxBase}&to=${this.fxTarget}`);
+      const hist = await histResp.json() as { rates?: Record<string, Record<string, number>> };
+      this.fxHistory = Object.keys(hist.rates ?? {}).sort().map((k) => hist.rates?.[k]?.[this.fxTarget] ?? 0).filter((v) => Number.isFinite(v) && v > 0);
+    } catch {
+      this.fxRate = 0;
+      this.fxHistory = [];
+      this.recalculateConverter();
+    }
   }
 
   private recalculateComparisons(): void {

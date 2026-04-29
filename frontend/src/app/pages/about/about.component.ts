@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AppLanguage, I18nService } from '../../core/i18n.service';
+import { I18nService } from '../../core/i18n.service';
 
 @Component({
   selector: 'app-about',
@@ -10,21 +10,21 @@ import { AppLanguage, I18nService } from '../../core/i18n.service';
 export class AboutComponent {
   constructor(private readonly i18nService: I18nService) {}
 
-  private readonly tips: Record<AppLanguage, string[]> = {
+  private readonly tips: Record<string, string[]> = {
     uk: [
       'Записуй навіть дрібні витрати — саме вони найчастіше “з’їдають” бюджет.',
       'Перевіряй вкладку Goals щодня, щоб бачити темп витрат.',
       'Спробуй встановити тижневий ліміт для найактивнішої категорії.'
     ],
+    ru: [
+      'Записывай даже мелкие траты — именно они чаще всего “съедают” бюджет.',
+      'Проверяй вкладку Goals ежедневно, чтобы контролировать темп расходов.',
+      'Попробуй установить недельный лимит для самой активной категории.'
+    ],
     en: [
       'Track even tiny expenses — they usually have the biggest hidden impact.',
       'Open Goals daily to keep your spending pace under control.',
       'Set a weekly cap for your most active category to save faster.'
-    ],
-    ru: [
-      'Записывай даже мелкие траты — именно они чаще всего «съедают» бюджет.',
-      'Проверяй вкладку Goals ежедневно, чтобы контролировать темп расходов.',
-      'Попробуй установить недельный лимит для самой активной категории.'
     ],
     es: [
       'Registra incluso los gastos pequeños: suelen tener el mayor impacto oculto.',
@@ -49,10 +49,9 @@ export class AboutComponent {
   };
 
   get tip(): string {
-    const language = this.i18nService.language;
-    const source = this.tips[language] ?? this.tips['en'];
-    const randomOffset = Math.floor(Math.random() * 10);
-    const tipIndex = (Date.now() + randomOffset) % source.length;
-    return source[tipIndex];
+    const lang = this.i18nService.language;
+    const source = this.tips[lang] ?? this.tips.en;
+    const daySeed = new Date().getTime() + Math.floor(Math.random() * 10);
+    return source[daySeed % source.length];
   }
 }

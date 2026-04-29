@@ -17,6 +17,15 @@
 }
 
 .ui-hex-trigger {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateZ(0);
+
   width: 64px;
   height: 72px;
   border: 2px solid rgba(143, 187, 255, 0.88);
@@ -140,4 +149,24 @@ h4 {
 .streak-caption {
   margin-top: 8px;
   opacity: 0.92;
+}
+
+select {
+  background: rgba(13, 27, 50, 0.9);
+  border: 1px solid rgba(124, 165, 238, 0.4);
+  color: #d9e8ff;
+  border-radius: 8px;
+  padding: 6px;
+}
+
+.fx-chart {
+  width: 100%;
+  height: 86px;
+  margin-top: 8px;
+
+  polyline {
+    fill: none;
+    stroke: #79c0ff;
+    stroke-width: 2;
+  }
 }

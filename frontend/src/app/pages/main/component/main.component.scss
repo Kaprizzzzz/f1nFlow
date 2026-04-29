@@ -1,20 +1,20 @@
 .dashboard-container {
   --dashboard-top-offset: calc(env(safe-area-inset-top, 0px) - 20px);
   --active-panel-gap: 50px;
-  --sphere-transition-duration: 0.819s;
+  --sphere-transition-duration: 0.901s;
   --sphere-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
-  --sphere-transform-duration: 1.029s;
-  --sphere-fade-duration: 0.651s;
+  --sphere-transform-duration: 1.132s;
+  --sphere-fade-duration: 0.716s;
   width: 100%;
   height: 100%;
   min-height: 100%;
   max-height: 100%;
   background:
-// ОСЬ ТАК: центральне синє сяйво опустив трохи нижче, щоб підсвітка краще лягала під опущені сфери.
+// Shifted the central blue glow lower to better align with lowered spheres.
     radial-gradient(circle at 50% 40%, rgba(61, 130, 240, 0.35) 0%, transparent 38%),
-    // ОСЬ ТАК: лівий теплий акцент теж зсунув вниз, щоб не лишався візуальний провал біля таббару.
+    // Shifted the left warm accent downward to avoid a visual gap near the tab bar.
     radial-gradient(circle at 22% 82%, rgba(255, 164, 67, 0.2) 0%, transparent 30%),
-    // ОСЬ ТАК: правий зелений акцент підвів ближче до нижнього ряду куль для балансу композиції.
+    // Moved the right green accent closer to the lower row of spheres for visual balance.
     radial-gradient(circle at 80% 80%, rgba(66, 235, 176, 0.2) 0%, transparent 26%),
     linear-gradient(180deg, #060b17 0%, #02050d 100%);
   display: flex;
@@ -124,7 +124,7 @@
   color: #dfeaff;
   font-weight: 700;
   font-size: 24px;
-  // Створення форми шестикутника
+  // Build hexagon shape
   clip-path: polygon(50% 0%, 92% 25%, 92% 75%, 50% 100%, 8% 75%, 8% 25%);
   box-shadow: 0 0 18px rgba(107, 164, 255, 0.25);
   cursor: pointer;
@@ -242,7 +242,7 @@
 }
 
 .dashboard-container.has-active:not(.fullscreen-panel-active) .sphere-wrapper.is-active {
-  animation: active-sphere-pop 1.1025s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: active-sphere-pop 1.268s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes active-sphere-pop {
@@ -299,7 +299,7 @@
   .layout-controls,
   .challenge-banner,
   .engagement-panel {
-    transition: opacity 0.26s ease;
+    transition: opacity 0.299s ease;
     opacity: 0;
     pointer-events: none;
   }

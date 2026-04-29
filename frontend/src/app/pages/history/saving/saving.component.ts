@@ -64,6 +64,10 @@ export class SavingComponent implements OnInit, OnDestroy {
   }
  
   handleCircleClick(): void {
+    if (this.isFullView) {
+      return;
+    }
+
     this.onSelect.emit();
   }
 

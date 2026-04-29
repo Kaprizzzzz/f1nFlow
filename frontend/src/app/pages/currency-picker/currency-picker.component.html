@@ -9,13 +9,14 @@
     {{ selectedCurrency }}
   </button>
 
-  <button
-    *ngFor="let currency of secondaryCurrencies"
-    type="button"
-    class="currency-hex option"
-    [class.visible]="isOpen"
-    (click)="pick(currency)"
-  >
-    {{ currency }}
-  </button>
+  <div class="options-panel" [class.visible]="isOpen">
+    <button
+      *ngFor="let currency of secondaryCurrencies"
+      type="button"
+      class="currency-hex option"
+      (click)="pick(currency)"
+    >
+      {{ currency }}
+    </button>
+  </div>
 </div>

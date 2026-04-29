@@ -301,23 +301,54 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
   private async refreshFx(): Promise<void> {
     try {
-      const latestResp = await fetch(`https://api.frankfurter.app/latest?from=${this.fxBase}&to=${this.fxTarget}`);
-      const latest = await latestResp.json() as { rates?: Record<string, number> };
-      this.fxRate = latest.rates?.[this.fxTarget] ?? 0;
+      const frankfurterRate = await this.fetchFrankfurterRate();
+      const fallbackRate = await this.fetchOpenExchangeRate();
+      this.fxRate = frankfurterRate > 0 ? frankfurterRate : fallbackRate;
       this.recalculateConverter();
 
-      const end = new Date();
-      const start = new Date();
-      start.setDate(end.getDate() - 14);
-      const format = (d: Date) => d.toISOString().slice(0,10);
-      const histResp = await fetch(`https://api.frankfurter.app/${format(start)}..${format(end)}?from=${this.fxBase}&to=${this.fxTarget}`);
-      const hist = await histResp.json() as { rates?: Record<string, Record<string, number>> };
-      this.fxHistory = Object.keys(hist.rates ?? {}).sort().map((k) => hist.rates?.[k]?.[this.fxTarget] ?? 0).filter((v) => Number.isFinite(v) && v > 0);
+      const history = await this.fetchFrankfurterHistory();
+      this.fxHistory = history.length > 1 ? history : this.buildFlatHistory(this.fxRate);
     } catch {
       this.fxRate = 0;
       this.fxHistory = [];
       this.recalculateConverter();
     }
+  }
+
+  private async fetchFrankfurterRate(): Promise<number> {
+    const response = await fetch(`https://api.frankfurter.app/latest?from=${this.fxBase}&to=${this.fxTarget}`);
+    const payload = await response.json() as { rates?: Record<string, number> };
+    const rate = payload.rates?.[this.fxTarget] ?? 0;
+    return Number.isFinite(rate) && rate > 0 ? rate : 0;
+  }
+
+  private async fetchOpenExchangeRate(): Promise<number> {
+    const response = await fetch(`https://open.er-api.com/v6/latest/${this.fxBase}`);
+    const payload = await response.json() as { rates?: Record<string, number> };
+    const rate = payload.rates?.[this.fxTarget] ?? 0;
+    return Number.isFinite(rate) && rate > 0 ? rate : 0;
+  }
+
+  private async fetchFrankfurterHistory(): Promise<number[]> {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - 14);
+    const format = (d: Date) => d.toISOString().slice(0, 10);
+    const response = await fetch(`https://api.frankfurter.app/${format(start)}..${format(end)}?from=${this.fxBase}&to=${this.fxTarget}`);
+    const payload = await response.json() as { rates?: Record<string, Record<string, number>> };
+
+    return Object.keys(payload.rates ?? {})
+      .sort()
+      .map((key) => payload.rates?.[key]?.[this.fxTarget] ?? 0)
+      .filter((value) => Number.isFinite(value) && value > 0);
+  }
+
+  private buildFlatHistory(rate: number): number[] {
+    if (!(rate > 0)) {
+      return [];
+    }
+
+    return Array.from({ length: 15 }, () => rate);
   }
 
   private recalculateComparisons(): void {
@@ -356,27 +387,27 @@ export class GoalsComponent implements OnInit, OnDestroy {
   private buildInsights(daysToDeadline: number): void {
     const insights: string[] = [];
     if (this.safeSpendPerDay > 0) {
-      insights.push(`Щоб дотягнути до дедлайну, орієнтир ≈ ${this.safeSpendPerDay.toFixed(2)} / день.`);
+      insights.push(`To stay on track until the deadline, target ≈ ${this.safeSpendPerDay.toFixed(2)} / day.`);
     }
     insights.push(
-      `Сьогодні: ${this.todaySpent.toFixed(2)} (${Math.abs(this.todayVsYesterdayPercent).toFixed(1)}% ${this.todayVsYesterdayDirection} за вчора).`
+      `Today: ${this.todaySpent.toFixed(2)} (${Math.abs(this.todayVsYesterdayPercent).toFixed(1)}% ${this.todayVsYesterdayDirection} vs yesterday).`
     );
     insights.push(
-      `Відносно середнього за місяць: ${Math.abs(this.todayVsMonthlyAvgPercent).toFixed(1)}% ${this.todayVsMonthlyDirection}.`
+      `Compared to monthly average: ${Math.abs(this.todayVsMonthlyAvgPercent).toFixed(1)}% ${this.todayVsMonthlyDirection}.`
     );
     if (this.spentPerDay > 0) {
       insights.push(
-        `Відносно середнього в обраному періоді: ${Math.abs(this.todayVsSelectedAvgPercent).toFixed(1)}% ${this.todayVsPeriodDirection}.`
+        `Compared to selected period average: ${Math.abs(this.todayVsSelectedAvgPercent).toFixed(1)}% ${this.todayVsPeriodDirection}.`
       );
     }
     if (this.safeSpendPerDay > 0 && this.todaySpent > this.safeSpendPerDay * 1.1) {
-      insights.push(`Ризик перевищення: сьогоднішні витрати вище безпечного ліміту на ${((this.todaySpent / this.safeSpendPerDay - 1) * 100).toFixed(1)}%.`);
+      insights.push(`Overspending risk: today's spending is above the safe limit by ${((this.todaySpent / this.safeSpendPerDay - 1) * 100).toFixed(1)}%.`);
     }
     if (this.safeSpendPerDay > 0 && this.todaySpent <= this.safeSpendPerDay * 0.9) {
-      insights.push(`Клас! Ти економиш: витрати нижче безпечного ліміту щонайменше на 10%.`);
+      insights.push(`Great! You're saving: spending is at least 10% below the safe limit.`);
     }
     if (daysToDeadline <= 3) {
-      insights.push('Дедлайн вже близько: краще тримати тільки обовʼязкові витрати.');
+      insights.push('The deadline is close: keep only essential spending.');
     }
     this.smartInsights = insights;
   }

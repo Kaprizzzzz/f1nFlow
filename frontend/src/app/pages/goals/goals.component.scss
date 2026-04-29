@@ -170,3 +170,14 @@ select {
     stroke-width: 2;
   }
 }
+
+.row .metric {
+  margin: 0;
+  align-self: end;
+  display: flex;
+  align-items: center;
+}
+
+.row label {
+  align-self: end;
+}

@@ -386,7 +386,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
   private buildInsights(daysToDeadline: number): void {
     const insights: string[] = [];
-    const t = (ua: string, en: string) => (this.i18nService.language === "ua" ? ua : en);
+    const t = (ua: string, en: string) => (this.i18nService.language === "uk" ? ua : en);
     if (this.safeSpendPerDay > 0) {
       insights.push(t(`Щоб вкластися до дедлайну, ціль ≈ ${this.safeSpendPerDay.toFixed(2)} / день.`, `To stay on track until the deadline, target ≈ ${this.safeSpendPerDay.toFixed(2)} / day.`));
     }

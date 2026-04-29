@@ -12,29 +12,29 @@
   </div>
 
   <section class="card">
-    <h3>Mini stats</h3>
+    <h3>{{ gt('miniStats') }}</h3>
     <div class="mini-stats-grid">
-      <p class="metric">Today spent: <strong>{{ todaySpent | number:'1.2-2' }}</strong></p>
-      <p class="metric">Yesterday spent: <strong>{{ yesterdaySpent | number:'1.2-2' }}</strong></p>
-      <p class="metric">Vs yesterday: <strong>{{ todayVsYesterdayPercent | number:'1.0-1' }}%</strong> ({{ todayVsYesterdayDirection }})</p>
-      <p class="metric">Vs month avg/day: <strong>{{ todayVsMonthlyAvgPercent | number:'1.0-1' }}%</strong> ({{ todayVsMonthlyDirection }})</p>
-      <p class="metric">Month avg/day: <strong>{{ monthlyAverageDaily | number:'1.2-2' }}</strong></p>
-      <p class="metric">Trend: <strong>{{ spendingTrendLabel }}</strong></p>
+      <p class="metric">{{ gt('todaySpent') }}: <strong>{{ todaySpent | number:'1.2-2' }}</strong></p>
+      <p class="metric">{{ gt('yesterdaySpent') }}: <strong>{{ yesterdaySpent | number:'1.2-2' }}</strong></p>
+      <p class="metric">{{ gt('vsYesterday') }}: <strong>{{ todayVsYesterdayPercent | number:'1.0-1' }}%</strong> ({{ todayVsYesterdayDirection }})</p>
+      <p class="metric">{{ gt('vsMonthAvgDay') }}: <strong>{{ todayVsMonthlyAvgPercent | number:'1.0-1' }}%</strong> ({{ todayVsMonthlyDirection }})</p>
+      <p class="metric">{{ gt('monthAvgDay') }}: <strong>{{ monthlyAverageDaily | number:'1.2-2' }}</strong></p>
+      <p class="metric">{{ gt('trend') }}: <strong>{{ spendingTrendLabel }}</strong></p>
     </div>
   </section>
 
   <section class="card">
-    <h3>Period categories</h3>
+    <h3>{{ gt('periodCategories') }}</h3>
     <div class="row">
-      <label>From <input type="date" [(ngModel)]="periodStart" [max]="periodEnd" (change)="onPeriodChange()" /></label>
-      <label>To <input type="date" [(ngModel)]="periodEnd" [min]="periodStart" [max]="todayDate" (change)="onPeriodChange()" /></label>
+      <label>{{ gt('from') }} <input type="date" [(ngModel)]="periodStart" [max]="periodEnd" (change)="onPeriodChange()" /></label>
+      <label>{{ gt('to') }} <input type="date" [(ngModel)]="periodEnd" [min]="periodStart" [max]="todayDate" (change)="onPeriodChange()" /></label>
     </div>
 
     <div class="category-columns">
       <div>
-        <h4>Income:</h4>
+        <h4>{{ gt('income') }}:</h4>
         @if (incomeSummary.length === 0) {
-          <p class="empty">No income in selected period</p>
+          <p class="empty">{{ gt('noIncomePeriod') }}</p>
         } @else {
           @for (item of incomeSummary; track trackByCategory($index, item)) {
             <div class="category-line">
@@ -52,9 +52,9 @@
       </div>
 
       <div>
-        <h4>Expense:</h4>
+        <h4>{{ gt('expense') }}:</h4>
         @if (expenseSummary.length === 0) {
-          <p class="empty">No expenses in selected period</p>
+          <p class="empty">{{ gt('noExpensePeriod') }}</p>
         } @else {
           @for (item of expenseSummary; track trackByCategory($index, item)) {
             <div class="category-line">
@@ -74,63 +74,63 @@
   </section>
 
   <section class="card">
-    <h3>Spending in selected period</h3>
-    <p class="metric">Spent in period: <strong>{{ periodSpent | number:'1.2-2' }}</strong></p>
-    <p class="metric">Average per day: <strong>{{ spentPerDay | number:'1.2-2' }}</strong></p>
-    <p class="metric">Average per week: <strong>{{ spentPerWeek | number:'1.2-2' }}</strong></p>
-    <p class="metric">Average per month: <strong>{{ spentPerMonth | number:'1.2-2' }}</strong></p>
-    <p class="metric">Today vs selected period avg: <strong>{{ todayVsSelectedAvgPercent | number:'1.0-1' }}%</strong> ({{ todayVsPeriodDirection }})</p>
+    <h3>{{ gt('spendingInPeriod') }}</h3>
+    <p class="metric">{{ gt('spentInPeriod') }}: <strong>{{ periodSpent | number:'1.2-2' }}</strong></p>
+    <p class="metric">{{ gt('avgPerDay') }}: <strong>{{ spentPerDay | number:'1.2-2' }}</strong></p>
+    <p class="metric">{{ gt('avgPerWeek') }}: <strong>{{ spentPerWeek | number:'1.2-2' }}</strong></p>
+    <p class="metric">{{ gt('avgPerMonth') }}: <strong>{{ spentPerMonth | number:'1.2-2' }}</strong></p>
+    <p class="metric">{{ gt('todayVsPeriodAvg') }}: <strong>{{ todayVsSelectedAvgPercent | number:'1.0-1' }}%</strong> ({{ todayVsPeriodDirection }})</p>
   </section>
 
   <section class="card">
-    <h3>Smart hints</h3>
+    <h3>{{ gt('smartHints') }}</h3>
     @for (item of smartInsights; track $index) {
       <p class="metric">• {{ item }}</p>
     }
   </section>
 
   <section class="card">
-    <h3>Streak</h3>
-    <p class="metric">Current streak: <strong>{{ streakCurrent }}</strong> днів</p>
-    <p class="metric">Best streak: <strong>{{ streakBest }}</strong> днів</p>
+    <h3>{{ gt('streak') }}</h3>
+    <p class="metric">{{ gt('currentStreak') }}: <strong>{{ streakCurrent }}</strong> {{ gt('days') }}</p>
+    <p class="metric">{{ gt('bestStreak') }}: <strong>{{ streakBest }}</strong> {{ gt('days') }}</p>
     <div class="streak-flame-strip" aria-label="Streak flames">
       @for (_ of streakFlames; track $index) {
         <span class="flame" [class.today]="$index === streakFlames.length - 1">🔥</span>
       }
     </div>
     @if (streakFlames.length > 0) {
-      <p class="metric streak-caption">Сьогодні зайшов(ла): <strong>+1 вогник</strong></p>
+      <p class="metric streak-caption">{{ gt('todayVisited') }}: <strong>+1 вогник</strong></p>
     }
   </section>
 
   <section class="card">
-    <h3>Weekly challenge</h3>
+    <h3>{{ gt('weeklyChallenge') }}</h3>
     @if (weeklyChallenge) {
       <p class="metric">
-        Утримати витрати в категорії <strong>{{ weeklyChallenge.category }}</strong> до
+        {{ gt('challengeTarget') }} <strong>{{ weeklyChallenge.category }}</strong> до
         <strong>{{ weeklyChallenge.limit | number:'1.2-2' }}</strong>.
       </p>
       <p class="metric">
-        Поточні витрати: <strong>{{ weeklyChallenge.spent | number:'1.2-2' }}</strong>
-        ({{ weeklyChallenge.completed ? '✅ виконано' : '⏳ в процесі' }}).
+        {{ gt('challengeCurrent') }}: <strong>{{ weeklyChallenge.spent | number:'1.2-2' }}</strong>
+        ({{ weeklyChallenge.completed ? ('✅ ' + gt('challengeDone')) : ('⏳ ' + gt('challengeInProgress')) }}).
       </p>
     } @else {
-      <p class="metric">Ще недостатньо даних для формування challenge.</p>
+      <p class="metric">{{ gt('challengeNotEnoughData') }}</p>
     }
   </section>
 
   <section class="card">
-    <h3>Badges</h3>
+    <h3>{{ gt('badges') }}</h3>
     @if (badges.length === 0) {
-      <p class="metric">Поки немає бейджів.</p>
+      <p class="metric">{{ gt('noBadges') }}</p>
     } @else {
       <p class="metric">{{ badges.join(' · ') }}</p>
     }
   </section>
 
   <section class="card">
-    <h3>Deadline planner</h3>
-    <label>Deadline date <input type="date" [(ngModel)]="deadline" [min]="todayDate" (change)="onDeadlineChange()" /></label>
-    <p class="metric">Recommended daily spending limit: <strong>{{ safeSpendPerDay | number:'1.2-2' }}</strong></p>
+    <h3>{{ gt('deadlinePlanner') }}</h3>
+    <label>{{ gt('deadlineDate') }} <input type="date" [(ngModel)]="deadline" [min]="todayDate" (change)="onDeadlineChange()" /></label>
+    <p class="metric">{{ gt('recommendedDailyLimit') }}: <strong>{{ safeSpendPerDay | number:'1.2-2' }}</strong></p>
   </section>
 </section>

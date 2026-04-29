@@ -20,7 +20,7 @@ $recent-glow: #ff78c7;
     justify-content: center;
     align-items: center;
     transform: scale(1);
-    transition: transform 0.86s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.65s ease;
+    transition: transform 0.903s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.683s ease;
 
     &::after {
       content: '';
@@ -239,7 +239,7 @@ $recent-glow: #ff78c7;
   padding: 16px;
   z-index: 2200;
   transform: none;
-  animation: recent-panel-appear 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: recent-panel-appear 0.756s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes recent-panel-appear {

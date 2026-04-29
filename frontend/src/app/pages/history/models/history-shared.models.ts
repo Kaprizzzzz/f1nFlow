@@ -10,4 +10,4 @@ export interface NewsItem {
   isRead: boolean;
 }
 
-export type Currency = 'EUR' | 'USD' | 'UAH';
+export type Currency = 'EUR' | 'USD' | 'UAH' | 'RUB' | 'PLN' | 'TRY' | 'CAD' | 'GBP' | 'HRK';

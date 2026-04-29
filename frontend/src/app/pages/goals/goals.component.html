@@ -133,4 +133,29 @@
     <label>{{ gt('deadlineDate') }} <input type="date" [(ngModel)]="deadline" [min]="todayDate" (change)="onDeadlineChange()" /></label>
     <p class="metric">{{ gt('recommendedDailyLimit') }}: <strong>{{ safeSpendPerDay | number:'1.2-2' }}</strong></p>
   </section>
+
+  <section class="card">
+    <h3>{{ gt('fxTrend') }}</h3>
+    <div class="row">
+      <label>{{ gt('from') }}
+        <select [(ngModel)]="fxBase" (change)="onFxPairChange()"><option *ngFor="let c of fxCurrencies" [value]="c">{{ c }}</option></select>
+      </label>
+      <label>{{ gt('to') }}
+        <select [(ngModel)]="fxTarget" (change)="onFxPairChange()"><option *ngFor="let c of fxCurrencies" [value]="c">{{ c }}</option></select>
+      </label>
+    </div>
+    <p class="metric">1 {{ fxBase }} = <strong>{{ fxRate | number:'1.4-4' }}</strong> {{ fxTarget }}</p>
+    <svg *ngIf="fxSparkline" viewBox="0 0 280 80" class="fx-chart"><polyline [attr.points]="fxSparkline"></polyline></svg>
+  </section>
+
+  <section class="card">
+    <h3>{{ gt('fxConverter') }}</h3>
+    <div class="row">
+      <label>{{ gt('amount') }}
+        <input type="number" min="0" step="0.01" [(ngModel)]="converterAmount" (input)="recalculateConverter()" />
+      </label>
+      <p class="metric">{{ gt('result') }}: <strong>{{ converterResult | number:'1.2-2' }} {{ fxTarget }}</strong></p>
+    </div>
+  </section>
 </section>
+

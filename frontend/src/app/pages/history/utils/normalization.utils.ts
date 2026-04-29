@@ -1,4 +1,5 @@
 import { GoalsPreferences } from '../models/finance.models';
+import { Currency } from '../models/history-shared.models';
 
 export function roundToCents(value: number): number {
   return Number(value.toFixed(2));
@@ -45,13 +46,19 @@ export function normalizeGoalsPreferences(preferences?: Partial<GoalsPreferences
 }
 
 export function getFallbackRate(
-  fromCurrency: 'EUR' | 'USD' | 'UAH',
-  toCurrency: 'EUR' | 'USD' | 'UAH'
+  fromCurrency: Currency,
+  toCurrency: Currency
 ): number {
-  const ratesInUsd: Record<'EUR' | 'USD' | 'UAH', number> = {
+  const ratesInUsd: Record<Currency, number> = {
     USD: 1,
     EUR: 1.09,
-    UAH: 1 / 41
+    UAH: 1 / 41,
+    RUB: 1 / 92,
+    PLN: 0.26,
+    TRY: 1 / 32,
+    CAD: 0.73,
+    GBP: 1.27,
+    HRK: 0.15
   };
 
   const fromInUsd = ratesInUsd[fromCurrency];

@@ -4,7 +4,7 @@
   </div>
 
   <div class="recent-panel" *ngIf="isFullView" (click)="$event.stopPropagation()">
-    <button type="button" class="panel-close-btn" (pointerdown)="$event.stopPropagation()" (click)="handleClose($event)" [attr.aria-label]="t('panel.closeRecent')">✕</button>
+    <button type="button" class="panel-close-btn" (pointerdown)="$event.stopPropagation()" (pointerup)="$event.stopPropagation()" (click)="handleClose($event)" [attr.aria-label]="t('panel.closeRecent')">✕</button>
     <div class="quick-limit-row">
       <span>{{ t('recent.quickCount') }}:</span>
       <div class="quick-limit-actions">

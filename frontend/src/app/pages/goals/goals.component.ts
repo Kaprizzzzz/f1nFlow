@@ -386,28 +386,23 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
   private buildInsights(daysToDeadline: number): void {
     const insights: string[] = [];
+    const t = (ua: string, en: string) => (this.i18nService.language === "ua" ? ua : en);
     if (this.safeSpendPerDay > 0) {
-      insights.push(`To stay on track until the deadline, target ≈ ${this.safeSpendPerDay.toFixed(2)} / day.`);
+      insights.push(t(`Щоб вкластися до дедлайну, ціль ≈ ${this.safeSpendPerDay.toFixed(2)} / день.`, `To stay on track until the deadline, target ≈ ${this.safeSpendPerDay.toFixed(2)} / day.`));
     }
-    insights.push(
-      `Today: ${this.todaySpent.toFixed(2)} (${Math.abs(this.todayVsYesterdayPercent).toFixed(1)}% ${this.todayVsYesterdayDirection} vs yesterday).`
-    );
-    insights.push(
-      `Compared to monthly average: ${Math.abs(this.todayVsMonthlyAvgPercent).toFixed(1)}% ${this.todayVsMonthlyDirection}.`
-    );
+    insights.push(t(`Сьогодні: ${this.todaySpent.toFixed(2)} (${Math.abs(this.todayVsYesterdayPercent).toFixed(1)}% ${this.todayVsYesterdayDirection} проти вчора).`, `Today: ${this.todaySpent.toFixed(2)} (${Math.abs(this.todayVsYesterdayPercent).toFixed(1)}% ${this.todayVsYesterdayDirection} vs yesterday).`));
+    insights.push(t(`Порівняно з середнім за місяць: ${Math.abs(this.todayVsMonthlyAvgPercent).toFixed(1)}% ${this.todayVsMonthlyDirection}.`, `Compared to monthly average: ${Math.abs(this.todayVsMonthlyAvgPercent).toFixed(1)}% ${this.todayVsMonthlyDirection}.`));
     if (this.spentPerDay > 0) {
-      insights.push(
-        `Compared to selected period average: ${Math.abs(this.todayVsSelectedAvgPercent).toFixed(1)}% ${this.todayVsPeriodDirection}.`
-      );
+      insights.push(t(`Порівняно з середнім за вибраний період: ${Math.abs(this.todayVsSelectedAvgPercent).toFixed(1)}% ${this.todayVsPeriodDirection}.`, `Compared to selected period average: ${Math.abs(this.todayVsSelectedAvgPercent).toFixed(1)}% ${this.todayVsPeriodDirection}.`));
     }
     if (this.safeSpendPerDay > 0 && this.todaySpent > this.safeSpendPerDay * 1.1) {
-      insights.push(`Overspending risk: today's spending is above the safe limit by ${((this.todaySpent / this.safeSpendPerDay - 1) * 100).toFixed(1)}%.`);
+      insights.push(t(`Ризик перевитрат: сьогоднішні витрати вищі за безпечний ліміт на ${((this.todaySpent / this.safeSpendPerDay - 1) * 100).toFixed(1)}%.`, `Overspending risk: today's spending is above the safe limit by ${((this.todaySpent / this.safeSpendPerDay - 1) * 100).toFixed(1)}%.`));
     }
     if (this.safeSpendPerDay > 0 && this.todaySpent <= this.safeSpendPerDay * 0.9) {
-      insights.push(`Great! You're saving: spending is at least 10% below the safe limit.`);
+      insights.push(t(`Клас! Ти економиш: витрати щонайменше на 10% нижчі за безпечний ліміт.`, `Great! You're saving: spending is at least 10% below the safe limit.`));
     }
     if (daysToDeadline <= 3) {
-      insights.push('The deadline is close: keep only essential spending.');
+      insights.push(t('Дедлайн близько: залиш тільки найнеобхідніші витрати.', 'The deadline is close: keep only essential spending.'));
     }
     this.smartInsights = insights;
   }

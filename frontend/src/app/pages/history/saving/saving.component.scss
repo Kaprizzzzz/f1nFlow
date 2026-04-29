@@ -255,7 +255,7 @@ $saving-glow: #63ffd0;
   --panel-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + 10px);
   position: fixed;
   --panel-lift: 5dvh;
-  top: calc(var(--panel-top-offset) - var(--panel-lift));
+  top: calc(var(--panel-top-offset) - var(--panel-lift) + 5dvh);
   left: 9px;
   right: 9px;
   width: auto;

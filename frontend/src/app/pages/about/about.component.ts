@@ -50,7 +50,8 @@ export class AboutComponent {
 
   get tip(): string {
     const lang = this.i18nService.language;
-    const source = this.tips[lang] ?? this.tips['en'];
+    const fallbackTips = this.tips['en'];
+    const source = this.tips[lang] ?? fallbackTips;
     const daySeed = new Date().getTime() + Math.floor(Math.random() * 10);
     return source[daySeed % source.length];
   }

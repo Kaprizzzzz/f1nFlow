@@ -67,10 +67,10 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   badges: string[] = [];
   selectedBadgeDescription = '';
   readonly badgeCatalog = [
-    { id: 'streak-bronze', title: 'Streak Bronze', color: '#b87333', descriptionKey: 'Visit app 5 days in a row' },
-    { id: 'streak-silver', title: 'Streak Silver', color: '#c0c0c0', descriptionKey: 'Visit app 14 days in a row' },
-    { id: 'streak-gold', title: 'Streak Gold', color: '#ffd700', descriptionKey: 'Visit app 30 days in a row' },
-    { id: 'challenge-winner', title: 'Challenge Winner', color: '#61dafb', descriptionKey: 'Complete weekly challenge' }
+    { id: 'streak-bronze', title: '🥉', color: '#b87333', descriptionKey: 'Visit app 5 days in a row' },
+    { id: 'streak-silver', title: '🥈', color: '#c0c0c0', descriptionKey: 'Visit app 14 days in a row' },
+    { id: 'streak-gold', title: '🥇', color: '#ffd700', descriptionKey: 'Visit app 30 days in a row' },
+    { id: 'challenge-winner', title: '🏆', color: '#61dafb', descriptionKey: 'Complete weekly challenge' }
   ];
   newsPanelAnchorBottom = 0;
 
@@ -184,6 +184,10 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setActiveTab(tab: SphereTab): void {
     if (this.isEditMode) {
+      return;
+    }
+    if (this.activeTab !== null && this.activeTab !== tab) {
+      this.closeActiveTab();
       return;
     }
     const nextTab = this.activeTab === tab ? null : tab;

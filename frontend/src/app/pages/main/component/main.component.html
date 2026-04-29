@@ -2,37 +2,6 @@
   @if (weeklyChallengeText) {
     <div class="challenge-banner">{{ weeklyChallengeText }}</div>
   }
-  <section class="engagement-panel">
-    <div class="streak-row">
-      🔥 {{ t('main.streakCurrent') }}: {{ streakCurrent }} {{ t('main.days') }} · {{ t('main.streakBest') }}: {{ streakBest }} {{ t('main.days') }}
-    </div>
-    <div class="missions-row">
-      <strong>{{ t('main.weeklyMissions') }}:</strong>
-      <ul>
-        <li>{{ t('main.challengeSpendLess') }}</li>
-        <li>{{ t('main.challengeNoSpendingDay') }}</li>
-      </ul>
-    </div>
-    <div class="badges-row">
-      <strong>{{ t('main.badges') }}:</strong>
-      <div class="badge-list">
-        @for (badge of badgeCatalog; track badge.id) {
-          <button
-            type="button"
-            class="badge-item"
-            [class.unlocked]="isBadgeUnlocked(badge.id)"
-            [style.--badge-color]="badge.color"
-            (click)="openBadgeDescription(badge.id)"
-          >
-            {{ badge.title }}
-          </button>
-        }
-      </div>
-      @if (selectedBadgeDescription) {
-        <p class="badge-description">{{ selectedBadgeDescription }}</p>
-      }
-    </div>
-  </section>
   <div class="layout-controls" *ngIf="canEditLayout">
     <button
       type="button"

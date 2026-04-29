@@ -3,10 +3,10 @@
     <button type="button" class="ui-hex-trigger" (click)="toggleUiPicker($event)" aria-label="Open goals UI options">⬢</button>
     @if (isUiPickerOpen) {
       <div class="ui-picker-panel">
-        <button type="button" class="theme-chip" [class.active]="visualizationMode === 'amount'" (click)="setVisualizationMode('amount')">Σ mode</button>
-        <button type="button" class="theme-chip" [class.active]="visualizationMode === 'segments'" (click)="setVisualizationMode('segments')">◫ mode</button>
-        <button type="button" class="theme-chip" [class.active]="theme === 'default'" (click)="setTheme('default')">Main theme</button>
-        <button type="button" class="theme-chip" [class.active]="theme === 'girly'" (click)="setTheme('girly')">Girly theme</button>
+        <button type="button" class="theme-chip" [class.active]="visualizationMode === 'amount'" (click)="setVisualizationMode('amount')">{{ gt('amountMode') }}</button>
+        <button type="button" class="theme-chip" [class.active]="visualizationMode === 'segments'" (click)="setVisualizationMode('segments')">{{ gt('segmentsMode') }}</button>
+        <button type="button" class="theme-chip" [class.active]="theme === 'default'" (click)="setTheme('default')">{{ gt('mainTheme') }}</button>
+        <button type="button" class="theme-chip" [class.active]="theme === 'girly'" (click)="setTheme('girly')">{{ gt('girlyTheme') }}</button>
       </div>
     }
   </div>
@@ -99,7 +99,7 @@
       }
     </div>
     @if (streakFlames.length > 0) {
-      <p class="metric streak-caption">{{ gt('todayVisited') }}: <strong>+1 вогник</strong></p>
+      <p class="metric streak-caption">{{ gt('todayVisited') }}: <strong>+1 🔥</strong></p>
     }
   </section>
 
@@ -107,7 +107,7 @@
     <h3>{{ gt('weeklyChallenge') }}</h3>
     @if (weeklyChallenge) {
       <p class="metric">
-        {{ gt('challengeTarget') }} <strong>{{ weeklyChallenge.category }}</strong> до
+        {{ gt('challengeTarget') }} <strong>{{ weeklyChallenge.category }}</strong> {{ gt('challengeLimitWord') }}
         <strong>{{ weeklyChallenge.limit | number:'1.2-2' }}</strong>.
       </p>
       <p class="metric">

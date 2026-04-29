@@ -5,7 +5,7 @@
   </div>
 
   <div class="history-list" *ngIf="isFullView" (click)="$event.stopPropagation()">
-    <button type="button" class="panel-close-btn" (pointerdown)="$event.stopPropagation()" (click)="handleClose($event)" [attr.aria-label]="t('panel.closeHistory')">✕</button>
+    <button type="button" class="panel-close-btn" (pointerdown)="$event.stopPropagation()" (pointerup)="$event.stopPropagation()" (click)="handleClose($event)" [attr.aria-label]="t('panel.closeHistory')">✕</button>
     <h4>{{ t('saving.historyTitle') }}</h4>
 
     <div class="history-row" *ngFor="let item of historyRows">

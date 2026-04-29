@@ -154,7 +154,7 @@
       <label>{{ gt('amount') }}
         <input type="number" min="0" step="0.01" [(ngModel)]="converterAmount" (input)="recalculateConverter()" />
       </label>
-      <p class="metric">{{ gt('result') }}: <strong>{{ converterResult | number:'1.2-2' }} {{ fxTarget }}</strong></p>
+      <p class="metric converter-result">{{ gt('result') }}: <strong>{{ converterResult | number:'1.2-2' }} {{ fxTarget }}</strong></p>
     </div>
   </section>
 </section>

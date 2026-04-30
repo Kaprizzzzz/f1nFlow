@@ -24,6 +24,8 @@ export type GoalsPreferences = {
   periodStart?: string;
   periodEnd?: string;
   deadline?: string;
+  fxBase?: string;
+  fxTarget?: string;
 };
 
 export type AppLanguage = 'uk' | 'en' | 'ru' | 'es' | 'be' | 'fr' | 'nl';

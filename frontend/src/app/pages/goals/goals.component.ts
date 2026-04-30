@@ -252,17 +252,26 @@ export class GoalsComponent implements OnInit, OnDestroy {
       visualizationMode: this.visualizationMode,
       periodStart: this.periodStart,
       periodEnd: this.periodEnd,
-      deadline: this.deadline
+      deadline: this.deadline,
+      fxBase: this.fxBase,
+      fxTarget: this.fxTarget
     });
   }
 
   private applyGoalsPreferences(preferences: GoalsPreferences): void {
     this.theme = preferences.theme;
     this.visualizationMode = preferences.visualizationMode;
-     this.periodStart = preferences.periodStart ?? this.periodStart;
+    this.periodStart = preferences.periodStart ?? this.periodStart;
     this.periodEnd = preferences.periodEnd ?? this.periodEnd;
     this.deadline = preferences.deadline ?? this.deadline;
+    if (typeof preferences.fxBase === 'string' && FX_CURRENCIES.includes(preferences.fxBase as FxCurrency)) {
+      this.fxBase = preferences.fxBase as FxCurrency;
+    }
+    if (typeof preferences.fxTarget === 'string' && FX_CURRENCIES.includes(preferences.fxTarget as FxCurrency)) {
+      this.fxTarget = preferences.fxTarget as FxCurrency;
+    }
     this.recalculate();
+    void this.refreshFx();
   }
 
   private buildSummary(periodTransactions: Transaction[], type: 'plus' | 'minus'): CategorySummary[] {

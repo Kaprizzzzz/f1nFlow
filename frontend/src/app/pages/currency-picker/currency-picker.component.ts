@@ -12,11 +12,12 @@ import { Currency } from '../history/models/history-shared.models';
    templateUrl: './currency-picker.component.html',
    styleUrl: './currency-picker.component.scss'
  })
-export class CurrencyPickerComponent implements OnInit, OnDestroy {
+ export class CurrencyPickerComponent implements OnInit, OnDestroy {
    isOpen = false;
 
    readonly currencies: readonly Currency[] = ['EUR', 'USD', 'UAH', 'RUB', 'PLN', 'TRY', 'CAD', 'GBP', 'HRK'];
   selectedCurrency: Currency = 'EUR';
+  selectedTargetCurrency: Currency = 'USD';
   exchangeRates: Partial<Record<Currency, number>> = {};
  
   private subscription = new Subscription();
@@ -27,7 +28,20 @@ export class CurrencyPickerComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.balanceService.currency$.subscribe((currency) => {
         this.selectedCurrency = currency;
+        if (this.selectedTargetCurrency === this.selectedCurrency) {
+          this.selectedTargetCurrency = this.secondaryCurrencies[0] ?? this.selectedCurrency;
+        }
+        this.syncConverterPair();
         void this.loadExchangeRates();
+      })
+    );
+
+    this.subscription.add(
+      this.balanceService.goalsPreferences$.subscribe((preferences) => {
+        const target = preferences.fxTarget as Currency | undefined;
+        if (target && this.currencies.includes(target) && target !== this.selectedCurrency) {
+          this.selectedTargetCurrency = target;
+        }
       })
     );
 
@@ -47,9 +61,10 @@ export class CurrencyPickerComponent implements OnInit, OnDestroy {
    }
  
   pick(currency: Currency): void {
-    void this.balanceService.setCurrency(currency);
-     this.isOpen = false;
-   }
+    this.selectedTargetCurrency = currency;
+    this.syncConverterPair();
+    this.isOpen = false;
+  }
 
   getRateLabel(currency: Currency): string {
     const rate = this.exchangeRates[currency];
@@ -82,6 +97,13 @@ export class CurrencyPickerComponent implements OnInit, OnDestroy {
     }
 
     this.exchangeRates = rates;
+  }
+
+  private syncConverterPair(): void {
+    this.balanceService.setGoalsPreferences({
+      fxBase: this.selectedCurrency,
+      fxTarget: this.selectedTargetCurrency
+    });
   }
  
    @HostListener('document:click')

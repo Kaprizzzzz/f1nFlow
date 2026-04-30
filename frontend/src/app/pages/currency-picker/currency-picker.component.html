@@ -16,7 +16,8 @@
       class="currency-hex option"
       (click)="pick(currency)"
     >
-      {{ currency }}
+      <span>{{ currency }}</span>
+      <small>1 {{ selectedCurrency }} = {{ getRateLabel(currency) }} {{ currency }}</small>
     </button>
   </div>
 </div>

@@ -16,7 +16,9 @@ import { Currency } from '../history/models/history-shared.models';
    isOpen = false;
 
    readonly currencies: readonly Currency[] = ['EUR', 'USD', 'UAH', 'RUB', 'PLN', 'TRY', 'CAD', 'GBP', 'HRK'];
-   selectedCurrency: Currency = 'EUR';
+  selectedCurrency: Currency = 'EUR';
+  selectedTargetCurrency: Currency = 'USD';
+  exchangeRates: Partial<Record<Currency, number>> = {};
  
   private subscription = new Subscription();
 
@@ -26,8 +28,24 @@ import { Currency } from '../history/models/history-shared.models';
     this.subscription.add(
       this.balanceService.currency$.subscribe((currency) => {
         this.selectedCurrency = currency;
+        if (this.selectedTargetCurrency === this.selectedCurrency) {
+          this.selectedTargetCurrency = this.secondaryCurrencies[0] ?? this.selectedCurrency;
+        }
+        this.syncConverterPair();
+        void this.loadExchangeRates();
       })
     );
+
+    this.subscription.add(
+      this.balanceService.goalsPreferences$.subscribe((preferences) => {
+        const target = preferences.fxTarget as Currency | undefined;
+        if (target && this.currencies.includes(target) && target !== this.selectedCurrency) {
+          this.selectedTargetCurrency = target;
+        }
+      })
+    );
+
+    void this.loadExchangeRates();
   }
 
   ngOnDestroy(): void {
@@ -42,10 +60,51 @@ import { Currency } from '../history/models/history-shared.models';
      this.isOpen = !this.isOpen;
    }
  
-   pick(currency: Currency): void {
-    void this.balanceService.setCurrency(currency);
-     this.isOpen = false;
-   }
+  pick(currency: Currency): void {
+    this.selectedTargetCurrency = currency;
+    this.syncConverterPair();
+    this.isOpen = false;
+  }
+
+  getRateLabel(currency: Currency): string {
+    const rate = this.exchangeRates[currency];
+    if (!(rate && Number.isFinite(rate) && rate > 0)) {
+      return '—';
+    }
+    return rate.toFixed(4);
+  }
+
+  private async loadExchangeRates(): Promise<void> {
+    const base = this.selectedCurrency;
+    const rates: Partial<Record<Currency, number>> = { [base]: 1 };
+
+    try {
+      const response = await fetch(`https://open.er-api.com/v6/latest/${base}`);
+      if (!response.ok) {
+        this.exchangeRates = rates;
+        return;
+      }
+
+      const payload = await response.json() as { rates?: Record<string, number> };
+      for (const currency of this.secondaryCurrencies) {
+        const nextRate = payload.rates?.[currency] ?? 0;
+        rates[currency] = Number.isFinite(nextRate) ? nextRate : 0;
+      }
+    } catch {
+      for (const currency of this.secondaryCurrencies) {
+        rates[currency] = 0;
+      }
+    }
+
+    this.exchangeRates = rates;
+  }
+
+  private syncConverterPair(): void {
+    this.balanceService.setGoalsPreferences({
+      fxBase: this.selectedCurrency,
+      fxTarget: this.selectedTargetCurrency
+    });
+  }
  
    @HostListener('document:click')
    closeOnOutsideClick(): void {

@@ -1,11 +1,6 @@
 <div class="circle-wrapper" [class.active]="isFullView" (click)="handleCircleClick()">
   <div class="main-circle">
     <span class="label">{{ t('tab.news') }}</span>
-    <div class="orbit" *ngIf="orbitSegments$ | async as orbitSegments" aria-hidden="true">
-      @for (segment of orbitSegments; track segment) {
-        <i class="orbit-segment" [style.--segment-index]="segment" [style.--segment-count]="orbitSegments.length"></i>
-      }
-    </div>
   </div>
 
   <div

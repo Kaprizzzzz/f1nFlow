@@ -35,13 +35,17 @@ export function normalizeGoalsPreferences(preferences?: Partial<GoalsPreferences
   const periodStart = normalizeIsoDate(preferences?.periodStart);
   const periodEnd = normalizeIsoDate(preferences?.periodEnd);
   const deadline = normalizeIsoDate(preferences?.deadline);
+  const fxBase = typeof preferences?.fxBase === 'string' ? preferences.fxBase : undefined;
+  const fxTarget = typeof preferences?.fxTarget === 'string' ? preferences.fxTarget : undefined;
 
   return {
     theme,
     visualizationMode,
     ...(periodStart ? { periodStart } : {}),
     ...(periodEnd ? { periodEnd } : {}),
-    ...(deadline ? { deadline } : {})
+    ...(deadline ? { deadline } : {}),
+    ...(fxBase ? { fxBase } : {}),
+    ...(fxTarget ? { fxTarget } : {})
   };
 }
 

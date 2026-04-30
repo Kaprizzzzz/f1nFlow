@@ -30,10 +30,34 @@
     box-shadow: 0 0 18px rgba(107, 164, 255, 0.35);
   }
 
+  .pair-preview {
+    font-size: 10px;
+    color: #dfeaff;
+    background: rgba(7, 15, 31, 0.8);
+    border: 1px solid rgba(143, 187, 255, 0.45);
+    border-radius: 8px;
+    padding: 3px 8px;
+    pointer-events: auto;
+  }
+
   .option {
-    width: 64px;
-    min-height: 72px;
+    width: 104px;
+    min-height: 92px;
     flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+
+    small {
+      font-size: 8px;
+      font-weight: 500;
+      line-height: 1.2;
+      opacity: 0.9;
+      max-width: 90px;
+      text-align: center;
+    }
   }
 
   .options-panel {
@@ -54,5 +78,10 @@
     max-height: 240px;
     opacity: 1;
     pointer-events: auto;
+  }
+
+  .option.active {
+    border-color: rgba(193, 220, 255, 0.98);
+    box-shadow: 0 0 14px rgba(141, 193, 255, 0.42);
   }
 }

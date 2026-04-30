@@ -252,17 +252,26 @@ export class GoalsComponent implements OnInit, OnDestroy {
       visualizationMode: this.visualizationMode,
       periodStart: this.periodStart,
       periodEnd: this.periodEnd,
-      deadline: this.deadline
+      deadline: this.deadline,
+      fxBase: this.fxBase,
+      fxTarget: this.fxTarget
     });
   }
 
   private applyGoalsPreferences(preferences: GoalsPreferences): void {
     this.theme = preferences.theme;
     this.visualizationMode = preferences.visualizationMode;
-     this.periodStart = preferences.periodStart ?? this.periodStart;
+    this.periodStart = preferences.periodStart ?? this.periodStart;
     this.periodEnd = preferences.periodEnd ?? this.periodEnd;
     this.deadline = preferences.deadline ?? this.deadline;
+    if (typeof preferences.fxBase === 'string' && FX_CURRENCIES.includes(preferences.fxBase as FxCurrency)) {
+      this.fxBase = preferences.fxBase as FxCurrency;
+    }
+    if (typeof preferences.fxTarget === 'string' && FX_CURRENCIES.includes(preferences.fxTarget as FxCurrency)) {
+      this.fxTarget = preferences.fxTarget as FxCurrency;
+    }
     this.recalculate();
+    void this.refreshFx();
   }
 
   private buildSummary(periodTransactions: Transaction[], type: 'plus' | 'minus'): CategorySummary[] {
@@ -300,9 +309,18 @@ export class GoalsComponent implements OnInit, OnDestroy {
   }
 
   private async refreshFx(): Promise<void> {
+    if (this.fxBase === this.fxTarget) {
+      this.fxRate = 1;
+      this.fxHistory = this.buildFlatHistory(1);
+      this.recalculateConverter();
+      return;
+    }
+
     try {
-      const frankfurterRate = await this.fetchFrankfurterRate();
-      const fallbackRate = await this.fetchOpenExchangeRate();
+      const [frankfurterRate, fallbackRate] = await Promise.all([
+        this.fetchFrankfurterRate(),
+        this.fetchOpenExchangeRate()
+      ]);
       this.fxRate = frankfurterRate > 0 ? frankfurterRate : fallbackRate;
       this.recalculateConverter();
 
@@ -316,17 +334,31 @@ export class GoalsComponent implements OnInit, OnDestroy {
   }
 
   private async fetchFrankfurterRate(): Promise<number> {
-    const response = await fetch(`https://api.frankfurter.app/latest?from=${this.fxBase}&to=${this.fxTarget}`);
-    const payload = await response.json() as { rates?: Record<string, number> };
-    const rate = payload.rates?.[this.fxTarget] ?? 0;
-    return Number.isFinite(rate) && rate > 0 ? rate : 0;
+    try {
+      const response = await fetch(`https://api.frankfurter.app/latest?from=${this.fxBase}&to=${this.fxTarget}`);
+      if (!response.ok) {
+        return 0;
+      }
+      const payload = await response.json() as { rates?: Record<string, number> };
+      const rate = payload.rates?.[this.fxTarget] ?? 0;
+      return Number.isFinite(rate) && rate > 0 ? rate : 0;
+    } catch {
+      return 0;
+    }
   }
 
   private async fetchOpenExchangeRate(): Promise<number> {
-    const response = await fetch(`https://open.er-api.com/v6/latest/${this.fxBase}`);
-    const payload = await response.json() as { rates?: Record<string, number> };
-    const rate = payload.rates?.[this.fxTarget] ?? 0;
-    return Number.isFinite(rate) && rate > 0 ? rate : 0;
+    try {
+      const response = await fetch(`https://open.er-api.com/v6/latest/${this.fxBase}`);
+      if (!response.ok) {
+        return 0;
+      }
+      const payload = await response.json() as { rates?: Record<string, number> };
+      const rate = payload.rates?.[this.fxTarget] ?? 0;
+      return Number.isFinite(rate) && rate > 0 ? rate : 0;
+    } catch {
+      return 0;
+    }
   }
 
   private async fetchFrankfurterHistory(): Promise<number[]> {

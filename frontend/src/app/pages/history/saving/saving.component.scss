@@ -239,6 +239,11 @@ $saving-glow: #63ffd0;
   right: 8px;
   width: 30px;
   height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: #fff;
+  color: #26083f;
+  font-weight: 700;
 }
 .circle-wrapper.active .history-list { 
   margin-top: 108px;

@@ -8,15 +8,18 @@
   >
     {{ selectedCurrency }}
   </button>
+  <div class="pair-preview">{{ selectedCurrency }} → {{ selectedTargetCurrency }}</div>
 
   <div class="options-panel" [class.visible]="isOpen">
     <button
       *ngFor="let currency of secondaryCurrencies"
       type="button"
       class="currency-hex option"
+      [class.active]="selectedTargetCurrency === currency"
       (click)="pick(currency)"
     >
-      {{ currency }}
+      <span>{{ currency }}</span>
+      <small>1 {{ selectedCurrency }} = {{ getRateLabel(currency) }} {{ currency }}</small>
     </button>
   </div>
 </div>

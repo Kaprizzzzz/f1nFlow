@@ -242,7 +242,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
   }
 
   get streakFlames(): number[] {
-    const count = Math.max(0, Math.min(30, this.streakCurrent));
+    const count = Math.max(1, Math.min(30, this.streakCurrent || 1));
     return Array.from({ length: count }, (_, index) => index);
   }
 
@@ -327,8 +327,8 @@ export class GoalsComponent implements OnInit, OnDestroy {
       const history = await this.fetchFrankfurterHistory();
       this.fxHistory = history.length > 1 ? history : this.buildFlatHistory(this.fxRate);
     } catch {
-      this.fxRate = 0;
-      this.fxHistory = [];
+      this.fxRate = 1;
+      this.fxHistory = this.buildFlatHistory(1);
       this.recalculateConverter();
     }
   }

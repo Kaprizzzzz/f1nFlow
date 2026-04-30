@@ -114,6 +114,11 @@
         {{ gt('challengeCurrent') }}: <strong>{{ weeklyChallenge.spent | number:'1.2-2' }}</strong>
         ({{ weeklyChallenge.completed ? ('✅ ' + gt('challengeDone')) : ('⏳ ' + gt('challengeInProgress')) }}).
       </p>
+      <div class="streak-flame-strip" aria-label="Weekly challenge flames">
+        @for (_ of [1,2,3,4,5,6,7]; track $index) {
+          <span class="flame">🔥</span>
+        }
+      </div>
     } @else {
       <p class="metric">{{ gt('challengeNotEnoughData') }}</p>
     }
@@ -125,6 +130,11 @@
       <p class="metric">{{ gt('noBadges') }}</p>
     } @else {
       <p class="metric">{{ badges.join(' · ') }}</p>
+      <div class="streak-flame-strip" aria-label="Badge flames">
+        @for (badge of badges; track $index) {
+          <span class="flame">{{ badge }}</span>
+        }
+      </div>
     }
   </section>
 

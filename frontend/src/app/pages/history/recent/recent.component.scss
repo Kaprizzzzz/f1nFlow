@@ -220,7 +220,7 @@ $recent-glow: #ff78c7;
   --panel-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + 10px);
   position: fixed;
   --panel-lift: 0dvh;
-  top: calc(var(--panel-top-offset) + 5dvh);
+  top: calc(var(--panel-top-offset) - 2dvh);
   left: 9px;
   right: 9px;
   width: auto;

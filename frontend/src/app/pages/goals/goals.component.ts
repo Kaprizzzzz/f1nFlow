@@ -241,6 +241,25 @@ export class GoalsComponent implements OnInit, OnDestroy {
     return GOALS_TRANSLATIONS[language]?.[key] ?? GOALS_TRANSLATIONS.en[key] ?? key;
   }
 
+
+  get weeklyChallengeFlames(): Array<{ index: number; active: boolean }> {
+    const activeCount = Math.max(0, Math.min(7, this.streakCurrent));
+    return Array.from({ length: 7 }, (_, index) => ({ index, active: index < activeCount }));
+  }
+
+  getFlameGlow(index: number): string {
+    const palette = [
+      'drop-shadow(0 0 8px rgba(255, 206, 84, 0.75))',
+      'drop-shadow(0 0 8px rgba(255, 158, 66, 0.78))',
+      'drop-shadow(0 0 8px rgba(255, 112, 66, 0.8))',
+      'drop-shadow(0 0 8px rgba(255, 95, 109, 0.8))',
+      'drop-shadow(0 0 8px rgba(203, 93, 255, 0.8))',
+      'drop-shadow(0 0 8px rgba(110, 185, 255, 0.8))',
+      'drop-shadow(0 0 8px rgba(102, 255, 191, 0.8))'
+    ];
+    return palette[Math.min(index, palette.length - 1)];
+  }
+
   get streakFlames(): number[] {
     const count = Math.max(1, Math.min(30, this.streakCurrent || 1));
     return Array.from({ length: count }, (_, index) => index);

@@ -177,9 +177,11 @@ export class UserEngagementService {
   }
 
   private toDayKey(date: Date): string {
-    const copy = new Date(date);
-    copy.setHours(0, 0, 0, 0);
-    return copy.toISOString().slice(0, 10);
+    const shifted = new Date(date.getTime() - 2 * 60 * 60 * 1000);
+    const yyyy = shifted.getUTCFullYear();
+    const mm = String(shifted.getUTCMonth() + 1).padStart(2, "0");
+    const dd = String(shifted.getUTCDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   private dayDiff(fromKey: string, toKey: string): number {

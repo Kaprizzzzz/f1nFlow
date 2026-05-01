@@ -30,19 +30,9 @@
     box-shadow: 0 0 18px rgba(107, 164, 255, 0.35);
   }
 
-  .pair-preview {
-    font-size: 10px;
-    color: #dfeaff;
-    background: rgba(7, 15, 31, 0.8);
-    border: 1px solid rgba(143, 187, 255, 0.45);
-    border-radius: 8px;
-    padding: 3px 8px;
-    pointer-events: auto;
-  }
-
   .option {
-    width: 104px;
-    min-height: 92px;
+    width: 72px;
+    height: 72px;
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
@@ -50,14 +40,6 @@
     align-items: center;
     gap: 4px;
 
-    small {
-      font-size: 8px;
-      font-weight: 500;
-      line-height: 1.2;
-      opacity: 0.9;
-      max-width: 90px;
-      text-align: center;
-    }
   }
 
   .options-panel {

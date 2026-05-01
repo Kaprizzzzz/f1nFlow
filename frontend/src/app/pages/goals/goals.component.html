@@ -115,8 +115,8 @@
         ({{ weeklyChallenge.completed ? ('✅ ' + gt('challengeDone')) : ('⏳ ' + gt('challengeInProgress')) }}).
       </p>
       <div class="streak-flame-strip" aria-label="Weekly challenge flames">
-        @for (_ of [1,2,3,4,5,6,7]; track $index) {
-          <span class="flame">🔥</span>
+        @for (flame of weeklyChallengeFlames; track $index) {
+          <span class="flame" [class.dim]="!flame.active" [style.filter]="flame.active ? getFlameGlow(flame.index) : null">🔥</span>
         }
       </div>
     } @else {

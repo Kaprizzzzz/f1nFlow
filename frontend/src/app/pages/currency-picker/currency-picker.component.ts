@@ -23,10 +23,9 @@ export class CurrencyPickerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription.add(
-      this.balanceService.goalsPreferences$.subscribe((preferences) => {
-        const nextBase = preferences.fxBase as Currency | undefined;
-        if (nextBase && this.currencies.includes(nextBase)) {
-          this.selectedCurrency = nextBase;
+      this.balanceService.currency$.subscribe((currency) => {
+        if (this.currencies.includes(currency)) {
+          this.selectedCurrency = currency;
         }
       })
     );
@@ -40,8 +39,8 @@ export class CurrencyPickerComponent implements OnInit, OnDestroy {
     this.isOpen = !this.isOpen;
   }
 
-  pick(currency: Currency): void {
-    this.balanceService.setGoalsPreferences({ fxBase: currency });
+  async pick(currency: Currency): Promise<void> {
+    await this.balanceService.setCurrency(currency);
     this.selectedCurrency = currency;
     this.isOpen = false;
   }

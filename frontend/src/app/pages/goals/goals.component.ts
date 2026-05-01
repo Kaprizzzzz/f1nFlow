@@ -341,14 +341,21 @@ export class GoalsComponent implements OnInit, OnDestroy {
         this.fetchOpenExchangeRate()
       ]);
       this.fxRate = frankfurterRate > 0 ? frankfurterRate : fallbackRate;
-      this.recalculateConverter();
+    } catch {
+      this.fxRate = 0;
+    }
 
+    if (!(this.fxRate > 0)) {
+      this.fxRate = 1;
+    }
+
+    this.recalculateConverter();
+
+    try {
       const history = await this.fetchFrankfurterHistory();
       this.fxHistory = history.length > 1 ? history : this.buildFlatHistory(this.fxRate);
     } catch {
-      this.fxRate = 1;
-      this.fxHistory = this.buildFlatHistory(1);
-      this.recalculateConverter();
+      this.fxHistory = this.buildFlatHistory(this.fxRate);
     }
   }
 

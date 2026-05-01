@@ -1,11 +1,11 @@
 $news-glow: #d28cff;
 
 .circle-wrapper { position: relative; display:flex; flex-direction:column; align-items:center; }
-.main-circle { --news-ring: conic-gradient(rgba(228, 183, 255, 0.95) 0deg, rgba(86, 36, 128, 0.46) 360deg); position:relative; width:116px; height:116px; border-radius:50%; background: radial-gradient(circle at 55% 18%, #efc8ff 0%, #d18bff 18%, #7b2ac7 56%, #2c0a47 100%); border:2px solid rgba($news-glow,.9); box-shadow:0 0 18px rgba($news-glow,.5), inset 0 -14px 22px rgba(0,0,0,.42); color:#fff; display:flex; justify-content:center; align-items:center; transform: translateY(18%); }
+.main-circle { --news-ring: conic-gradient(rgba(228, 183, 255, 0.95) 0deg, rgba(86, 36, 128, 0.46) 360deg); position:relative; width:116px; height:116px; border-radius:50%; background: radial-gradient(circle at 55% 18%, #efc8ff 0%, #d18bff 18%, #7b2ac7 56%, #2c0a47 100%); border:2px solid rgba($news-glow,.9); box-shadow:0 0 18px rgba($news-glow,.5), inset 0 -14px 22px rgba(0,0,0,.42); color:#fff; display:flex; justify-content:center; align-items:center; transform: translateY(22%); }
 .main-circle::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; background: var(--news-ring); -webkit-mask: radial-gradient(circle, transparent 68%, black 71%); mask: radial-gradient(circle, transparent 68%, black 71%); pointer-events: none; opacity:.72; }
 .label { font-size:19px; font-weight:600; z-index:2; }
 .news-panel { position: relative; margin-top:14px; width:320px; border-radius:18px; padding:12px; background: linear-gradient(180deg, rgba(61, 23, 100, 0.86) 0%, rgba(37, 12, 61, 0.9) 100%); border:1px solid rgba($news-glow,.45); color:#f8eeff; }
-.panel-close-btn { position:absolute; top:8px; right:8px; width:30px; height:30px; }
+.panel-close-btn { position:absolute; top:8px; right:8px; width:30px; height:30px; border:1px solid rgba(255,255,255,.55); border-radius:50%; background:#fff; color:#26083f; font-weight:700; }
 .news-list { margin-top: 28px; display:grid; gap:10px; }
 .news-card { border:1px solid rgba(206,176,255,.35); border-radius:12px; padding:10px; background:rgba(21, 9, 33, .55); }
 .news-card.unread { border-color: rgba(255,220,255,.72); box-shadow:0 0 10px rgba(198,127,255,.35); }

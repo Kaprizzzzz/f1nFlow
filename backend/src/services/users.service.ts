@@ -4,6 +4,11 @@ import { createHash, randomBytes } from 'crypto';
 import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { Transaction } from '../entities/transaction.entity';
+import { Subscription, SubscriptionStatus } from '../entities/subscription.entity';
+import { SubscriptionPlan } from '../entities/subscription-plan.entity';
+import { PaymentEvent } from '../entities/payment-event.entity';
+import { ConsentLog } from '../entities/consent-log.entity';
+import { SecurityAuditLog } from '../entities/security-audit-log.entity';
 import { SaveStateDto } from '../common/dto';
 import { IncomingTransaction, UserEngagementService } from './user-engagement.service';
 
@@ -22,6 +27,16 @@ export class UsersService {
     private usersRepository: Repository<User>,
     @InjectRepository(Transaction)
     private transactionsRepository: Repository<Transaction>,
+    @InjectRepository(Subscription)
+    private subscriptionsRepository: Repository<Subscription>,
+    @InjectRepository(SubscriptionPlan)
+    private plansRepository: Repository<SubscriptionPlan>,
+    @InjectRepository(PaymentEvent)
+    private paymentEventsRepository: Repository<PaymentEvent>,
+    @InjectRepository(ConsentLog)
+    private consentLogsRepository: Repository<ConsentLog>,
+    @InjectRepository(SecurityAuditLog)
+    private securityAuditRepository: Repository<SecurityAuditLog>,
     private dataSource: DataSource,
     private userEngagementService: UserEngagementService
    ) {}
@@ -52,7 +67,34 @@ export class UsersService {
     const token = randomBytes(32).toString('hex');
     user.sessionTokenHash = this.hashToken(token);
     await this.usersRepository.save(user);
+    await this.securityAuditRepository.save(this.securityAuditRepository.create({ userId, eventType: 'session_token_issued' }));
     return token;
+  }
+
+  async getBillingOverview(telegramId: string) {
+    const user = await this.ensureUser({ telegramId });
+    const plans = await this.plansRepository.find({ where: { isActive: true }, order: { intervalCount: 'ASC' } });
+    const activeSubscription = await this.subscriptionsRepository.findOne({ where: { userId: user.id, status: SubscriptionStatus.ACTIVE }, relations: { plan: true } });
+    return { plans, activeSubscription };
+  }
+
+  async activateSubscription(telegramId: string, planCode: string) {
+    const user = await this.ensureUser({ telegramId });
+    const plan = await this.plansRepository.findOne({ where: { code: planCode, isActive: true } });
+    if (!plan) throw new NotFoundException('Plan not found');
+
+    await this.subscriptionsRepository.update({ userId: user.id, status: SubscriptionStatus.ACTIVE }, { status: SubscriptionStatus.CANCELED, canceledAt: new Date() });
+    const now = new Date();
+    const expiresAt = new Date(now);
+    expiresAt.setDate(expiresAt.getDate() + (plan.interval === 'year' ? 365 * plan.intervalCount : 30 * plan.intervalCount));
+    const subscription = await this.subscriptionsRepository.save(this.subscriptionsRepository.create({ userId: user.id, planId: plan.id, status: SubscriptionStatus.ACTIVE, startedAt: now, expiresAt, canceledAt: null }));
+    await this.paymentEventsRepository.save(this.paymentEventsRepository.create({ userId: user.id, subscriptionId: subscription.id, eventType: 'subscription_activated', amountUsd: plan.priceUsd, provider: 'manual', providerRef: null, metadata: { planCode } }));
+    return { subscription };
+  }
+
+  async recordConsent(telegramId: string, documentType: 'privacy' | 'terms', documentVersion: string, ipAddress?: string) {
+    const user = await this.ensureUser({ telegramId });
+    return this.consentLogsRepository.save(this.consentLogsRepository.create({ userId: user.id, documentType, documentVersion, accepted: true, ipAddress: ipAddress || null }));
   }
 
   async findBySessionToken(token: string): Promise<User | null> {

@@ -3,6 +3,7 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
@@ -141,6 +142,19 @@ export class LoginDto {
 export class PresenceDto {
   @IsBoolean()
   isOnline: boolean;
+}
+
+export class ActivateSubscriptionDto {
+  @IsString()
+  planCode: string;
+}
+
+export class ConsentDto {
+  @IsIn(['privacy', 'terms'])
+  documentType: 'privacy' | 'terms';
+
+  @IsString()
+  documentVersion: string;
 }
 
 export class NewsItemDto {

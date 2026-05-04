@@ -7,6 +7,7 @@ import {
   UpdateDateColumn
 } from 'typeorm';
  import { Transaction } from './transaction.entity';
+import { Subscription } from './subscription.entity';
  
   export type SphereLayout = Record<'income' | 'expense' | 'saving' | 'news' | 'recent', { left: number; top: number }>;
   export type GoalsPreferences = {
@@ -98,4 +99,7 @@ import {
 
   @OneToMany(() => Transaction, (transaction) => transaction.user, { cascade: true })
    transactions: Transaction[];
+
+  @OneToMany(() => Subscription, (subscription) => subscription.user)
+  subscriptions: Subscription[];
 }

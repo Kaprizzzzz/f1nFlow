@@ -12,7 +12,7 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { Request } from 'express';
-import { LoginDto, PresenceDto, SaveStateDto } from '../common/dto';
+import { ActivateSubscriptionDto, ConsentDto, LoginDto, PresenceDto, SaveStateDto } from '../common/dto';
 import { AuthGuard } from '../common/guards';
 import { TelegramInitDataService } from '../services/telegram-init-data.service';
 import { UsersService } from '../services/users.service';
@@ -35,8 +35,7 @@ export class UsersController {
       data?.initData || headerInitData || authInitData
     );
 
-    const allowInsecure = (process.env.ALLOW_INSECURE_LOGIN || '').toLowerCase() === 'true';
-    if (!parsedTelegramProfile && !allowInsecure) {
+    if (!parsedTelegramProfile) {
       throw new UnauthorizedException('Invalid Telegram initData signature');
     }
 
@@ -59,6 +58,36 @@ export class UsersController {
       user,
       accessToken
     };
+  }
+
+  @Get('me/billing')
+  @UseGuards(AuthGuard)
+  async getBilling(@Req() request: Request & { user?: { telegramId: string } }) {
+    const telegramId = request.user?.telegramId;
+    if (!telegramId) throw new BadRequestException('Authenticated user is required');
+    return this.usersService.getBillingOverview(telegramId);
+  }
+
+  @Post('me/billing/activate')
+  @UseGuards(AuthGuard)
+  async activateBilling(
+    @Req() request: Request & { user?: { telegramId: string } },
+    @Body() payload: ActivateSubscriptionDto
+  ) {
+    const telegramId = request.user?.telegramId;
+    if (!telegramId) throw new BadRequestException('Authenticated user is required');
+    return this.usersService.activateSubscription(telegramId, payload.planCode);
+  }
+
+  @Post('me/consent')
+  @UseGuards(AuthGuard)
+  async saveConsent(
+    @Req() request: Request & { user?: { telegramId: string } },
+    @Body() payload: ConsentDto
+  ) {
+    const telegramId = request.user?.telegramId;
+    if (!telegramId) throw new BadRequestException('Authenticated user is required');
+    return this.usersService.recordConsent(telegramId, payload.documentType, payload.documentVersion, request.ip);
   }
 
   @Get('me/state')

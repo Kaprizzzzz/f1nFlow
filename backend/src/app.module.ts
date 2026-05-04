@@ -20,9 +20,9 @@ import { UsersModule } from './modules/users.module';
         synchronize: false,
         migrationsRun: true,
         migrations: ['dist/database/migrations/*.js'],
-        ssl: {
-          rejectUnauthorized: false
-        }
+        ssl: configService.get<string>('DATABASE_SSL_ENABLED') === 'true' ? {
+          rejectUnauthorized: configService.get<string>('DATABASE_SSL_REJECT_UNAUTHORIZED') !== 'false'
+        } : false
       })
     }),
     UsersModule,

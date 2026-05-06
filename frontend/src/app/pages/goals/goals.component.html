@@ -1,45 +1,120 @@
-<section class="goals-screen" [class.theme-girly]="theme === 'girly'" (click)="closeUiPicker()">
+<section
+  class="goals-screen"
+  [class.theme-girly]="theme === 'girly'"
+  (click)="closeUiPicker()"
+>
   <div class="goals-ui-controls" (click)="$event.stopPropagation()">
-    <button type="button" class="ui-hex-trigger" (click)="toggleUiPicker($event)" aria-label="Open goals UI options">⬢</button>
+    <button
+      type="button"
+      class="ui-hex-trigger"
+      (click)="toggleUiPicker($event)"
+      aria-label="Open goals UI options"
+    >
+      ⬢
+    </button>
     @if (isUiPickerOpen) {
       <div class="ui-picker-panel">
-        <button type="button" class="theme-chip" [class.active]="visualizationMode === 'amount'" (click)="setVisualizationMode('amount')">{{ gt('amountMode') }}</button>
-        <button type="button" class="theme-chip" [class.active]="visualizationMode === 'segments'" (click)="setVisualizationMode('segments')">{{ gt('segmentsMode') }}</button>
-        <button type="button" class="theme-chip" [class.active]="theme === 'default'" (click)="setTheme('default')">{{ gt('mainTheme') }}</button>
-        <button type="button" class="theme-chip" [class.active]="theme === 'girly'" (click)="setTheme('girly')">{{ gt('girlyTheme') }}</button>
+        <button
+          type="button"
+          class="theme-chip"
+          [class.active]="visualizationMode === 'amount'"
+          (click)="setVisualizationMode('amount')"
+        >
+          {{ gt("amountMode") }}
+        </button>
+        <button
+          type="button"
+          class="theme-chip"
+          [class.active]="visualizationMode === 'segments'"
+          (click)="setVisualizationMode('segments')"
+        >
+          {{ gt("segmentsMode") }}
+        </button>
+        <button
+          type="button"
+          class="theme-chip"
+          [class.active]="theme === 'default'"
+          (click)="setTheme('default')"
+        >
+          {{ gt("mainTheme") }}
+        </button>
+        <button
+          type="button"
+          class="theme-chip"
+          [class.active]="theme === 'girly'"
+          (click)="setTheme('girly')"
+        >
+          {{ gt("girlyTheme") }}
+        </button>
       </div>
     }
   </div>
 
   <section class="card">
-    <h3>{{ gt('miniStats') }}</h3>
+    <h3>{{ gt("miniStats") }}</h3>
     <div class="mini-stats-grid">
-      <p class="metric">{{ gt('todaySpent') }}: <strong>{{ todaySpent | number:'1.2-2' }}</strong></p>
-      <p class="metric">{{ gt('yesterdaySpent') }}: <strong>{{ yesterdaySpent | number:'1.2-2' }}</strong></p>
-      <p class="metric">{{ gt('vsYesterday') }}: <strong>{{ todayVsYesterdayPercent | number:'1.0-1' }}%</strong> ({{ todayVsYesterdayDirection }})</p>
-      <p class="metric">{{ gt('vsMonthAvgDay') }}: <strong>{{ todayVsMonthlyAvgPercent | number:'1.0-1' }}%</strong> ({{ todayVsMonthlyDirection }})</p>
-      <p class="metric">{{ gt('monthAvgDay') }}: <strong>{{ monthlyAverageDaily | number:'1.2-2' }}</strong></p>
-      <p class="metric">{{ gt('trend') }}: <strong>{{ spendingTrendLabel }}</strong></p>
+      <p class="metric">
+        {{ gt("todaySpent") }}:
+        <strong>{{ todaySpent | number: "1.2-2" }}</strong>
+      </p>
+      <p class="metric">
+        {{ gt("yesterdaySpent") }}:
+        <strong>{{ yesterdaySpent | number: "1.2-2" }}</strong>
+      </p>
+      <p class="metric">
+        {{ gt("vsYesterday") }}:
+        <strong>{{ todayVsYesterdayPercent | number: "1.0-1" }}%</strong> ({{
+          todayVsYesterdayDirection
+        }})
+      </p>
+      <p class="metric">
+        {{ gt("vsMonthAvgDay") }}:
+        <strong>{{ todayVsMonthlyAvgPercent | number: "1.0-1" }}%</strong> ({{
+          todayVsMonthlyDirection
+        }})
+      </p>
+      <p class="metric">
+        {{ gt("monthAvgDay") }}:
+        <strong>{{ monthlyAverageDaily | number: "1.2-2" }}</strong>
+      </p>
+      <p class="metric">
+        {{ gt("trend") }}: <strong>{{ spendingTrendLabel }}</strong>
+      </p>
     </div>
   </section>
 
   <section class="card">
-    <h3>{{ gt('periodCategories') }}</h3>
+    <h3>{{ gt("periodCategories") }}</h3>
     <div class="row">
-      <label>{{ gt('from') }} <input type="date" [(ngModel)]="periodStart" [max]="periodEnd" (change)="onPeriodChange()" /></label>
-      <label>{{ gt('to') }} <input type="date" [(ngModel)]="periodEnd" [min]="periodStart" [max]="todayDate" (change)="onPeriodChange()" /></label>
+      <label
+        >{{ gt("from") }}
+        <input
+          type="date"
+          [(ngModel)]="periodStart"
+          [max]="periodEnd"
+          (change)="onPeriodChange()"
+      /></label>
+      <label
+        >{{ gt("to") }}
+        <input
+          type="date"
+          [(ngModel)]="periodEnd"
+          [min]="periodStart"
+          [max]="todayDate"
+          (change)="onPeriodChange()"
+      /></label>
     </div>
 
     <div class="category-columns">
       <div>
-        <h4>{{ gt('income') }}:</h4>
+        <h4>{{ gt("income") }}:</h4>
         @if (incomeSummary.length === 0) {
-          <p class="empty">{{ gt('noIncomePeriod') }}</p>
+          <p class="empty">{{ gt("noIncomePeriod") }}</p>
         } @else {
           @for (item of incomeSummary; track trackByCategory($index, item)) {
             <div class="category-line">
-              <span>{{ item.name }} - {{ item.amount | number:'1.2-2' }}</span>
-              @if (visualizationMode === 'segments') {
+              <span>{{ item.name }} - {{ item.amount | number: "1.2-2" }}</span>
+              @if (visualizationMode === "segments") {
                 <span class="segments" aria-hidden="true">
                   @for (_ of getSegmentsArray(item.segments); track $index) {
                     <i></i>
@@ -52,14 +127,14 @@
       </div>
 
       <div>
-        <h4>{{ gt('expense') }}:</h4>
+        <h4>{{ gt("expense") }}:</h4>
         @if (expenseSummary.length === 0) {
-          <p class="empty">{{ gt('noExpensePeriod') }}</p>
+          <p class="empty">{{ gt("noExpensePeriod") }}</p>
         } @else {
           @for (item of expenseSummary; track trackByCategory($index, item)) {
             <div class="category-line">
-              <span>{{ item.name }} - {{ item.amount | number:'1.2-2' }}</span>
-              @if (visualizationMode === 'segments') {
+              <span>{{ item.name }} - {{ item.amount | number: "1.2-2" }}</span>
+              @if (visualizationMode === "segments") {
                 <span class="segments" aria-hidden="true">
                   @for (_ of getSegmentsArray(item.segments); track $index) {
                     <i></i>
@@ -74,62 +149,106 @@
   </section>
 
   <section class="card">
-    <h3>{{ gt('spendingInPeriod') }}</h3>
-    <p class="metric">{{ gt('spentInPeriod') }}: <strong>{{ periodSpent | number:'1.2-2' }}</strong></p>
-    <p class="metric">{{ gt('avgPerDay') }}: <strong>{{ spentPerDay | number:'1.2-2' }}</strong></p>
-    <p class="metric">{{ gt('avgPerWeek') }}: <strong>{{ spentPerWeek | number:'1.2-2' }}</strong></p>
-    <p class="metric">{{ gt('avgPerMonth') }}: <strong>{{ spentPerMonth | number:'1.2-2' }}</strong></p>
-    <p class="metric">{{ gt('todayVsPeriodAvg') }}: <strong>{{ todayVsSelectedAvgPercent | number:'1.0-1' }}%</strong> ({{ todayVsPeriodDirection }})</p>
+    <h3>{{ gt("spendingInPeriod") }}</h3>
+    <p class="metric">
+      {{ gt("spentInPeriod") }}:
+      <strong>{{ periodSpent | number: "1.2-2" }}</strong>
+    </p>
+    <p class="metric">
+      {{ gt("avgPerDay") }}:
+      <strong>{{ spentPerDay | number: "1.2-2" }}</strong>
+    </p>
+    <p class="metric">
+      {{ gt("avgPerWeek") }}:
+      <strong>{{ spentPerWeek | number: "1.2-2" }}</strong>
+    </p>
+    <p class="metric">
+      {{ gt("avgPerMonth") }}:
+      <strong>{{ spentPerMonth | number: "1.2-2" }}</strong>
+    </p>
+    <p class="metric">
+      {{ gt("todayVsPeriodAvg") }}:
+      <strong>{{ todayVsSelectedAvgPercent | number: "1.0-1" }}%</strong> ({{
+        todayVsPeriodDirection
+      }})
+    </p>
   </section>
 
   <section class="card">
-    <h3>{{ gt('smartHints') }}</h3>
+    <h3>{{ gt("smartHints") }}</h3>
     @for (item of smartInsights; track $index) {
       <p class="metric">• {{ item }}</p>
     }
   </section>
 
   <section class="card">
-    <h3>{{ gt('streak') }}</h3>
-    <p class="metric">{{ gt('currentStreak') }}: <strong>{{ streakCurrent }}</strong> {{ gt('days') }}</p>
-    <p class="metric">{{ gt('bestStreak') }}: <strong>{{ streakBest }}</strong> {{ gt('days') }}</p>
+    <h3>{{ gt("streak") }}</h3>
+    <p class="metric">
+      {{ gt("currentStreak") }}: <strong>{{ streakCurrent }}</strong>
+      {{ gt("days") }}
+    </p>
+    <p class="metric">
+      {{ gt("bestStreak") }}: <strong>{{ streakBest }}</strong> {{ gt("days") }}
+    </p>
     <div class="streak-flame-strip" aria-label="Streak flames">
       @for (_ of streakFlames; track $index) {
-        <span class="flame" [class.today]="$index === streakFlames.length - 1">🔥</span>
+        <span class="flame" [class.today]="$index === streakFlames.length - 1"
+          >🔥</span
+        >
       }
     </div>
     @if (streakFlames.length > 0) {
-      <p class="metric streak-caption">{{ gt('todayVisited') }}: <strong>+1 🔥</strong></p>
+      <p class="metric streak-caption">
+        {{ gt("todayVisited") }}: <strong>+1 🔥</strong>
+      </p>
     }
   </section>
 
   <section class="card">
-    <h3>{{ gt('weeklyChallenge') }}</h3>
+    <h3>{{ gt("weeklyChallenge") }}</h3>
     @if (weeklyChallenge) {
       <p class="metric">
-        {{ gt('challengeTarget') }} <strong>{{ weeklyChallenge.category }}</strong> {{ gt('challengeLimitWord') }}
-        <strong>{{ weeklyChallenge.limit | number:'1.2-2' }}</strong>.
+        {{ gt("challengeTarget") }}
+        <strong>{{ weeklyChallenge.category }}</strong>
+        {{ gt("challengeLimitWord") }}
+        <strong
+          >{{ weeklyChallenge.limit | number: "1.2-2" }}
+          {{ weeklyChallenge.currency || currency }}</strong
+        >.
       </p>
       <p class="metric">
-        {{ gt('challengeCurrent') }}: <strong>{{ weeklyChallenge.spent | number:'1.2-2' }}</strong>
-        ({{ weeklyChallenge.completed ? ('✅ ' + gt('challengeDone')) : ('⏳ ' + gt('challengeInProgress')) }}).
+        {{ gt("challengeCurrent") }}:
+        <strong
+          >{{ weeklyChallenge.spent | number: "1.2-2" }}
+          {{ weeklyChallenge.currency || currency }}</strong
+        >
+        ({{
+          weeklyChallenge.completed
+            ? "✅ " + gt("challengeDone")
+            : "⏳ " + gt("challengeInProgress")
+        }}).
       </p>
       <div class="streak-flame-strip" aria-label="Weekly challenge flames">
         @for (flame of weeklyChallengeFlames; track $index) {
-          <span class="flame" [class.dim]="!flame.active" [style.filter]="flame.active ? getFlameGlow(flame.index) : null">🔥</span>
+          <span
+            class="flame"
+            [class.dim]="!flame.active"
+            [style.filter]="flame.active ? getFlameGlow(flame.index) : null"
+            >🔥</span
+          >
         }
       </div>
     } @else {
-      <p class="metric">{{ gt('challengeNotEnoughData') }}</p>
+      <p class="metric">{{ gt("challengeNotEnoughData") }}</p>
     }
   </section>
 
   <section class="card">
-    <h3>{{ gt('badges') }}</h3>
+    <h3>{{ gt("badges") }}</h3>
     @if (badges.length === 0) {
-      <p class="metric">{{ gt('noBadges') }}</p>
+      <p class="metric">{{ gt("noBadges") }}</p>
     } @else {
-      <p class="metric">{{ badges.join(' · ') }}</p>
+      <p class="metric">{{ badges.join(" · ") }}</p>
       <div class="streak-flame-strip" aria-label="Badge flames">
         @for (badge of badges; track $index) {
           <span class="flame">{{ badge }}</span>
@@ -139,33 +258,63 @@
   </section>
 
   <section class="card">
-    <h3>{{ gt('deadlinePlanner') }}</h3>
-    <label>{{ gt('deadlineDate') }} <input type="date" [(ngModel)]="deadline" [min]="todayDate" (change)="onDeadlineChange()" /></label>
-    <p class="metric">{{ gt('recommendedDailyLimit') }}: <strong>{{ safeSpendPerDay | number:'1.2-2' }}</strong></p>
+    <h3>{{ gt("deadlinePlanner") }}</h3>
+    <label
+      >{{ gt("deadlineDate") }}
+      <input
+        type="date"
+        [(ngModel)]="deadline"
+        [min]="todayDate"
+        (change)="onDeadlineChange()"
+    /></label>
+    <p class="metric">
+      {{ gt("recommendedDailyLimit") }}:
+      <strong>{{ safeSpendPerDay | number: "1.2-2" }}</strong>
+    </p>
   </section>
 
   <section class="card">
-    <h3>{{ gt('fxTrend') }}</h3>
+    <h3>{{ gt("fxTrend") }}</h3>
     <div class="row">
-      <label>{{ gt('from') }}
-        <select [(ngModel)]="fxBase" (change)="onFxPairChange()"><option *ngFor="let c of fxCurrencies" [value]="c">{{ c }}</option></select>
+      <label
+        >{{ gt("from") }}
+        <select [(ngModel)]="fxBase" (change)="onFxPairChange()">
+          <option *ngFor="let c of fxCurrencies" [value]="c">{{ c }}</option>
+        </select>
       </label>
-      <label>{{ gt('to') }}
-        <select [(ngModel)]="fxTarget" (change)="onFxPairChange()"><option *ngFor="let c of fxCurrencies" [value]="c">{{ c }}</option></select>
+      <label
+        >{{ gt("to") }}
+        <select [(ngModel)]="fxTarget" (change)="onFxPairChange()">
+          <option *ngFor="let c of fxCurrencies" [value]="c">{{ c }}</option>
+        </select>
       </label>
     </div>
-    <p class="metric">1 {{ fxBase }} = <strong>{{ fxRate | number:'1.4-4' }}</strong> {{ fxTarget }}</p>
-    <svg *ngIf="fxSparkline" viewBox="0 0 280 80" class="fx-chart"><polyline [attr.points]="fxSparkline"></polyline></svg>
+    <p class="metric">
+      1 {{ fxBase }} = <strong>{{ fxRate | number: "1.4-4" }}</strong>
+      {{ fxTarget }}
+    </p>
+    <svg *ngIf="fxSparkline" viewBox="0 0 280 80" class="fx-chart">
+      <polyline [attr.points]="fxSparkline"></polyline>
+    </svg>
   </section>
 
   <section class="card">
-    <h3>{{ gt('fxConverter') }}</h3>
+    <h3>{{ gt("fxConverter") }}</h3>
     <div class="row">
-      <label>{{ gt('amount') }}
-        <input type="number" min="0" step="0.01" [(ngModel)]="converterAmount" (input)="recalculateConverter()" />
+      <label
+        >{{ gt("amount") }}
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          [(ngModel)]="converterAmount"
+          (input)="recalculateConverter()"
+        />
       </label>
-      <p class="metric converter-result">{{ gt('result') }}: <strong>{{ converterResult | number:'1.2-2' }} {{ fxTarget }}</strong></p>
+      <p class="metric converter-result">
+        {{ gt("result") }}:
+        <strong>{{ converterResult | number: "1.2-2" }} {{ fxTarget }}</strong>
+      </p>
     </div>
   </section>
 </section>
-

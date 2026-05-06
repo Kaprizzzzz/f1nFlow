@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SessionService } from '../user/service/user.service';
-
+import { I18nService } from '../../core/i18n.service';
 
 interface ReferralPerson {
   id: string;
@@ -23,9 +23,8 @@ interface ReferralOverviewPayload {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './referrals.component.html',
-  styleUrl: './referrals.component.scss'
+  styleUrl: './referrals.component.scss',
 })
-
 export class ReferralsComponent implements OnInit, OnDestroy {
   invitedPeople: ReferralPerson[] = [];
   topReferrers: ReferralPerson[] = [];
@@ -36,7 +35,8 @@ export class ReferralsComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly sessionService: SessionService,
-    private readonly http: HttpClient
+    private readonly http: HttpClient,
+    private readonly i18nService: I18nService,
   ) {}
 
   ngOnInit(): void {
@@ -44,7 +44,7 @@ export class ReferralsComponent implements OnInit, OnDestroy {
       return;
     }
 
-  this.subscription.add(
+    this.subscription.add(
       this.sessionService.user$.subscribe((user) => {
         const baseUrl = `${window.location.origin}${window.location.pathname}`;
 
@@ -53,28 +53,33 @@ export class ReferralsComponent implements OnInit, OnDestroy {
           return;
         }
 
-  this.inviteLink = this.buildFallbackInviteLink(baseUrl, user.telegramId);
+        this.inviteLink = this.buildFallbackInviteLink(
+          baseUrl,
+          user.telegramId,
+        );
 
         this.http
-          .get<ReferralOverviewPayload>(`${this.getApiUrl()}/users/${user.telegramId}/referrals`)
+          .get<ReferralOverviewPayload>(
+            `${this.getApiUrl()}/users/${user.telegramId}/referrals`,
+          )
           .subscribe({
             next: (data) => {
               this.invitedPeople = data.invitedPeople.map((item) => ({
                 ...item,
-                joinedAt: new Date(item.joinedAt)
+                joinedAt: new Date(item.joinedAt),
               }));
               this.topReferrers = data.topReferrers.map((item) => ({
                 ...item,
-                joinedAt: new Date(item.joinedAt)
+                joinedAt: new Date(item.joinedAt),
               }));
               this.inviteLink = `${baseUrl}?ref=${encodeURIComponent(data.referralCode)}`;
             },
             error: () => {
               this.invitedPeople = [];
               this.topReferrers = [];
-            }
+            },
           });
-      })
+      }),
     );
   }
 
@@ -85,26 +90,35 @@ export class ReferralsComponent implements OnInit, OnDestroy {
   trackById(_: number, item: ReferralPerson): string {
     return item.id;
   }
+
+  t(key: string): string {
+    return this.i18nService.t(key);
+  }
   async copyInviteLink(): Promise<void> {
-    if (!this.inviteLink || typeof navigator === 'undefined' || !navigator.clipboard) {
+    if (
+      !this.inviteLink ||
+      typeof navigator === 'undefined' ||
+      !navigator.clipboard
+    ) {
       return;
     }
 
     await navigator.clipboard.writeText(this.inviteLink);
-    this.copyStatus = 'Copied!';
+    this.copyStatus = this.t('referrals.copied');
     setTimeout(() => (this.copyStatus = ''), 2200);
   }
 
   getTelegramShareLink(): string {
-    return `https://t.me/share/url?url=${encodeURIComponent(this.inviteLink)}&text=${encodeURIComponent('Join me on F1nFlow!')}`;
+    return `https://t.me/share/url?url=${encodeURIComponent(this.inviteLink)}&text=${encodeURIComponent(this.t('referrals.shareText'))}`;
   }
 
   getViberShareLink(): string {
-    return `viber://forward?text=${encodeURIComponent(`Join me on F1nFlow: ${this.inviteLink}`)}`;
+    return `viber://forward?text=${encodeURIComponent(`${this.t('referrals.shareText')} ${this.inviteLink}`)}`;
   }
 
   private buildFallbackInviteLink(baseUrl: string, telegramId: string): string {
-    const fallbackCode = telegramId.replace(/[^a-zA-Z0-9]/g, '').slice(-8) || 'guest';
+    const fallbackCode =
+      telegramId.replace(/[^a-zA-Z0-9]/g, '').slice(-8) || 'guest';
     return `${baseUrl}?ref=${encodeURIComponent(fallbackCode)}`;
   }
 

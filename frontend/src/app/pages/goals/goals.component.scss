@@ -1,4 +1,4 @@
-@use './goals.girly-theme.scss';
+@use "./goals.girly-theme.scss";
 
 .goals-screen {
   height: 100%;
@@ -29,7 +29,11 @@
   width: 64px;
   height: 72px;
   border: 2px solid rgba(143, 187, 255, 0.88);
-  background: linear-gradient(180deg, rgba(11, 22, 42, 0.95) 0%, rgba(8, 14, 28, 0.95) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(11, 22, 42, 0.95) 0%,
+    rgba(8, 14, 28, 0.95) 100%
+  );
   color: #dfeaff;
   font-weight: 700;
   font-size: 24px;
@@ -37,7 +41,11 @@
 }
 
 .ui-picker-panel {
-  margin-top: 8px;
+  position: absolute;
+  top: 80px;
+  right: 0;
+  width: max-content;
+  margin-top: 0;
   display: grid;
   gap: 6px;
 }
@@ -47,6 +55,7 @@
   border-radius: 8px;
   background: rgba(13, 27, 50, 0.92);
   color: #d9e8ff;
+  min-width: 112px;
   font-size: 12px;
   padding: 6px 8px;
 
@@ -57,7 +66,11 @@
 
 .card {
   border: 1px solid rgba(118, 159, 228, 0.28);
-  background: linear-gradient(180deg, rgba(13, 24, 45, 0.95), rgba(8, 14, 27, 0.95));
+  background: linear-gradient(
+    180deg,
+    rgba(13, 24, 45, 0.95),
+    rgba(8, 14, 27, 0.95)
+  );
   border-radius: 14px;
   padding: 12px;
 }
@@ -82,7 +95,9 @@ input {
   padding: 6px;
 }
 
-.metric { font-size: 13px; }
+.metric {
+  font-size: 13px;
+}
 
 .mini-stats-grid {
   display: grid;
@@ -126,7 +141,6 @@ h4 {
   font-size: 12px;
   opacity: 0.75;
 }
-
 
 .streak-flame-strip {
   margin-top: 8px;
@@ -182,6 +196,13 @@ select {
   align-self: end;
 }
 
-.converter-result { justify-content: center; text-align: center; width: 100%; }
+.converter-result {
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+}
 
-.flame.dim { opacity: 0.35; filter: grayscale(1) !important; }
+.flame.dim {
+  opacity: 0.35;
+  filter: grayscale(1) !important;
+}

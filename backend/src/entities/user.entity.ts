@@ -4,45 +4,49 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from 'typeorm';
- import { Transaction } from './transaction.entity';
+import { Transaction } from './transaction.entity';
 import { Subscription } from './subscription.entity';
- 
-  export type SphereLayout = Record<'income' | 'expense' | 'saving' | 'news' | 'recent', { left: number; top: number }>;
-  export type GoalsPreferences = {
-    theme: 'default' | 'girly';
-    visualizationMode: 'amount' | 'segments';
-    periodStart?: string;
-    periodEnd?: string;
-    deadline?: string;
-  };
 
-  export type WeeklyChallenge = {
+export type SphereLayout = Record<
+  'income' | 'expense' | 'saving' | 'news' | 'recent',
+  { left: number; top: number }
+>;
+export type GoalsPreferences = {
+  theme: 'default' | 'girly';
+  visualizationMode: 'amount' | 'segments';
+  periodStart?: string;
+  periodEnd?: string;
+  deadline?: string;
+};
+
+export type WeeklyChallenge = {
   category: string;
   limit: number;
   spent: number;
   weekStart: string;
   completed: boolean;
+  currency?: string;
 };
 
- @Entity()
- export class User {
+@Entity()
+export class User {
   @PrimaryGeneratedColumn('uuid')
-   id: string;
- 
+  id: string;
+
   @Column({ unique: true })
-   telegramId: string;
- 
-   @Column({ nullable: true })
-   userName: string;
- 
-   @Column({ unique: true })
-   referralCode: string;
- 
-   @Column({ nullable: true })
-   referredBy: string | null;
- 
+  telegramId: string;
+
+  @Column({ nullable: true })
+  userName: string;
+
+  @Column({ unique: true })
+  referralCode: string;
+
+  @Column({ nullable: true })
+  referredBy: string | null;
+
   @Column({ default: 'EUR' })
   currency: string;
 
@@ -50,10 +54,20 @@ import { Subscription } from './subscription.entity';
   language: string;
 
   @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
-  incomeCategories: Array<{ name: string; amount: number; icon?: string }>;
+  incomeCategories: Array<{
+    name: string;
+    amount: number;
+    icon?: string;
+    position?: { left: number; top: number };
+  }>;
 
   @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
-  expenseCategories: Array<{ name: string; amount: number; icon?: string }>;
+  expenseCategories: Array<{
+    name: string;
+    amount: number;
+    icon?: string;
+    position?: { left: number; top: number };
+  }>;
 
   @Column({ type: 'jsonb', nullable: true })
   sphereLayout: SphereLayout | null;
@@ -78,7 +92,8 @@ import { Subscription } from './subscription.entity';
 
   @Column({
     type: 'jsonb',
-    default: () => '\'{"theme":"default","visualizationMode":"amount"}\'::jsonb'
+    default: () =>
+      '\'{"theme":"default","visualizationMode":"amount"}\'::jsonb',
   })
   goalsPreferences: GoalsPreferences;
 
@@ -97,8 +112,10 @@ import { Subscription } from './subscription.entity';
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Transaction, (transaction) => transaction.user, { cascade: true })
-   transactions: Transaction[];
+  @OneToMany(() => Transaction, (transaction) => transaction.user, {
+    cascade: true,
+  })
+  transactions: Transaction[];
 
   @OneToMany(() => Subscription, (subscription) => subscription.user)
   subscriptions: Subscription[];

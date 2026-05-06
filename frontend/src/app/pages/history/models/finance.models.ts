@@ -13,6 +13,7 @@ export interface WeeklyChallenge {
   spent: number;
   weekStart: string;
   completed: boolean;
+  currency?: string;
 }
 
 export type SphereTab = 'income' | 'expense' | 'saving' | 'news' | 'recent';

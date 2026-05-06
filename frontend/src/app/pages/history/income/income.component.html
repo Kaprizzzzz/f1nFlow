@@ -1,87 +1,206 @@
 <div class="circle-wrapper" [class.active]="isFullView">
-    <div class="main-circle" (click)="handleCircleClick()" [style.--category-ring]="categoriesRingGradient">
-      <span class="label">{{ displayLabel }}</span>
-      <span class="value">{{ displayValue | number:'1.2-2' }}</span>
-    </div>
-  
-   <div class="sticker-row" *ngIf="isFullView" (click)="$event.stopPropagation()">
+  <div
+    class="main-circle"
+    (click)="handleCircleClick()"
+    [style.--category-ring]="categoriesRingGradient"
+  >
+    <span class="label">{{ displayLabel }}</span>
+    <span class="value">{{ displayValue | number: "1.2-2" }}</span>
+  </div>
+
+  <div
+    class="sticker-row"
+    *ngIf="isFullView"
+    (click)="$event.stopPropagation()"
+  >
     <button
       *ngFor="let category of categories; let i = index"
-        type="button"
-        class="mini-circle"
-        [class.selected]="category.name === selectedCategory"
-        (click)="selectCategory(category, $event)"
-        [ngStyle]="getMiniCircleStyle(i, categories.length)"
-        [title]="category.name"
-        [attr.data-category-index]="i"
-        draggable="true"
-        (pointerdown)="onMiniPointerDown(i, $event)"
-        (pointermove)="onMiniPointerMove($event)"
-        (pointerup)="onMiniPointerUp($event)"
-        (pointercancel)="onMiniPointerUp($event)"
-        (dragstart)="startDrag(i, $event)"
-        (dragover)="allowDrop($event)"
-        (drop)="dropOn(i, $event)"
-      >
-        {{ category.icon || '📁' }}
-      </button>
-      <button *ngIf="!selectedCategory" type="button" class="mini-circle add-category-circle" (click)="openCreateCategory($event)">+</button>
-    </div>
-  
-    <div class="panel" *ngIf="isFullView && showCategoryPanel" (click)="$event.stopPropagation()">
-      <div class="selected-card" *ngIf="selectedCategoryData as category">
-        <div class="summary">
-          <span class="emoji">{{ category.icon || '📁' }}</span>
-          <div>
-            <div class="name">{{ category.name }}</div>
-            <div class="amount">{{ category.amount | number:'1.2-2' }}</div>
-          </div>
-        </div>
-        
-        <div class="row-actions">
-          <button type="button" class="icon-btn" (click)="toggleAmountPanel(category, $event)">+</button>
-          <button type="button" class="icon-btn" (click)="openEditName(category, $event)">✏️</button>
-          <button type="button" class="icon-btn danger" (click)="deleteCategory(category.name, $event)">🗑️</button>
+      type="button"
+      class="mini-circle"
+      [class.selected]="category.name === selectedCategory"
+      (click)="selectCategory(category, $event)"
+      [ngStyle]="getMiniCircleStyle(i, categories.length)"
+      [title]="category.name"
+      [attr.data-category-index]="i"
+      draggable="true"
+      (pointerdown)="onMiniPointerDown(i, $event)"
+      (pointermove)="onMiniPointerMove($event)"
+      (pointerup)="onMiniPointerUp($event)"
+      (pointercancel)="onMiniPointerUp($event)"
+      (dragstart)="startDrag(i, $event)"
+      (dragover)="allowDrop($event)"
+      (drop)="dropOn(i, $event)"
+    >
+      {{ category.icon || "📁" }}
+    </button>
+    <button
+      *ngIf="!selectedCategory"
+      type="button"
+      class="mini-circle add-category-circle"
+      (click)="openCreateCategory($event)"
+    >
+      +
+    </button>
+  </div>
+
+  <div
+    class="panel"
+    *ngIf="isFullView && showCategoryPanel"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="selected-card" *ngIf="selectedCategoryData as category">
+      <div class="summary">
+        <span class="emoji">{{ category.icon || "📁" }}</span>
+        <div>
+          <div class="name">{{ category.name }}</div>
+          <div class="amount">{{ category.amount | number: "1.2-2" }}</div>
         </div>
       </div>
 
+      <div class="row-actions">
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="toggleAmountPanel(category, $event)"
+        >
+          +
+        </button>
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="openEditName(category, $event)"
+        >
+          ✏️
+        </button>
+        <button
+          type="button"
+          class="icon-btn danger"
+          (click)="deleteCategory(category.name, $event)"
+        >
+          🗑️
+        </button>
       </div>
-      <div class="amount-modal-backdrop" *ngIf="editModeCategory && panelMode === 'name'" (click)="cancelEdit($event)">
-        <div class="amount-modal" (click)="$event.stopPropagation()">
-        <button type="button" class="modal-close-btn" (click)="cancelEdit($event)" aria-label="Close modal">✕</button>
-        <div class="amount-modal-title">Edit category name</div>
-          <input type="text" [(ngModel)]="editedCategoryName" placeholder="New category name" />
-        <div class="amount-modal-actions">
-          <button type="button" class="small-btn ghost" (click)="cancelEdit($event)">Cancel</button>
-          <button type="button" class="small-btn" (click)="saveEdit($event)">Save</button>
+    </div>
+  </div>
+  <div
+    class="amount-modal-backdrop"
+    *ngIf="editModeCategory && panelMode === 'name'"
+    (click)="cancelEdit($event)"
+  >
+    <div class="amount-modal" (click)="$event.stopPropagation()">
+      <button
+        type="button"
+        class="modal-close-btn"
+        (click)="cancelEdit($event)"
+        [attr.aria-label]="t('common.close')"
+      >
+        ✕
+      </button>
+      <div class="amount-modal-title">{{ t("category.editName") }}</div>
+      <input
+        type="text"
+        [(ngModel)]="editedCategoryName"
+        [placeholder]="t('category.newName')"
+      />
+      <div class="amount-modal-actions">
+        <button
+          type="button"
+          class="small-btn ghost"
+          (click)="cancelEdit($event)"
+        >
+          {{ t("common.cancel") }}
+        </button>
+        <button type="button" class="small-btn" (click)="saveEdit($event)">
+          {{ t("common.save") }}
+        </button>
       </div>
     </div>
   </div>
 
-     <div class="amount-modal-backdrop" *ngIf="selectedCategoryData && panelMode === 'amount'" (click)="closeAmountPanel()">
-      <div class="amount-modal" [class.shake]="isAmountShakeActive" (click)="$event.stopPropagation()">
-        <button type="button" class="modal-close-btn" (click)="closeAmountPanel($event)" aria-label="Close modal">✕</button>
-        <div class="amount-modal-title">{{ selectedCategoryData.name }}</div>
-          <input type="text" [(ngModel)]="amountInput" (ngModelChange)="onAmountInputChange()" placeholder="0,00" inputmode="decimal" autocomplete="off" />
-      <div class="amount-error" *ngIf="isAmountInvalid">invalid</div>
-        <div class="amount-modal-actions">
-          <button type="button" class="small-btn ghost" (click)="closeAmountPanel($event)">Cancel</button>
-          <button type="button" class="small-btn" (click)="saveData()">Save</button>
-        </div>
+  <div
+    class="amount-modal-backdrop"
+    *ngIf="selectedCategoryData && panelMode === 'amount'"
+    (click)="closeAmountPanel()"
+  >
+    <div
+      class="amount-modal"
+      [class.shake]="isAmountShakeActive"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        type="button"
+        class="modal-close-btn"
+        (click)="closeAmountPanel($event)"
+        [attr.aria-label]="t('common.close')"
+      >
+        ✕
+      </button>
+      <div class="amount-modal-title">{{ selectedCategoryData.name }}</div>
+      <input
+        type="text"
+        [(ngModel)]="amountInput"
+        (ngModelChange)="onAmountInputChange()"
+        placeholder="0,00"
+        inputmode="decimal"
+        autocomplete="off"
+      />
+      <div class="amount-error" *ngIf="isAmountInvalid">
+        {{ t("common.invalid") }}
+      </div>
+      <div class="amount-modal-actions">
+        <button
+          type="button"
+          class="small-btn ghost"
+          (click)="closeAmountPanel($event)"
+        >
+          {{ t("common.cancel") }}
+        </button>
+        <button type="button" class="small-btn" (click)="saveData()">
+          {{ t("common.save") }}
+        </button>
       </div>
     </div>
-     <div class="category-modal-backdrop" *ngIf="isCreateCategoryOpen" (click)="closeCreateCategory()">
-      <div class="category-modal" (click)="$event.stopPropagation()">
-        <button type="button" class="modal-close-btn" (click)="closeCreateCategory($event)" aria-label="Close modal">✕</button>
-        <div class="amount-modal-title">Create category</div>
-        <input type="text" [(ngModel)]="newCategoryName" placeholder="Create category" />
-        <select [(ngModel)]="newCategoryIcon" aria-label="Category icon">
-          <option *ngFor="let icon of emojiOptions" [ngValue]="icon">{{ icon }}</option>
-        </select>
-        <div class="amount-modal-actions">
-          <button type="button" class="small-btn ghost" (click)="closeCreateCategory($event)">Cancel</button>
-          <button type="button" class="small-btn" (click)="addCategory($event)">Save</button>
-        </div>
+  </div>
+  <div
+    class="category-modal-backdrop"
+    *ngIf="isCreateCategoryOpen"
+    (click)="closeCreateCategory()"
+  >
+    <div class="category-modal" (click)="$event.stopPropagation()">
+      <button
+        type="button"
+        class="modal-close-btn"
+        (click)="closeCreateCategory($event)"
+        [attr.aria-label]="t('common.close')"
+      >
+        ✕
+      </button>
+      <div class="amount-modal-title">{{ t("category.create") }}</div>
+      <input
+        type="text"
+        [(ngModel)]="newCategoryName"
+        [placeholder]="t('category.createPlaceholder')"
+      />
+      <select
+        [(ngModel)]="newCategoryIcon"
+        [attr.aria-label]="t('category.icon')"
+      >
+        <option *ngFor="let icon of emojiOptions" [ngValue]="icon">
+          {{ icon }}
+        </option>
+      </select>
+      <div class="amount-modal-actions">
+        <button
+          type="button"
+          class="small-btn ghost"
+          (click)="closeCreateCategory($event)"
+        >
+          {{ t("common.cancel") }}
+        </button>
+        <button type="button" class="small-btn" (click)="addCategory($event)">
+          {{ t("common.save") }}
+        </button>
       </div>
     </div>
- </div>
+  </div>
+</div>

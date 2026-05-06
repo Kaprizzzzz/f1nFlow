@@ -15,27 +15,41 @@ export class UserEngagementService {
     user: User,
     transactions: IncomingTransaction[],
     previousLastSeenAt: Date | null,
-    now: Date
+    now: Date,
   ): void {
     const normalized = transactions
       .map((tx) => ({
         ...tx,
         amount: Number(tx.amount),
-        date: new Date(tx.date)
+        date: new Date(tx.date),
       }))
-      .filter((tx) => Number.isFinite(tx.amount) && !Number.isNaN(tx.date.getTime()))
+      .filter(
+        (tx) => Number.isFinite(tx.amount) && !Number.isNaN(tx.date.getTime()),
+      )
       .sort((a, b) => a.date.getTime() - b.date.getTime());
 
-    const nextStreak = this.calculatePresenceStreak(previousLastSeenAt, now, user.streakCurrent ?? 0);
+    const nextStreak = this.calculatePresenceStreak(
+      previousLastSeenAt,
+      now,
+      user.streakCurrent ?? 0,
+    );
     user.streakCurrent = nextStreak;
     user.streakBest = Math.max(user.streakBest ?? 0, nextStreak);
 
-    user.weeklyChallenge = this.buildWeeklyChallenge(normalized, user.weeklyChallenge ?? null);
+    user.weeklyChallenge = this.buildWeeklyChallenge(
+      normalized,
+      user.weeklyChallenge ?? null,
+      user.currency || 'EUR',
+    );
     user.news = this.buildPersonalizedNews(user.news ?? [], normalized);
     user.badges = this.buildBadges(user, normalized);
   }
 
-  private calculatePresenceStreak(previousLastSeenAt: Date | null, now: Date, currentStreak: number): number {
+  private calculatePresenceStreak(
+    previousLastSeenAt: Date | null,
+    now: Date,
+    currentStreak: number,
+  ): number {
     if (!previousLastSeenAt) {
       return Math.max(1, currentStreak || 0);
     }
@@ -57,32 +71,52 @@ export class UserEngagementService {
 
   private buildWeeklyChallenge(
     transactions: Array<IncomingTransaction & { date: Date }>,
-    current: WeeklyChallenge | null
+    current: WeeklyChallenge | null,
+    currency: string,
   ): WeeklyChallenge | null {
     const weekStart = this.getWeekStart(new Date());
     const weekStartKey = this.toDayKey(weekStart);
 
     if (current?.weekStart === weekStartKey) {
       const spent = transactions
-        .filter((tx) => tx.type === 'minus' && tx.category === current.category && tx.date >= weekStart)
+        .filter(
+          (tx) =>
+            tx.type === 'minus' &&
+            tx.category === current.category &&
+            tx.date >= weekStart,
+        )
         .reduce((sum, tx) => sum + tx.amount, 0);
 
       return {
         ...current,
         spent: Number(spent.toFixed(2)),
-        completed: spent <= current.limit
+        completed: spent <= current.limit,
+        currency,
       };
     }
 
-    const previousWeekStart = new Date(weekStart);
-    previousWeekStart.setDate(previousWeekStart.getDate() - 7);
-
-    const previousWeekEnd = new Date(weekStart);
-    previousWeekEnd.setMilliseconds(-1);
+    const previousMonthStart = new Date(
+      weekStart.getFullYear(),
+      weekStart.getMonth() - 1,
+      1,
+    );
+    const previousMonthEnd = new Date(
+      weekStart.getFullYear(),
+      weekStart.getMonth(),
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
 
     const grouped = new Map<string, number>();
     for (const tx of transactions) {
-      if (tx.type !== 'minus' || tx.date < previousWeekStart || tx.date > previousWeekEnd) {
+      if (
+        tx.type !== 'minus' ||
+        tx.date < previousMonthStart ||
+        tx.date > previousMonthEnd
+      ) {
         continue;
       }
       grouped.set(tx.category, (grouped.get(tx.category) ?? 0) + tx.amount);
@@ -93,10 +127,15 @@ export class UserEngagementService {
       return null;
     }
 
-    const [category, prevWeekSpent] = top;
-    const limit = Number((prevWeekSpent * 0.9).toFixed(2));
+    const [category, previousMonthSpent] = top;
+    const limit = Number((previousMonthSpent * 0.9).toFixed(2));
     const currentSpent = transactions
-      .filter((tx) => tx.type === 'minus' && tx.category === category && tx.date >= weekStart)
+      .filter(
+        (tx) =>
+          tx.type === 'minus' &&
+          tx.category === category &&
+          tx.date >= weekStart,
+      )
       .reduce((sum, tx) => sum + tx.amount, 0);
 
     return {
@@ -104,13 +143,14 @@ export class UserEngagementService {
       limit,
       spent: Number(currentSpent.toFixed(2)),
       weekStart: weekStartKey,
-      completed: currentSpent <= limit
+      completed: currentSpent <= limit,
+      currency,
     };
   }
 
   private buildPersonalizedNews(
     currentNews: Array<{ id: string; title: string; isRead: boolean }>,
-    transactions: Array<IncomingTransaction & { date: Date }>
+    transactions: Array<IncomingTransaction & { date: Date }>,
   ): Array<{ id: string; title: string; isRead: boolean }> {
     const weekStart = this.getWeekStart(new Date());
     const previousWeekStart = new Date(weekStart);
@@ -123,29 +163,40 @@ export class UserEngagementService {
       .reduce((sum, tx) => sum + tx.amount, 0);
 
     const previousWeekExpense = transactions
-      .filter((tx) => tx.type === 'minus' && tx.date >= previousWeekStart && tx.date <= previousWeekEnd)
+      .filter(
+        (tx) =>
+          tx.type === 'minus' &&
+          tx.date >= previousWeekStart &&
+          tx.date <= previousWeekEnd,
+      )
       .reduce((sum, tx) => sum + tx.amount, 0);
 
     if (previousWeekExpense <= 0) {
       return currentNews;
     }
 
-    const deltaPercent = ((currentWeekExpense - previousWeekExpense) / previousWeekExpense) * 100;
+    const deltaPercent =
+      ((currentWeekExpense - previousWeekExpense) / previousWeekExpense) * 100;
     const absDelta = Math.round(Math.abs(deltaPercent));
     const trend = deltaPercent <= 0 ? 'менше' : 'більше';
     const insightId = `weekly-insight-${this.toDayKey(weekStart)}`;
 
-    const withoutOldInsight = currentNews.filter((item) => item.id !== insightId);
+    const withoutOldInsight = currentNews.filter(
+      (item) => item.id !== insightId,
+    );
     const insight = {
       id: insightId,
       title: `Персональний інсайт: ти витратив на ${absDelta}% ${trend}, ніж минулого тижня.`,
-      isRead: false
+      isRead: false,
     };
 
     return [insight, ...withoutOldInsight].slice(0, 20);
   }
 
-  private buildBadges(user: User, transactions: IncomingTransaction[]): string[] {
+  private buildBadges(
+    user: User,
+    transactions: IncomingTransaction[],
+  ): string[] {
     const badges = new Set<string>(user.badges ?? []);
 
     if (transactions.length > 0) {
@@ -179,8 +230,8 @@ export class UserEngagementService {
   private toDayKey(date: Date): string {
     const shifted = new Date(date.getTime() - 2 * 60 * 60 * 1000);
     const yyyy = shifted.getUTCFullYear();
-    const mm = String(shifted.getUTCMonth() + 1).padStart(2, "0");
-    const dd = String(shifted.getUTCDate()).padStart(2, "0");
+    const mm = String(shifted.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(shifted.getUTCDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
   }
 

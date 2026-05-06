@@ -1,8 +1,18 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { BalanceService, CategoryItem } from '../balance.service';
+import { I18nService } from '../../../core/i18n.service';
 import { map } from 'rxjs/operators';
 
 type PanelMode = 'amount' | 'name' | null;
@@ -12,7 +22,7 @@ type PanelMode = 'amount' | 'name' | null;
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './income.component.html',
-  styleUrl: './income.component.scss'
+  styleUrl: './income.component.scss',
 })
 export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
   @Input() isFullView = false;
@@ -39,37 +49,62 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
   dragCategoryIndex: number | null = null;
   pointerDragIndex: number | null = null;
   pointerHoverIndex: number | null = null;
+  private pointerStart: {
+    x: number;
+    y: number;
+    left: number;
+    top: number;
+  } | null = null;
+  private draggedCategoryName = '';
+  private didDragCategory = false;
 
   private subscriptions = new Subscription();
 
-  constructor(private balanceService: BalanceService) {}
+  constructor(
+    private balanceService: BalanceService,
+    private i18nService: I18nService,
+  ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
       this.balanceService.incomeCategories$
-        .pipe(map((categories) => categories.reduce((acc, item) => acc + item.amount, 0)))
-        .subscribe((sum) => (this.totalIncome = sum))
+        .pipe(
+          map((categories) =>
+            categories.reduce((acc, item) => acc + item.amount, 0),
+          ),
+        )
+        .subscribe((sum) => (this.totalIncome = sum)),
     );
 
     this.subscriptions.add(
       this.balanceService.expenseCategories$
-        .pipe(map((categories) => categories.reduce((acc, item) => acc + item.amount, 0)))
-        .subscribe((sum) => (this.totalExpense = sum))
+        .pipe(
+          map((categories) =>
+            categories.reduce((acc, item) => acc + item.amount, 0),
+          ),
+        )
+        .subscribe((sum) => (this.totalExpense = sum)),
     );
 
     this.subscriptions.add(
       this.balanceService.incomeCategories$.subscribe((categories) => {
         this.categories = categories;
 
-        if (this.selectedCategory && !categories.some((item) => item.name === this.selectedCategory)) {
+        if (
+          this.selectedCategory &&
+          !categories.some((item) => item.name === this.selectedCategory)
+        ) {
           this.selectedCategory = '';
           this.panelMode = null;
         }
 
-        if (this.editModeCategory && !categories.some((item) => item.name === this.editModeCategory)) {
+        if (
+          this.editModeCategory &&
+          !categories.some((item) => item.name === this.editModeCategory)
+        ) {
           this.resetEditState();
         }
-      })
+      }),
     );
   }
 
@@ -89,15 +124,27 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get displayLabel(): string {
-    return this.isFullView && this.selectedCategoryData ? this.selectedCategoryData.name : 'Income';
+    return this.isFullView && this.selectedCategoryData
+      ? this.selectedCategoryData.name
+      : this.t('main.income');
   }
 
   get displayValue(): number {
-    return this.isFullView && this.selectedCategoryData ? this.selectedCategoryData.amount : this.totalIncome;
+    return this.isFullView && this.selectedCategoryData
+      ? this.selectedCategoryData.amount
+      : this.totalIncome;
+  }
+
+  t(key: string): string {
+    return this.i18nService.t(key);
   }
 
   get categoriesRingGradient(): string {
-    return this.buildCategoryRingGradient(this.categories, 'rgba(137, 211, 255, 0.95)', 'rgba(73, 99, 146, 0.28)');
+    return this.buildCategoryRingGradient(
+      this.categories,
+      'rgba(137, 211, 255, 0.95)',
+      'rgba(73, 99, 146, 0.28)',
+    );
   }
 
   handleCircleClick(): void {
@@ -136,6 +183,10 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
 
   selectCategory(category: CategoryItem, event: Event): void {
     event.stopPropagation();
+    if (this.didDragCategory) {
+      this.didDragCategory = false;
+      return;
+    }
     if (this.selectedCategory === category.name) {
       this.resetEditState();
       this.selectedCategory = '';
@@ -147,16 +198,27 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   getMiniCircleStyle(index: number, total: number): Record<string, string> {
+    const category = this.categories[index];
+    if (category?.position) {
+      return {
+        left: `${category.position.left}px`,
+        top: `${category.position.top}px`,
+      };
+    }
+
     const singleItemArcAngle = 270;
     const startAngle = 205;
     const endAngle = 335;
-    const angle = total <= 1 ? singleItemArcAngle : startAngle + ((endAngle - startAngle) * index) / (total - 1);
+    const angle =
+      total <= 1
+        ? singleItemArcAngle
+        : startAngle + ((endAngle - startAngle) * index) / (total - 1);
     const radians = (angle * Math.PI) / 180;
     const radius = 176;
 
     return {
       left: `${Math.cos(radians) * radius}px`,
-      top: `${Math.sin(radians) * radius}px`
+      top: `${Math.sin(radians) * radius}px`,
     };
   }
 
@@ -165,7 +227,8 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
     const isSameCategory = this.selectedCategory === category.name;
     this.selectedCategory = category.name;
     this.amountInput = '';
-    this.panelMode = isSameCategory && this.panelMode === 'amount' ? null : 'amount';
+    this.panelMode =
+      isSameCategory && this.panelMode === 'amount' ? null : 'amount';
   }
 
   saveData(): void {
@@ -193,7 +256,6 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
       this.syncModalUiState();
     }
   }
-
 
   onAmountInputChange(): void {
     if (this.isAmountInvalid) {
@@ -229,7 +291,11 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
     const normalizedName = this.newCategoryName.trim();
     if (!normalizedName) return;
 
-    this.balanceService.addCategory('plus', normalizedName, this.newCategoryIcon);
+    this.balanceService.addCategory(
+      'plus',
+      normalizedName,
+      this.newCategoryIcon,
+    );
     this.newCategoryName = '';
     this.newCategoryIcon = this.emojiOptions[0];
     this.isCreateCategoryOpen = false;
@@ -252,6 +318,16 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
   onMiniPointerDown(index: number, event: PointerEvent): void {
     this.pointerDragIndex = index;
     this.pointerHoverIndex = index;
+    const category = this.categories[index];
+    const currentStyle = this.getMiniCircleStyle(index, this.categories.length);
+    this.pointerStart = {
+      x: event.clientX,
+      y: event.clientY,
+      left: Number.parseFloat(currentStyle['left'] ?? '0') || 0,
+      top: Number.parseFloat(currentStyle['top'] ?? '0') || 0,
+    };
+    this.draggedCategoryName = category?.name ?? '';
+    this.didDragCategory = false;
 
     const circle = event.currentTarget as HTMLElement | null;
     circle?.setPointerCapture(event.pointerId);
@@ -261,18 +337,40 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onMiniPointerMove(event: PointerEvent): void {
-    if (this.pointerDragIndex === null) {
+    if (
+      this.pointerDragIndex === null ||
+      !this.pointerStart ||
+      !this.draggedCategoryName
+    ) {
       return;
     }
 
     event.preventDefault();
+    const distance = Math.hypot(
+      event.clientX - this.pointerStart.x,
+      event.clientY - this.pointerStart.y,
+    );
+    const nextLeft = this.clampCategoryPosition(
+      this.pointerStart.left + event.clientX - this.pointerStart.x,
+      -180,
+      180,
+    );
+    const nextTop = this.clampCategoryPosition(
+      this.pointerStart.top + event.clientY - this.pointerStart.y,
+      -250,
+      160,
+    );
 
-    const hovered = document.elementFromPoint(event.clientX, event.clientY) as HTMLElement | null;
-    const target = hovered?.closest('[data-category-index]') as HTMLElement | null;
-    const targetIndexRaw = target?.dataset['categoryIndex'];
-
-    if (targetIndexRaw !== undefined) {
-      this.pointerHoverIndex = Number(targetIndexRaw);
+    if (distance > 4) {
+      this.didDragCategory = true;
+      this.balanceService.updateCategoryPosition(
+        'plus',
+        this.draggedCategoryName,
+        {
+          left: nextLeft,
+          top: nextTop,
+        },
+      );
     }
   }
 
@@ -284,12 +382,18 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
 
-    if (this.pointerHoverIndex !== null && this.pointerHoverIndex !== this.pointerDragIndex) {
-      this.balanceService.swapCategories('plus', this.pointerDragIndex, this.pointerHoverIndex);
-    }
-
     this.pointerDragIndex = null;
     this.pointerHoverIndex = null;
+    this.pointerStart = null;
+    this.draggedCategoryName = '';
+  }
+
+  private clampCategoryPosition(
+    value: number,
+    min: number,
+    max: number,
+  ): number {
+    return Math.max(min, Math.min(max, value));
   }
 
   startDrag(index: number, event: DragEvent): void {
@@ -310,7 +414,9 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
     event.stopPropagation();
 
     const sourceIndexRaw = event.dataTransfer?.getData('text/plain');
-    const sourceIndex = sourceIndexRaw ? Number(sourceIndexRaw) : this.dragCategoryIndex;
+    const sourceIndex = sourceIndexRaw
+      ? Number(sourceIndexRaw)
+      : this.dragCategoryIndex;
 
     if (sourceIndex === null || !Number.isInteger(sourceIndex)) {
       this.dragCategoryIndex = null;
@@ -327,7 +433,8 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
     event.stopPropagation();
     const isSameCategory = this.editModeCategory === category.name;
     this.editModeCategory = category.name;
-    this.panelMode = isSameCategory && this.panelMode === 'name' ? null : 'name';
+    this.panelMode =
+      isSameCategory && this.panelMode === 'name' ? null : 'name';
     this.editedCategoryName = category.name;
     this.syncModalUiState();
   }
@@ -336,8 +443,15 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
     event.stopPropagation();
     if (!this.editModeCategory || this.panelMode !== 'name') return;
 
-    this.balanceService.renameCategory('plus', this.editModeCategory, this.editedCategoryName);
-    if (this.selectedCategory === this.editModeCategory && this.editedCategoryName.trim()) {
+    this.balanceService.renameCategory(
+      'plus',
+      this.editModeCategory,
+      this.editedCategoryName,
+    );
+    if (
+      this.selectedCategory === this.editModeCategory &&
+      this.editedCategoryName.trim()
+    ) {
       this.selectedCategory = this.editedCategoryName.trim();
     }
     this.resetEditState();
@@ -355,8 +469,15 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
     this.resetEditState();
   }
 
-  private buildCategoryRingGradient(categories: CategoryItem[], activeColor: string, emptyColor: string): string {
-    const total = categories.reduce((sum, item) => sum + Math.max(0, item.amount), 0);
+  private buildCategoryRingGradient(
+    categories: CategoryItem[],
+    activeColor: string,
+    emptyColor: string,
+  ): string {
+    const total = categories.reduce(
+      (sum, item) => sum + Math.max(0, item.amount),
+      0,
+    );
     if (total <= 0) {
       return `conic-gradient(${emptyColor} 0deg, ${emptyColor} 360deg)`;
     }
@@ -398,7 +519,10 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    document.body.classList.toggle('category-modal-open', this.panelMode !== null || this.isCreateCategoryOpen);
+    document.body.classList.toggle(
+      'category-modal-open',
+      this.panelMode !== null || this.isCreateCategoryOpen,
+    );
   }
 
   private closeTransientUi(): void {

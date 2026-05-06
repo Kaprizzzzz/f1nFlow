@@ -1,16 +1,26 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHash, randomBytes } from 'crypto';
 import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { Transaction } from '../entities/transaction.entity';
-import { Subscription, SubscriptionStatus } from '../entities/subscription.entity';
+import {
+  Subscription,
+  SubscriptionStatus,
+} from '../entities/subscription.entity';
 import { SubscriptionPlan } from '../entities/subscription-plan.entity';
 import { PaymentEvent } from '../entities/payment-event.entity';
 import { ConsentLog } from '../entities/consent-log.entity';
 import { SecurityAuditLog } from '../entities/security-audit-log.entity';
 import { SaveStateDto } from '../common/dto';
-import { IncomingTransaction, UserEngagementService } from './user-engagement.service';
+import {
+  IncomingTransaction,
+  UserEngagementService,
+} from './user-engagement.service';
 
 const MAX_TRANSACTIONS_PER_SAVE = 1000;
 
@@ -18,9 +28,9 @@ interface EnsureUserPayload {
   telegramId: string;
   userName?: string;
   referredBy?: string;
-}  
+}
 
- @Injectable()
+@Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
@@ -38,17 +48,23 @@ export class UsersService {
     @InjectRepository(SecurityAuditLog)
     private securityAuditRepository: Repository<SecurityAuditLog>,
     private dataSource: DataSource,
-    private userEngagementService: UserEngagementService
-   ) {}
- 
-   async findOrCreateUser(telegramId: string, userName: string, referredBy?: string): Promise<User> {
+    private userEngagementService: UserEngagementService,
+  ) {}
+
+  async findOrCreateUser(
+    telegramId: string,
+    userName: string,
+    referredBy?: string,
+  ): Promise<User> {
     if (telegramId === 'server-render') {
-      throw new BadRequestException('Cannot create user for server-render profile');
+      throw new BadRequestException(
+        'Cannot create user for server-render profile',
+      );
     }
-     let user = await this.usersRepository.findOne({ where: { telegramId } });
- 
-     if (!user) {
-       user = await this.createUserSafely(telegramId, userName, referredBy);
+    let user = await this.usersRepository.findOne({ where: { telegramId } });
+
+    if (!user) {
+      user = await this.createUserSafely(telegramId, userName, referredBy);
     } else {
       user.userName = userName || user.userName;
       user.isOnline = true;
@@ -67,34 +83,87 @@ export class UsersService {
     const token = randomBytes(32).toString('hex');
     user.sessionTokenHash = this.hashToken(token);
     await this.usersRepository.save(user);
-    await this.securityAuditRepository.save(this.securityAuditRepository.create({ userId, eventType: 'session_token_issued' }));
+    await this.securityAuditRepository.save(
+      this.securityAuditRepository.create({
+        userId,
+        eventType: 'session_token_issued',
+      }),
+    );
     return token;
   }
 
   async getBillingOverview(telegramId: string) {
     const user = await this.ensureUser({ telegramId });
-    const plans = await this.plansRepository.find({ where: { isActive: true }, order: { intervalCount: 'ASC' } });
-    const activeSubscription = await this.subscriptionsRepository.findOne({ where: { userId: user.id, status: SubscriptionStatus.ACTIVE }, relations: { plan: true } });
+    const plans = await this.plansRepository.find({
+      where: { isActive: true },
+      order: { intervalCount: 'ASC' },
+    });
+    const activeSubscription = await this.subscriptionsRepository.findOne({
+      where: { userId: user.id, status: SubscriptionStatus.ACTIVE },
+      relations: { plan: true },
+    });
     return { plans, activeSubscription };
   }
 
   async activateSubscription(telegramId: string, planCode: string) {
     const user = await this.ensureUser({ telegramId });
-    const plan = await this.plansRepository.findOne({ where: { code: planCode, isActive: true } });
+    const plan = await this.plansRepository.findOne({
+      where: { code: planCode, isActive: true },
+    });
     if (!plan) throw new NotFoundException('Plan not found');
 
-    await this.subscriptionsRepository.update({ userId: user.id, status: SubscriptionStatus.ACTIVE }, { status: SubscriptionStatus.CANCELED, canceledAt: new Date() });
+    await this.subscriptionsRepository.update(
+      { userId: user.id, status: SubscriptionStatus.ACTIVE },
+      { status: SubscriptionStatus.CANCELED, canceledAt: new Date() },
+    );
     const now = new Date();
     const expiresAt = new Date(now);
-    expiresAt.setDate(expiresAt.getDate() + (plan.interval === 'year' ? 365 * plan.intervalCount : 30 * plan.intervalCount));
-    const subscription = await this.subscriptionsRepository.save(this.subscriptionsRepository.create({ userId: user.id, planId: plan.id, status: SubscriptionStatus.ACTIVE, startedAt: now, expiresAt, canceledAt: null }));
-    await this.paymentEventsRepository.save(this.paymentEventsRepository.create({ userId: user.id, subscriptionId: subscription.id, eventType: 'subscription_activated', amountUsd: plan.priceUsd, provider: 'manual', providerRef: null, metadata: { planCode } }));
+    expiresAt.setDate(
+      expiresAt.getDate() +
+        (plan.interval === 'year'
+          ? 365 * plan.intervalCount
+          : 30 * plan.intervalCount),
+    );
+    const subscription = await this.subscriptionsRepository.save(
+      this.subscriptionsRepository.create({
+        userId: user.id,
+        planId: plan.id,
+        status: SubscriptionStatus.ACTIVE,
+        startedAt: now,
+        expiresAt,
+        canceledAt: null,
+      }),
+    );
+    await this.paymentEventsRepository.save(
+      this.paymentEventsRepository.create({
+        userId: user.id,
+        subscriptionId: subscription.id,
+        eventType: 'subscription_activated',
+        amountUsd: plan.priceUsd,
+        provider: 'manual',
+        providerRef: null,
+        metadata: { planCode },
+      }),
+    );
     return { subscription };
   }
 
-  async recordConsent(telegramId: string, documentType: 'privacy' | 'terms', documentVersion: string, ipAddress?: string) {
+  async recordConsent(
+    telegramId: string,
+    documentType: 'privacy' | 'terms',
+    documentVersion: string,
+    ipAddress?: string,
+  ) {
     const user = await this.ensureUser({ telegramId });
-    return this.consentLogsRepository.save(this.consentLogsRepository.create({ userId: user.id, documentType, documentVersion, accepted: true, ipAddress: ipAddress || null }));
+    return this.consentLogsRepository.save(
+      this.consentLogsRepository.create({
+        userId: user.id,
+        documentType,
+        documentVersion,
+        accepted: true,
+        ipAddress: ipAddress || null,
+      }),
+    );
   }
 
   async findBySessionToken(token: string): Promise<User | null> {
@@ -102,14 +171,16 @@ export class UsersService {
       return null;
     }
 
-    return this.usersRepository.findOne({ where: { sessionTokenHash: this.hashToken(token) } });
+    return this.usersRepository.findOne({
+      where: { sessionTokenHash: this.hashToken(token) },
+    });
   }
 
   async getUserState(telegramId: string) {
     const user = await this.ensureUser({ telegramId });
     const hydratedUser = await this.usersRepository.findOne({
       where: { id: user.id },
-      relations: { transactions: true }
+      relations: { transactions: true },
     });
 
     if (!hydratedUser) {
@@ -126,35 +197,57 @@ export class UsersService {
           category: item.category,
           type: item.type,
           date: item.date,
-          label: item.label
-        }))
+          label: item.label,
+        })),
     };
   }
 
   async saveUserState(telegramId: string, payload: SaveStateDto) {
     const user = await this.ensureUser({ telegramId });
 
-    if (payload.transactions && payload.transactions.length > MAX_TRANSACTIONS_PER_SAVE) {
-      throw new BadRequestException(`Too many transactions in one request. Max allowed: ${MAX_TRANSACTIONS_PER_SAVE}`);
+    if (
+      payload.transactions &&
+      payload.transactions.length > MAX_TRANSACTIONS_PER_SAVE
+    ) {
+      throw new BadRequestException(
+        `Too many transactions in one request. Max allowed: ${MAX_TRANSACTIONS_PER_SAVE}`,
+      );
     }
 
     await this.dataSource.transaction(async (manager) => {
       const txUsersRepository = manager.getRepository(User);
       const txTransactionsRepository = manager.getRepository(Transaction);
-      const userToUpdate = await txUsersRepository.findOne({ where: { id: user.id } });
+      const userToUpdate = await txUsersRepository.findOne({
+        where: { id: user.id },
+      });
 
-    if (!userToUpdate) {
+      if (!userToUpdate) {
         throw new NotFoundException('User not found');
       }
       const previousLastSeen = userToUpdate.lastSeenAt;
       userToUpdate.currency = payload.currency ?? userToUpdate.currency;
       userToUpdate.language = payload.language ?? userToUpdate.language ?? 'en';
-      userToUpdate.incomeCategories = payload.incomeCategories ?? userToUpdate.incomeCategories ?? [];
-      userToUpdate.expenseCategories = payload.expenseCategories ?? userToUpdate.expenseCategories ?? [];
-      userToUpdate.sphereLayout = payload.sphereLayout ?? userToUpdate.sphereLayout;
-      userToUpdate.quickTransactionsLimit = payload.quickTransactionsLimit ?? userToUpdate.quickTransactionsLimit ?? 3;
+      userToUpdate.incomeCategories =
+        payload.incomeCategories ?? userToUpdate.incomeCategories ?? [];
+      userToUpdate.expenseCategories =
+        payload.expenseCategories ?? userToUpdate.expenseCategories ?? [];
+      userToUpdate.sphereLayout =
+        payload.sphereLayout ?? userToUpdate.sphereLayout;
+      userToUpdate.quickTransactionsLimit =
+        payload.quickTransactionsLimit ??
+        userToUpdate.quickTransactionsLimit ??
+        3;
       userToUpdate.news = payload.news ?? userToUpdate.news ?? [];
-      userToUpdate.goalsPreferences = payload.goalsPreferences ?? userToUpdate.goalsPreferences ?? { theme: 'default', visualizationMode: 'amount' };
+      userToUpdate.streakCurrent =
+        payload.streakCurrent ?? userToUpdate.streakCurrent ?? 0;
+      userToUpdate.streakBest =
+        payload.streakBest ?? userToUpdate.streakBest ?? 0;
+      userToUpdate.badges = payload.badges ?? userToUpdate.badges ?? [];
+      userToUpdate.goalsPreferences = payload.goalsPreferences ??
+        userToUpdate.goalsPreferences ?? {
+          theme: 'default',
+          visualizationMode: 'amount',
+        };
       const now = new Date();
       userToUpdate.lastSeenAt = now;
 
@@ -164,17 +257,24 @@ export class UsersService {
             category: tx.category,
             type: tx.type,
             date: tx.date,
-            label: tx.label
+            label: tx.label,
           }))
-        : (await txTransactionsRepository.find({ where: { userId: user.id } })).map((tx) => ({
+        : (
+            await txTransactionsRepository.find({ where: { userId: user.id } })
+          ).map((tx) => ({
             amount: Number(tx.amount),
             category: tx.category,
             type: tx.type,
             date: tx.date,
-            label: tx.label
+            label: tx.label,
           }));
 
-      this.userEngagementService.applyEngagementState(userToUpdate, incomingTransactions, previousLastSeen, now);
+      this.userEngagementService.applyEngagementState(
+        userToUpdate,
+        incomingTransactions,
+        previousLastSeen,
+        now,
+      );
 
       await txUsersRepository.save(userToUpdate);
 
@@ -188,8 +288,8 @@ export class UsersService {
               type: tx.type,
               date: new Date(tx.date),
               label: tx.label,
-              userId: user.id
-            })
+              userId: user.id,
+            }),
           );
           await txTransactionsRepository.save(nextTransactions);
         }
@@ -204,14 +304,14 @@ export class UsersService {
     user.isOnline = isOnline;
     user.lastSeenAt = new Date();
     return this.usersRepository.save(user);
-   }
+  }
 
-   async getReferralOverview(telegramId: string) {
+  async getReferralOverview(telegramId: string) {
     const user = await this.ensureUser({ telegramId });
 
     const invitedPeople = await this.usersRepository.find({
       where: [{ referredBy: user.referralCode }, { referredBy: user.id }],
-      order: { firstSeenAt: 'DESC' }
+      order: { firstSeenAt: 'DESC' },
     });
 
     const topRows = await this.usersRepository
@@ -228,16 +328,16 @@ export class UsersService {
     const topReferrers = await Promise.all(
       topRows.map(async (row) => {
         const referrerUser = await this.usersRepository.findOne({
-          where: [{ referralCode: row.referrer }, { id: row.referrer }]
+          where: [{ referralCode: row.referrer }, { id: row.referrer }],
         });
 
         return {
           id: referrerUser?.id || `external-${row.referrer}`,
           name: referrerUser?.userName || `User ${row.referrer.slice(0, 6)}`,
           joinedAt: referrerUser?.firstSeenAt || new Date(),
-          referralsCount: Number(row.referralsCount)
+          referralsCount: Number(row.referralsCount),
         };
-      })
+      }),
     );
 
     return {
@@ -246,9 +346,9 @@ export class UsersService {
         id: person.id,
         name: person.userName || `User ${person.telegramId.slice(-4)}`,
         joinedAt: person.firstSeenAt,
-        referralsCount: 0
+        referralsCount: 0,
       })),
-      topReferrers
+      topReferrers,
     };
   }
 
@@ -256,24 +356,36 @@ export class UsersService {
     return createHash('sha256').update(token).digest('hex');
   }
 
-  private async createUserSafely(telegramId: string, userName?: string, referredBy?: string): Promise<User> {
+  private async createUserSafely(
+    telegramId: string,
+    userName?: string,
+    referredBy?: string,
+  ): Promise<User> {
     try {
       return await this.usersRepository.save(
         this.usersRepository.create({
           telegramId,
           userName: userName || `Guest ${telegramId.slice(-4)}`,
-          referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
+          referralCode: Math.random()
+            .toString(36)
+            .substring(2, 8)
+            .toUpperCase(),
           referredBy: referredBy?.trim() || null,
           lastSeenAt: new Date(),
-          isOnline: true
-        })
+          isOnline: true,
+        }),
       );
     } catch (error) {
-      if (!(error instanceof QueryFailedError) || (error as { code?: string }).code !== '23505') {
+      if (
+        !(error instanceof QueryFailedError) ||
+        (error as { code?: string }).code !== '23505'
+      ) {
         throw error;
       }
 
-      const existing = await this.usersRepository.findOne({ where: { telegramId } });
+      const existing = await this.usersRepository.findOne({
+        where: { telegramId },
+      });
       if (!existing) {
         throw error;
       }
@@ -281,8 +393,14 @@ export class UsersService {
     }
   }
 
-   private async ensureUser({ telegramId, userName, referredBy }: EnsureUserPayload): Promise<User> {
-    const existing = await this.usersRepository.findOne({ where: { telegramId } });
+  private async ensureUser({
+    telegramId,
+    userName,
+    referredBy,
+  }: EnsureUserPayload): Promise<User> {
+    const existing = await this.usersRepository.findOne({
+      where: { telegramId },
+    });
     if (existing) {
       if (userName && existing.userName !== userName) {
         existing.userName = userName;
@@ -293,4 +411,4 @@ export class UsersService {
 
     return this.createUserSafely(telegramId, userName, referredBy);
   }
-} 
+}

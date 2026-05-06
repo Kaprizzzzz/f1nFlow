@@ -7,28 +7,34 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  ValidateNested
+  ValidateNested,
 } from 'class-validator';
 
 export enum Theme {
   DEFAULT = 'default',
-  GIRLY = 'girly'
+  GIRLY = 'girly',
 }
 
 export enum VisualizationMode {
   AMOUNT = 'amount',
-  SEGMENTS = 'segments'
+  SEGMENTS = 'segments',
 }
 
 export enum TransactionType {
   PLUS = 'plus',
-  MINUS = 'minus'
+  MINUS = 'minus',
 }
 
 export enum Currency {
   EUR = 'EUR',
   USD = 'USD',
-  UAH = 'UAH'
+  UAH = 'UAH',
+  RUB = 'RUB',
+  PLN = 'PLN',
+  TRY = 'TRY',
+  CAD = 'CAD',
+  GBP = 'GBP',
+  HRK = 'HRK',
 }
 
 export enum Language {
@@ -38,7 +44,15 @@ export enum Language {
   ES = 'es',
   BE = 'be',
   FR = 'fr',
-  NL = 'nl'
+  NL = 'nl',
+}
+
+export class CategoryPositionDto {
+  @IsNumber()
+  left: number;
+
+  @IsNumber()
+  top: number;
 }
 
 export class CategoryDto {
@@ -51,6 +65,11 @@ export class CategoryDto {
   @IsOptional()
   @IsString()
   icon?: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CategoryPositionDto)
+  position?: CategoryPositionDto;
 }
 
 export class SpherePositionDto {
@@ -214,4 +233,20 @@ export class SaveStateDto {
   @IsOptional()
   @IsEnum(Language)
   language?: Language;
+
+  @IsOptional()
+  @IsNumber()
+  streakCurrent?: number;
+
+  @IsOptional()
+  @IsNumber()
+  streakBest?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  badges?: string[];
+
+  @IsOptional()
+  weeklyChallenge?: unknown;
 }

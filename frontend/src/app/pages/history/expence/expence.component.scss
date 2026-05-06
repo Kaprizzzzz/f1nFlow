@@ -7,16 +7,27 @@ $expense-glow: #ffb060;
   align-items: center;
   width: max-content;
   max-width: none;
-  padding-top:0; // Додано відступ зверху для іконок
+  padding-top: 0; // Додано відступ зверху для іконок
 
   .main-circle {
-    --category-ring: conic-gradient(rgba(127, 70, 85, 0.35) 0deg, rgba(127, 70, 85, 0.35) 360deg);
+    --category-ring: conic-gradient(
+      rgba(127, 70, 85, 0.35) 0deg,
+      rgba(127, 70, 85, 0.35) 360deg
+    );
     width: 135px;
     height: 135px;
     border-radius: 50%;
-    background: radial-gradient(circle at 50% 18%, #ffd27f 0%, #f2a24f 16%, #9f5b18 50%, #341700 100%);
+    background: radial-gradient(
+      circle at 50% 18%,
+      #ffd27f 0%,
+      #f2a24f 16%,
+      #9f5b18 50%,
+      #341700 100%
+    );
     border: 2px solid rgba($expense-glow, 0.9);
-    box-shadow: 0 0 20px rgba($expense-glow, 0.5), inset 0 -16px 26px rgba(0, 0, 0, 0.45);
+    box-shadow:
+      0 0 20px rgba($expense-glow, 0.5),
+      inset 0 -16px 26px rgba(0, 0, 0, 0.45);
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -28,7 +39,7 @@ $expense-glow: #ffb060;
     position: relative;
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       inset: -10px;
       border-radius: 50%;
@@ -38,7 +49,10 @@ $expense-glow: #ffb060;
       pointer-events: none;
     }
 
-    .label { font-size: 18px; opacity: 0.95; }
+    .label {
+      font-size: 18px;
+      opacity: 0.95;
+    }
     .value {
       font-size: clamp(17px, 5.8vw, 34px);
       font-weight: 600;
@@ -52,8 +66,12 @@ $expense-glow: #ffb060;
 
   &.active .main-circle {
     transform: scale(1.56);
-    .label { font-size: 32px; }
-    .value { font-size: clamp(18px, 7vw, 36px); }
+    .label {
+      font-size: 32px;
+    }
+    .value {
+      font-size: clamp(18px, 7vw, 36px);
+    }
   }
   &.active {
     padding-top: 48px;
@@ -134,9 +152,17 @@ $expense-glow: #ffb060;
   align-items: center;
   gap: 10px;
   color: #ffedda;
-  .emoji { font-size: 24px; }
-  .name { font-size: 16px; font-weight: 600; }
-  .amount { font-size: 18px; font-weight: 700; }
+  .emoji {
+    font-size: 24px;
+  }
+  .name {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .amount {
+    font-size: 18px;
+    font-weight: 700;
+  }
 }
 
 .row-actions {
@@ -185,7 +211,9 @@ select {
   font-size: 14px;
 }
 
-.small-btn.ghost { background: transparent; }
+.small-btn.ghost {
+  background: transparent;
+}
 
 .amount-modal-backdrop {
   position: fixed;
@@ -245,7 +273,6 @@ select {
 .category-modal {
   @extend .amount-modal;
 }
-
 
 .amount-modal.shake {
   animation: modal-shake 0.24s ease-in-out;

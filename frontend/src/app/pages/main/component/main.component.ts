@@ -7,7 +7,7 @@ import {
   OnInit,
   QueryList,
   ViewChild,
-  ViewChildren
+  ViewChildren,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BehaviorSubject, Subscription, combineLatest, map } from 'rxjs';
@@ -16,14 +16,17 @@ import { IncomeComponent } from '../../history/income/income.component';
 import { NewsComponent } from '../../history/news/news.component';
 import { SavingComponent } from '../../history/saving/saving.component';
 import { BalanceService, SphereTab } from '../../history/balance.service';
-import { RecentCategoryGroup, RecentComponent } from '../../history/recent/recent.component';
+import {
+  RecentCategoryGroup,
+  RecentComponent,
+} from '../../history/recent/recent.component';
 import { SessionService } from '../../user/service/user.service';
 import {
   DEFAULT_SPHERE_POSITIONS,
   DragState,
   SpherePosition,
   SphereLayoutService,
-  SphereSize
+  SphereSize,
 } from '../sphere-layout.service';
 import { RecentFacadeService } from '../recent-facade.service';
 import { MainViewModel } from '../main-view-model';
@@ -40,10 +43,10 @@ type MainTab = SphereTab | null;
     ExpenceComponent,
     SavingComponent,
     NewsComponent,
-    RecentComponent
+    RecentComponent,
   ],
   templateUrl: './main.component.html',
-  styleUrl: './main.component.scss'
+  styleUrl: './main.component.scss',
 })
 export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('layoutRef')
@@ -67,10 +70,30 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   badges: string[] = [];
   selectedBadgeDescription = '';
   readonly badgeCatalog = [
-    { id: 'streak-bronze', title: '🥉', color: '#b87333', descriptionKey: 'Visit app 5 days in a row' },
-    { id: 'streak-silver', title: '🥈', color: '#c0c0c0', descriptionKey: 'Visit app 14 days in a row' },
-    { id: 'streak-gold', title: '🥇', color: '#ffd700', descriptionKey: 'Visit app 30 days in a row' },
-    { id: 'challenge-winner', title: '🏆', color: '#61dafb', descriptionKey: 'Complete weekly challenge' }
+    {
+      id: 'streak-bronze',
+      title: '🥉',
+      color: '#b87333',
+      descriptionKey: 'Visit app 5 days in a row',
+    },
+    {
+      id: 'streak-silver',
+      title: '🥈',
+      color: '#c0c0c0',
+      descriptionKey: 'Visit app 14 days in a row',
+    },
+    {
+      id: 'streak-gold',
+      title: '🥇',
+      color: '#ffd700',
+      descriptionKey: 'Visit app 30 days in a row',
+    },
+    {
+      id: 'challenge-winner',
+      title: '🏆',
+      color: '#61dafb',
+      descriptionKey: 'Complete weekly challenge',
+    },
   ];
   newsPanelAnchorBottom = 0;
 
@@ -83,8 +106,10 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription = new Subscription();
   private lastAppliedLayoutKey = '';
   private previousBodyTouchAction = '';
-  private readonly globalPointerMoveHandler = (event: PointerEvent): void => this.onDragMove(event);
-  private readonly globalPointerUpHandler = (event: PointerEvent): void => this.onGlobalPointerStop(event);
+  private readonly globalPointerMoveHandler = (event: PointerEvent): void =>
+    this.onDragMove(event);
+  private readonly globalPointerUpHandler = (event: PointerEvent): void =>
+    this.onGlobalPointerStop(event);
 
   private readonly vm$;
 
@@ -93,43 +118,70 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     private sessionService: SessionService,
     private sphereLayoutService: SphereLayoutService,
     private recentFacade: RecentFacadeService,
-    private i18nService: I18nService
+    private i18nService: I18nService,
   ) {
-    this.spherePositions = this.sphereLayoutService.clonePositions(DEFAULT_SPHERE_POSITIONS);
-    this.savedSpherePositions = this.sphereLayoutService.clonePositions(DEFAULT_SPHERE_POSITIONS);
+    this.spherePositions = this.sphereLayoutService.clonePositions(
+      DEFAULT_SPHERE_POSITIONS,
+    );
+    this.savedSpherePositions = this.sphereLayoutService.clonePositions(
+      DEFAULT_SPHERE_POSITIONS,
+    );
     this.sphereSizes = this.sphereLayoutService.createFallbackSphereSizes();
 
     this.vm$ = combineLatest([
       this.sessionService.user$,
       this.balanceService.quickTransactionsLimit$,
+      this.balanceService.currency$,
       this.balanceService.transactions$,
       this.balanceService.weeklyChallenge$,
       this.balanceService.streakCurrent$,
       this.balanceService.streakBest$,
       this.balanceService.badges$,
       this.balanceService.sphereLayout$,
-      this.isEditMode$
+      this.isEditMode$,
     ]).pipe(
-      map(([_user, quickTransactionsLimit, transactions, weeklyChallenge, streakCurrent, streakBest, badges, sphereLayout, _isEditMode]): MainViewModel & { streakCurrent: number; streakBest: number; badges: string[] } => ({
-        canEditLayout: true,
-        quickTransactionsLimit,
-        recentCategoryGroups: this.recentFacade.buildRecentCategoryGroups(transactions, quickTransactionsLimit),
-        weeklyChallengeText: weeklyChallenge
-          ? `${this.i18nService.t('main.weeklyChallenge')}: ${weeklyChallenge.category} ≤ ${weeklyChallenge.limit.toFixed(2)}`
-          : '',
-        sphereLayout,
-        streakCurrent: streakCurrent ?? 0,
-        streakBest: streakBest ?? 0,
-        badges: badges ?? []
-      }))
+      map(
+        ([
+          _user,
+          quickTransactionsLimit,
+          currency,
+          transactions,
+          weeklyChallenge,
+          streakCurrent,
+          streakBest,
+          badges,
+          sphereLayout,
+          _isEditMode,
+        ]): MainViewModel & {
+          streakCurrent: number;
+          streakBest: number;
+          badges: string[];
+        } => ({
+          canEditLayout: true,
+          quickTransactionsLimit,
+          recentCategoryGroups: this.recentFacade.buildRecentCategoryGroups(
+            transactions,
+            quickTransactionsLimit,
+          ),
+          weeklyChallengeText: weeklyChallenge
+            ? `${this.i18nService.t('main.weeklyChallenge')}: ${weeklyChallenge.category} ≤ ${weeklyChallenge.limit.toFixed(2)} ${weeklyChallenge.currency ?? currency}`
+            : '',
+          sphereLayout,
+          streakCurrent: streakCurrent ?? 0,
+          streakBest: streakBest ?? 0,
+          badges: badges ?? [],
+        }),
+      ),
     );
   }
 
   ngOnInit(): void {
     const initialLayout = this.balanceService.getSphereLayout();
     if (initialLayout) {
-      this.spherePositions = this.sphereLayoutService.clonePositions(initialLayout);
-      this.savedSpherePositions = this.sphereLayoutService.clonePositions(initialLayout);
+      this.spherePositions =
+        this.sphereLayoutService.clonePositions(initialLayout);
+      this.savedSpherePositions =
+        this.sphereLayoutService.clonePositions(initialLayout);
       this.lastAppliedLayoutKey = this.getLayoutKey(initialLayout);
     } else {
       this.lastAppliedLayoutKey = this.getLayoutKey(this.savedSpherePositions);
@@ -146,8 +198,12 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
         this.badges = vm.badges;
 
         if (vm.sphereLayout && this.hasExternalLayoutUpdate(vm.sphereLayout)) {
-          this.spherePositions = this.sphereLayoutService.clonePositions(vm.sphereLayout);
-          this.savedSpherePositions = this.sphereLayoutService.clonePositions(vm.sphereLayout);
+          this.spherePositions = this.sphereLayoutService.clonePositions(
+            vm.sphereLayout,
+          );
+          this.savedSpherePositions = this.sphereLayoutService.clonePositions(
+            vm.sphereLayout,
+          );
           this.lastAppliedLayoutKey = this.getLayoutKey(vm.sphereLayout);
         }
 
@@ -156,18 +212,21 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
           this.isEditMode$.next(false);
           this.stopDrag();
         }
-      })
+      }),
     );
   }
 
   ngAfterViewInit(): void {
     this.measureSphereSizes();
     if (this.sphereRefs) {
-      this.subscription.add(this.sphereRefs.changes.subscribe(() => this.measureSphereSizes()));
+      this.subscription.add(
+        this.sphereRefs.changes.subscribe(() => this.measureSphereSizes()),
+      );
     }
 
     const raf =
-      globalThis.requestAnimationFrame ?? ((callback: FrameRequestCallback) => setTimeout(() => callback(0), 0));
+      globalThis.requestAnimationFrame ??
+      ((callback: FrameRequestCallback) => setTimeout(() => callback(0), 0));
 
     raf(() => {
       this.measureSphereSizes();
@@ -233,7 +292,9 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!badge) {
       return;
     }
-    const status = this.isBadgeUnlocked(id) ? '' : ` (${this.t('badge.locked')})`;
+    const status = this.isBadgeUnlocked(id)
+      ? ''
+      : ` (${this.t('badge.locked')})`;
     this.selectedBadgeDescription = `${badge.title}${status}: ${badge.descriptionKey}`;
   }
 
@@ -258,20 +319,26 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isEditMode = false;
       this.isEditMode$.next(false);
       this.stopDrag();
-      this.spherePositions = this.sphereLayoutService.clonePositions(this.savedSpherePositions);
+      this.spherePositions = this.sphereLayoutService.clonePositions(
+        this.savedSpherePositions,
+      );
       return;
     }
 
     this.isEditMode = true;
     this.isEditMode$.next(true);
     this.stopDrag();
-    this.spherePositions = this.sphereLayoutService.clonePositions(this.savedSpherePositions);
+    this.spherePositions = this.sphereLayoutService.clonePositions(
+      this.savedSpherePositions,
+    );
   }
 
   saveLayout(): void {
     this.measureSphereSizes();
     this.clampAllCurrentSpherePositions();
-    this.savedSpherePositions = this.sphereLayoutService.clonePositions(this.spherePositions);
+    this.savedSpherePositions = this.sphereLayoutService.clonePositions(
+      this.spherePositions,
+    );
     this.balanceService.setSphereLayout(this.savedSpherePositions);
     this.lastAppliedLayoutKey = this.getLayoutKey(this.savedSpherePositions);
     this.isEditMode = false;
@@ -280,11 +347,13 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resetToDefaultLayout(): void {
-    this.savedSpherePositions = this.sphereLayoutService.clonePositions(DEFAULT_SPHERE_POSITIONS);
+    this.savedSpherePositions = this.sphereLayoutService.clonePositions(
+      DEFAULT_SPHERE_POSITIONS,
+    );
     this.spherePositions = this.sphereLayoutService.clampAllSpherePositions(
       DEFAULT_SPHERE_POSITIONS,
       this.layoutRef?.nativeElement,
-      this.sphereSizes
+      this.sphereSizes,
     );
     this.balanceService.setSphereLayout(this.spherePositions);
     this.lastAppliedLayoutKey = this.getLayoutKey(this.spherePositions);
@@ -294,31 +363,46 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onDragStart(event: PointerEvent, tab: SphereTab): void {
-    if (!this.isEditMode || this.activeTab !== null || !this.canEditLayout || !this.layoutRef?.nativeElement) {
+    if (
+      !this.isEditMode ||
+      this.activeTab !== null ||
+      !this.canEditLayout ||
+      !this.layoutRef?.nativeElement
+    ) {
       return;
     }
 
     event.preventDefault();
     event.stopPropagation();
 
-    this.dragState = this.sphereLayoutService.startDrag(event, tab, this.layoutRef.nativeElement);
+    this.dragState = this.sphereLayoutService.startDrag(
+      event,
+      tab,
+      this.layoutRef.nativeElement,
+    );
     this.attachGlobalPointerListeners();
     this.previousBodyTouchAction = document.body.style.touchAction;
     document.body.style.touchAction = 'none';
   }
 
   onDragMove(event: PointerEvent): void {
-    if (!this.dragState || !this.isEditMode || event.pointerId !== this.dragState.pointerId || !this.layoutRef?.nativeElement) {
+    if (
+      !this.dragState ||
+      !this.isEditMode ||
+      event.pointerId !== this.dragState.pointerId ||
+      !this.layoutRef?.nativeElement
+    ) {
       return;
     }
 
     event.preventDefault();
 
-    this.spherePositions[this.dragState.tab] = this.sphereLayoutService.calculateDragPosition(
-      event,
-      this.dragState,
-      this.layoutRef.nativeElement
-    );
+    this.spherePositions[this.dragState.tab] =
+      this.sphereLayoutService.calculateDragPosition(
+        event,
+        this.dragState,
+        this.layoutRef.nativeElement,
+      );
   }
 
   stopDrag(): void {
@@ -332,7 +416,12 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getSphereStyle(tab: SphereTab): Record<string, string> {
-    return this.sphereLayoutService.getSphereStyle(tab, this.spherePositions, this.layoutRef?.nativeElement, this.sphereSizes);
+    return this.sphereLayoutService.getSphereStyle(
+      tab,
+      this.spherePositions,
+      this.layoutRef?.nativeElement,
+      this.sphereSizes,
+    );
   }
 
   isFullscreenPanelTab(tab: MainTab = this.activeTab): boolean {
@@ -344,24 +433,31 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    document.body.classList.toggle('panel-fullscreen-active', this.isFullscreenPanelTab(tab));
+    document.body.classList.toggle(
+      'panel-fullscreen-active',
+      this.isFullscreenPanelTab(tab),
+    );
   }
 
   private measureSphereSizes(): void {
-    this.sphereSizes = this.sphereLayoutService.measureSphereSizes(this.sphereRefs, this.sphereSizes);
+    this.sphereSizes = this.sphereLayoutService.measureSphereSizes(
+      this.sphereRefs,
+      this.sphereSizes,
+    );
   }
 
   private clampAllCurrentSpherePositions(): void {
     this.spherePositions = this.sphereLayoutService.clampAllSpherePositions(
       this.spherePositions,
       this.layoutRef?.nativeElement,
-      this.sphereSizes
+      this.sphereSizes,
     );
-    this.savedSpherePositions = this.sphereLayoutService.clampAllSpherePositions(
-      this.savedSpherePositions,
-      this.layoutRef?.nativeElement,
-      this.sphereSizes
-    );
+    this.savedSpherePositions =
+      this.sphereLayoutService.clampAllSpherePositions(
+        this.savedSpherePositions,
+        this.layoutRef?.nativeElement,
+        this.sphereSizes,
+      );
   }
 
   private updateNewsPanelAnchorBottom(): void {
@@ -370,16 +466,21 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const raf =
-      globalThis.requestAnimationFrame ?? ((callback: FrameRequestCallback) => setTimeout(() => callback(0), 0));
+      globalThis.requestAnimationFrame ??
+      ((callback: FrameRequestCallback) => setTimeout(() => callback(0), 0));
 
     raf(() => {
       const layout = this.layoutRef?.nativeElement;
-      const newsCircle = layout?.querySelector<HTMLElement>('.sphere-wrapper[data-tab="news"] .main-circle');
+      const newsCircle = layout?.querySelector<HTMLElement>(
+        '.sphere-wrapper[data-tab="news"] .main-circle',
+      );
       if (!newsCircle) {
         return;
       }
 
-      this.newsPanelAnchorBottom = Math.ceil(newsCircle.getBoundingClientRect().bottom);
+      this.newsPanelAnchorBottom = Math.ceil(
+        newsCircle.getBoundingClientRect().bottom,
+      );
     });
   }
 
@@ -392,9 +493,15 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private attachGlobalPointerListeners(): void {
-    window.addEventListener('pointermove', this.globalPointerMoveHandler, { passive: false });
-    window.addEventListener('pointerup', this.globalPointerUpHandler, { passive: true });
-    window.addEventListener('pointercancel', this.globalPointerUpHandler, { passive: true });
+    window.addEventListener('pointermove', this.globalPointerMoveHandler, {
+      passive: false,
+    });
+    window.addEventListener('pointerup', this.globalPointerUpHandler, {
+      passive: true,
+    });
+    window.addEventListener('pointercancel', this.globalPointerUpHandler, {
+      passive: true,
+    });
   }
 
   private detachGlobalPointerListeners(): void {
@@ -415,7 +522,9 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     return false;
   }
 
-  private hasExternalLayoutUpdate(layout: Record<SphereTab, SpherePosition>): boolean {
+  private hasExternalLayoutUpdate(
+    layout: Record<SphereTab, SpherePosition>,
+  ): boolean {
     const nextLayoutKey = this.getLayoutKey(layout);
     return nextLayoutKey !== this.lastAppliedLayoutKey;
   }

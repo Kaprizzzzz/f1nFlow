@@ -14,7 +14,11 @@
 
 .card-block {
   border: 1px solid rgba(118, 159, 228, 0.28);
-  background: linear-gradient(180deg, rgba(13, 24, 45, 0.95) 0%, rgba(8, 14, 27, 0.95) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(13, 24, 45, 0.95) 0%,
+    rgba(8, 14, 27, 0.95) 100%
+  );
   border-radius: 14px;
   padding: 12px;
   h3 {

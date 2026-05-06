@@ -49,6 +49,38 @@ type TranslationKey =
   | 'main.days'
   | 'main.badges'
   | 'main.weeklyMissions'
+  | 'common.cancel'
+  | 'common.save'
+  | 'common.close'
+  | 'common.loading'
+  | 'common.invalid'
+  | 'main.income'
+  | 'main.expense'
+  | 'category.create'
+  | 'category.createPlaceholder'
+  | 'category.editName'
+  | 'category.newName'
+  | 'category.icon'
+  | 'about.title'
+  | 'about.description'
+  | 'about.telegramChannel'
+  | 'about.telegramChat'
+  | 'about.instagram'
+  | 'about.tiktok'
+  | 'about.tip'
+  | 'referrals.title'
+  | 'referrals.peopleTitle'
+  | 'referrals.peopleDescription'
+  | 'referrals.joined'
+  | 'referrals.emptyInvited'
+  | 'referrals.topTitle'
+  | 'referrals.topDescription'
+  | 'referrals.emptyTop'
+  | 'referrals.inviteTitle'
+  | 'referrals.inviteDescription'
+  | 'referrals.copyLink'
+  | 'referrals.copied'
+  | 'referrals.shareText'
   | 'badge.locked';
 
 export interface LanguageOption {
@@ -71,7 +103,8 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'tips.title': 'Швидкий старт',
     'tips.subtitle': 'Короткі підказки, щоб швидше освоїтись.',
     'tips.step1': 'Натисни на сферу, щоб відкрити детальну панель категорії.',
-    'tips.step2': 'У режимі редагування можна перетягувати сфери та зберігати власний макет.',
+    'tips.step2':
+      'У режимі редагування можна перетягувати сфери та зберігати власний макет.',
     'tips.step3': 'Ліміт швидких транзакцій і валюта зберігаються автоматично.',
     'tips.next': 'Далі',
     'tips.gotIt': 'Зрозуміло',
@@ -97,14 +130,51 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'saving.noRecords': 'Поки немає записів.',
     'news.empty': 'Персональні інсайти зʼявляться після активності.',
     'main.weeklyChallenge': 'Тижневий челендж',
-    'main.challengeSpendLess': 'Витратити вдвічі менше денного ліміту до дедлайну',
+    'main.challengeSpendLess':
+      'Витратити вдвічі менше денного ліміту до дедлайну',
     'main.challengeNoSpendingDay': 'Зробити щонайменше 1 день без витрат',
     'main.streakCurrent': 'Поточний стрік',
     'main.streakBest': 'Найкращий стрік',
     'main.days': 'днів',
     'main.badges': 'Бейджі',
     'main.weeklyMissions': 'Тижневі місії',
-    'badge.locked': 'Заблоковано'
+    'common.cancel': 'Скасувати',
+    'common.save': 'Зберегти',
+    'common.close': 'Закрити',
+    'common.loading': 'Завантаження...',
+    'common.invalid': 'Некоректно',
+    'main.income': 'Дохід',
+    'main.expense': 'Витрати',
+    'category.create': 'Створити категорію',
+    'category.createPlaceholder': 'Назва категорії',
+    'category.editName': 'Редагувати назву категорії',
+    'category.newName': 'Нова назва категорії',
+    'category.icon': 'Іконка категорії',
+    'about.title': 'Про F1nFlow',
+    'about.description':
+      'F1nFlow допомагає керувати витратами, відстежувати категорії та тримати бюджет під контролем.',
+    'about.telegramChannel': 'Telegram-канал',
+    'about.telegramChat': 'Telegram-чат',
+    'about.instagram': 'Instagram',
+    'about.tiktok': 'TikTok',
+    'about.tip': 'Порада',
+    'referrals.title': 'Реферали',
+    'referrals.peopleTitle': 'Люди, яких ти запросив(ла)',
+    'referrals.peopleDescription':
+      'Це список користувачів, які приєдналися за твоїм реферальним кодом.',
+    'referrals.joined': 'Приєднався(лась)',
+    'referrals.emptyInvited': 'У тебе ще немає запрошених рефералів.',
+    'referrals.topTitle': 'Топ 100 користувачів за рефералами',
+    'referrals.topDescription':
+      'Рейтинг побудовано лише на реальних реферальних записах з бази даних.',
+    'referrals.emptyTop': 'Поки немає даних рейтингу рефералів.',
+    'referrals.inviteTitle': 'Твоє персональне посилання-запрошення',
+    'referrals.inviteDescription':
+      'Скопіюй і поділись ним напряму в Telegram або Viber.',
+    'referrals.copyLink': 'Скопіювати',
+    'referrals.copied': 'Скопійовано!',
+    'referrals.shareText': 'Приєднуйся до мене у F1nFlow!',
+    'badge.locked': 'Заблоковано',
   },
   en: {
     'nav.main': 'Main',
@@ -120,7 +190,8 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'tips.subtitle': 'A few hints to get comfortable faster.',
     'tips.step1': 'Tap any sphere to open the category details panel.',
     'tips.step2': 'In edit mode you can drag spheres and save your own layout.',
-    'tips.step3': 'Quick transaction limit and currency are saved automatically.',
+    'tips.step3':
+      'Quick transaction limit and currency are saved automatically.',
     'tips.next': 'Next',
     'tips.gotIt': 'Got it',
     'tips.skip': 'Skip',
@@ -145,14 +216,51 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'saving.noRecords': 'No records yet.',
     'news.empty': 'Personal insights appear after your activity.',
     'main.weeklyChallenge': 'Weekly challenge',
-    'main.challengeSpendLess': 'Spend 2x less than your daily limit before deadline',
+    'main.challengeSpendLess':
+      'Spend 2x less than your daily limit before deadline',
     'main.challengeNoSpendingDay': 'Complete at least 1 no-spend day',
     'main.streakCurrent': 'Current streak',
     'main.streakBest': 'Best streak',
     'main.days': 'days',
     'main.badges': 'Badges',
     'main.weeklyMissions': 'Weekly missions',
-    'badge.locked': 'Locked'
+    'common.cancel': 'Cancel',
+    'common.save': 'Save',
+    'common.close': 'Close',
+    'common.loading': 'Loading...',
+    'common.invalid': 'Invalid',
+    'main.income': 'Income',
+    'main.expense': 'Expense',
+    'category.create': 'Create category',
+    'category.createPlaceholder': 'Category name',
+    'category.editName': 'Edit category name',
+    'category.newName': 'New category name',
+    'category.icon': 'Category icon',
+    'about.title': 'About F1nFlow',
+    'about.description':
+      'F1nFlow helps you manage spending, track categories, and keep your budget under control.',
+    'about.telegramChannel': 'Telegram channel',
+    'about.telegramChat': 'Telegram chat',
+    'about.instagram': 'Instagram',
+    'about.tiktok': 'TikTok',
+    'about.tip': 'Tip',
+    'referrals.title': 'Referrals',
+    'referrals.peopleTitle': 'People you invited',
+    'referrals.peopleDescription':
+      'This is the list of users who joined with your referral code.',
+    'referrals.joined': 'Joined',
+    'referrals.emptyInvited': 'You do not have invited referrals yet.',
+    'referrals.topTitle': 'Top 100 users by referrals',
+    'referrals.topDescription':
+      'Leaderboard based only on real referral records from the database.',
+    'referrals.emptyTop': 'No referral leaderboard data yet.',
+    'referrals.inviteTitle': 'Your personal invite link',
+    'referrals.inviteDescription':
+      'Copy and share it directly with Telegram or Viber.',
+    'referrals.copyLink': 'Copy link',
+    'referrals.copied': 'Copied!',
+    'referrals.shareText': 'Join me on F1nFlow!',
+    'badge.locked': 'Locked',
   },
   ru: {
     'nav.main': 'Главная',
@@ -167,8 +275,10 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'tips.title': 'Быстрый старт',
     'tips.subtitle': 'Короткие подсказки для быстрого старта.',
     'tips.step1': 'Нажмите на сферу, чтобы открыть подробную панель категории.',
-    'tips.step2': 'В режиме редактирования можно перетаскивать сферы и сохранять свой макет.',
-    'tips.step3': 'Лимит быстрых транзакций и валюта сохраняются автоматически.',
+    'tips.step2':
+      'В режиме редактирования можно перетаскивать сферы и сохранять свой макет.',
+    'tips.step3':
+      'Лимит быстрых транзакций и валюта сохраняются автоматически.',
     'tips.next': 'Далее',
     'tips.gotIt': 'Понятно',
     'tips.skip': 'Пропустить',
@@ -193,14 +303,51 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'saving.noRecords': 'Пока нет записей.',
     'news.empty': 'Персональные инсайты появятся после активности.',
     'main.weeklyChallenge': 'Недельный челлендж',
-    'main.challengeSpendLess': 'Потратить вдвое меньше дневного лимита до дедлайна',
+    'main.challengeSpendLess':
+      'Потратить вдвое меньше дневного лимита до дедлайна',
     'main.challengeNoSpendingDay': 'Сделать минимум 1 день без трат',
     'main.streakCurrent': 'Текущий стрик',
     'main.streakBest': 'Лучший стрик',
     'main.days': 'дней',
     'main.badges': 'Бейджи',
     'main.weeklyMissions': 'Недельные миссии',
-    'badge.locked': 'Заблокировано'
+    'common.cancel': 'Отмена',
+    'common.save': 'Сохранить',
+    'common.close': 'Закрыть',
+    'common.loading': 'Загрузка...',
+    'common.invalid': 'Некорректно',
+    'main.income': 'Доход',
+    'main.expense': 'Расход',
+    'category.create': 'Создать категорию',
+    'category.createPlaceholder': 'Название категории',
+    'category.editName': 'Редактировать название категории',
+    'category.newName': 'Новое название категории',
+    'category.icon': 'Иконка категории',
+    'about.title': 'О F1nFlow',
+    'about.description':
+      'F1nFlow помогает управлять расходами, отслеживать категории и держать бюджет под контролем.',
+    'about.telegramChannel': 'Telegram-канал',
+    'about.telegramChat': 'Telegram-чат',
+    'about.instagram': 'Instagram',
+    'about.tiktok': 'TikTok',
+    'about.tip': 'Совет',
+    'referrals.title': 'Рефералы',
+    'referrals.peopleTitle': 'Люди, которых вы пригласили',
+    'referrals.peopleDescription':
+      'Это список пользователей, которые присоединились по вашему реферальному коду.',
+    'referrals.joined': 'Присоединился(лась)',
+    'referrals.emptyInvited': 'У вас пока нет приглашённых рефералов.',
+    'referrals.topTitle': 'Топ 100 пользователей по рефералам',
+    'referrals.topDescription':
+      'Рейтинг построен только на реальных реферальных записях из базы данных.',
+    'referrals.emptyTop': 'Пока нет данных рейтинга рефералов.',
+    'referrals.inviteTitle': 'Ваша персональная ссылка-приглашение',
+    'referrals.inviteDescription':
+      'Скопируйте и поделитесь ею напрямую в Telegram или Viber.',
+    'referrals.copyLink': 'Скопировать',
+    'referrals.copied': 'Скопировано!',
+    'referrals.shareText': 'Присоединяйся ко мне в F1nFlow!',
+    'badge.locked': 'Заблокировано',
   },
   es: {
     'nav.main': 'Inicio',
@@ -241,14 +388,51 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'saving.noRecords': 'Aún no hay registros.',
     'news.empty': 'Los insights personales aparecerán después de tu actividad.',
     'main.weeklyChallenge': 'Desafío semanal',
-    'main.challengeSpendLess': 'Gastar 2x menos que tu límite diario antes del plazo',
+    'main.challengeSpendLess':
+      'Gastar 2x menos que tu límite diario antes del plazo',
     'main.challengeNoSpendingDay': 'Completar al menos 1 día sin gastos',
     'main.streakCurrent': 'Racha actual',
     'main.streakBest': 'Mejor racha',
     'main.days': 'días',
     'main.badges': 'Insignias',
     'main.weeklyMissions': 'Misiones semanales',
-    'badge.locked': 'Bloqueado'
+    'common.cancel': 'Cancelar',
+    'common.save': 'Guardar',
+    'common.close': 'Cerrar',
+    'common.loading': 'Cargando...',
+    'common.invalid': 'No válido',
+    'main.income': 'Ingresos',
+    'main.expense': 'Gastos',
+    'category.create': 'Crear categoría',
+    'category.createPlaceholder': 'Nombre de categoría',
+    'category.editName': 'Editar nombre de categoría',
+    'category.newName': 'Nuevo nombre de categoría',
+    'category.icon': 'Icono de categoría',
+    'about.title': 'Acerca de F1nFlow',
+    'about.description':
+      'F1nFlow te ayuda a gestionar gastos, seguir categorías y mantener tu presupuesto bajo control.',
+    'about.telegramChannel': 'Canal de Telegram',
+    'about.telegramChat': 'Chat de Telegram',
+    'about.instagram': 'Instagram',
+    'about.tiktok': 'TikTok',
+    'about.tip': 'Consejo',
+    'referrals.title': 'Referidos',
+    'referrals.peopleTitle': 'Personas que invitaste',
+    'referrals.peopleDescription':
+      'Esta es la lista de usuarios que se unieron con tu código de referido.',
+    'referrals.joined': 'Se unió',
+    'referrals.emptyInvited': 'Aún no tienes referidos invitados.',
+    'referrals.topTitle': 'Top 100 usuarios por referidos',
+    'referrals.topDescription':
+      'Clasificación basada solo en registros reales de referidos de la base de datos.',
+    'referrals.emptyTop': 'Aún no hay datos de clasificación de referidos.',
+    'referrals.inviteTitle': 'Tu enlace personal de invitación',
+    'referrals.inviteDescription':
+      'Cópialo y compártelo directamente con Telegram o Viber.',
+    'referrals.copyLink': 'Copiar enlace',
+    'referrals.copied': '¡Copiado!',
+    'referrals.shareText': '¡Únete a mí en F1nFlow!',
+    'badge.locked': 'Bloqueado',
   },
   be: {
     'nav.main': 'Галоўная',
@@ -263,7 +447,8 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'tips.title': 'Хуткі старт',
     'tips.subtitle': 'Кароткія падказкі для пачатку працы.',
     'tips.step1': 'Націсніце на сферу, каб адкрыць дэталёвую панэль катэгорыі.',
-    'tips.step2': 'У рэжыме рэдагавання можна перацягваць сферы і захоўваць уласны макет.',
+    'tips.step2':
+      'У рэжыме рэдагавання можна перацягваць сферы і захоўваць уласны макет.',
     'tips.step3': 'Ліміт хуткіх транзакцый і валюта захоўваюцца аўтаматычна.',
     'tips.next': 'Далей',
     'tips.gotIt': 'Зразумела',
@@ -289,14 +474,51 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'saving.noRecords': 'Пакуль няма запісаў.',
     'news.empty': 'Персанальныя інсайты зʼявяцца пасля актыўнасці.',
     'main.weeklyChallenge': 'Тыднёвы чэлендж',
-    'main.challengeSpendLess': 'Патраціць у 2 разы менш за дзённы ліміт да дэдлайну',
+    'main.challengeSpendLess':
+      'Патраціць у 2 разы менш за дзённы ліміт да дэдлайну',
     'main.challengeNoSpendingDay': 'Зрабіць мінімум 1 дзень без выдаткаў',
     'main.streakCurrent': 'Бягучы стрык',
     'main.streakBest': 'Найлепшы стрык',
     'main.days': 'дзён',
     'main.badges': 'Бэйджы',
     'main.weeklyMissions': 'Тыднёвыя місіі',
-    'badge.locked': 'Заблакавана'
+    'common.cancel': 'Скасаваць',
+    'common.save': 'Захаваць',
+    'common.close': 'Закрыць',
+    'common.loading': 'Загрузка...',
+    'common.invalid': 'Некарэктна',
+    'main.income': 'Даход',
+    'main.expense': 'Выдаткі',
+    'category.create': 'Стварыць катэгорыю',
+    'category.createPlaceholder': 'Назва катэгорыі',
+    'category.editName': 'Рэдагаваць назву катэгорыі',
+    'category.newName': 'Новая назва катэгорыі',
+    'category.icon': 'Іконка катэгорыі',
+    'about.title': 'Пра F1nFlow',
+    'about.description':
+      'F1nFlow дапамагае кіраваць выдаткамі, адсочваць катэгорыі і трымаць бюджэт пад кантролем.',
+    'about.telegramChannel': 'Telegram-канал',
+    'about.telegramChat': 'Telegram-чат',
+    'about.instagram': 'Instagram',
+    'about.tiktok': 'TikTok',
+    'about.tip': 'Парада',
+    'referrals.title': 'Рэфералы',
+    'referrals.peopleTitle': 'Людзі, якіх вы запрасілі',
+    'referrals.peopleDescription':
+      'Гэта спіс карыстальнікаў, якія далучыліся па вашым рэферальным кодзе.',
+    'referrals.joined': 'Далучыўся(лася)',
+    'referrals.emptyInvited': 'У вас пакуль няма запрошаных рэфералаў.',
+    'referrals.topTitle': 'Топ 100 карыстальнікаў па рэфералах',
+    'referrals.topDescription':
+      'Рэйтынг заснаваны толькі на рэальных рэферальных запісах з базы даных.',
+    'referrals.emptyTop': 'Пакуль няма даных рэферальнага рэйтынгу.',
+    'referrals.inviteTitle': 'Ваша персанальная спасылка-запрашэнне',
+    'referrals.inviteDescription':
+      'Скапіруйце і падзяліцеся ёй напрамую ў Telegram або Viber.',
+    'referrals.copyLink': 'Скапіраваць',
+    'referrals.copied': 'Скапіравана!',
+    'referrals.shareText': 'Далучайся да мяне ў F1nFlow!',
+    'badge.locked': 'Заблакавана',
   },
   fr: {
     'nav.main': 'Accueil',
@@ -310,9 +532,12 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'lang.cancel': 'Annuler',
     'tips.title': 'Démarrage rapide',
     'tips.subtitle': 'Quelques conseils pour commencer plus vite.',
-    'tips.step1': 'Touchez une sphère pour ouvrir le panneau détaillé de catégorie.',
-    'tips.step2': 'En mode édition, vous pouvez déplacer les sphères et enregistrer votre disposition.',
-    'tips.step3': 'La limite rapide et la devise sont enregistrées automatiquement.',
+    'tips.step1':
+      'Touchez une sphère pour ouvrir le panneau détaillé de catégorie.',
+    'tips.step2':
+      'En mode édition, vous pouvez déplacer les sphères et enregistrer votre disposition.',
+    'tips.step3':
+      'La limite rapide et la devise sont enregistrées automatiquement.',
     'tips.next': 'Suivant',
     'tips.gotIt': 'Compris',
     'tips.skip': 'Passer',
@@ -337,14 +562,52 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'saving.noRecords': 'Aucun enregistrement pour le moment.',
     'news.empty': 'Les insights personnels apparaissent après votre activité.',
     'main.weeklyChallenge': 'Défi hebdomadaire',
-    'main.challengeSpendLess': 'Dépenser 2x moins que votre limite quotidienne avant l’échéance',
+    'main.challengeSpendLess':
+      'Dépenser 2x moins que votre limite quotidienne avant l’échéance',
     'main.challengeNoSpendingDay': 'Faire au moins 1 journée sans dépenses',
     'main.streakCurrent': 'Série actuelle',
     'main.streakBest': 'Meilleure série',
     'main.days': 'jours',
     'main.badges': 'Badges',
     'main.weeklyMissions': 'Missions hebdomadaires',
-    'badge.locked': 'Verrouillé'
+    'common.cancel': 'Annuler',
+    'common.save': 'Enregistrer',
+    'common.close': 'Fermer',
+    'common.loading': 'Chargement...',
+    'common.invalid': 'Invalide',
+    'main.income': 'Revenus',
+    'main.expense': 'Dépenses',
+    'category.create': 'Créer une catégorie',
+    'category.createPlaceholder': 'Nom de la catégorie',
+    'category.editName': 'Modifier le nom de catégorie',
+    'category.newName': 'Nouveau nom de catégorie',
+    'category.icon': 'Icône de catégorie',
+    'about.title': 'À propos de F1nFlow',
+    'about.description':
+      'F1nFlow vous aide à gérer vos dépenses, suivre les catégories et garder votre budget sous contrôle.',
+    'about.telegramChannel': 'Canal Telegram',
+    'about.telegramChat': 'Chat Telegram',
+    'about.instagram': 'Instagram',
+    'about.tiktok': 'TikTok',
+    'about.tip': 'Conseil',
+    'referrals.title': 'Parrainages',
+    'referrals.peopleTitle': 'Personnes invitées',
+    'referrals.peopleDescription':
+      'Voici la liste des utilisateurs qui ont rejoint avec votre code de parrainage.',
+    'referrals.joined': 'Rejoint le',
+    'referrals.emptyInvited': 'Vous n’avez pas encore de filleuls invités.',
+    'referrals.topTitle': 'Top 100 des utilisateurs par parrainages',
+    'referrals.topDescription':
+      'Classement basé uniquement sur les vrais enregistrements de parrainage de la base de données.',
+    'referrals.emptyTop':
+      'Aucune donnée de classement de parrainage pour le moment.',
+    'referrals.inviteTitle': 'Votre lien d’invitation personnel',
+    'referrals.inviteDescription':
+      'Copiez-le et partagez-le directement avec Telegram ou Viber.',
+    'referrals.copyLink': 'Copier le lien',
+    'referrals.copied': 'Copié !',
+    'referrals.shareText': 'Rejoins-moi sur F1nFlow !',
+    'badge.locked': 'Verrouillé',
   },
   nl: {
     'nav.main': 'Start',
@@ -358,8 +621,10 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'lang.cancel': 'Annuleren',
     'tips.title': 'Snelle start',
     'tips.subtitle': 'Korte tips om sneller op weg te zijn.',
-    'tips.step1': 'Tik op een sfeer om het detailpaneel van de categorie te openen.',
-    'tips.step2': 'In bewerkmodus kun je sferen verslepen en je eigen lay-out opslaan.',
+    'tips.step1':
+      'Tik op een sfeer om het detailpaneel van de categorie te openen.',
+    'tips.step2':
+      'In bewerkmodus kun je sferen verslepen en je eigen lay-out opslaan.',
     'tips.step3': 'Snellimiet en valuta worden automatisch opgeslagen.',
     'tips.next': 'Volgende',
     'tips.gotIt': 'Begrepen',
@@ -385,15 +650,52 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'saving.noRecords': 'Nog geen records.',
     'news.empty': 'Persoonlijke inzichten verschijnen na je activiteit.',
     'main.weeklyChallenge': 'Wekelijkse uitdaging',
-    'main.challengeSpendLess': 'Geef 2x minder uit dan je daglimiet vóór de deadline',
+    'main.challengeSpendLess':
+      'Geef 2x minder uit dan je daglimiet vóór de deadline',
     'main.challengeNoSpendingDay': 'Voltooi minstens 1 dag zonder uitgaven',
     'main.streakCurrent': 'Huidige reeks',
     'main.streakBest': 'Beste reeks',
     'main.days': 'dagen',
     'main.badges': 'Badges',
     'main.weeklyMissions': 'Wekelijkse missies',
-    'badge.locked': 'Vergrendeld'
-  }
+    'common.cancel': 'Annuleren',
+    'common.save': 'Opslaan',
+    'common.close': 'Sluiten',
+    'common.loading': 'Laden...',
+    'common.invalid': 'Ongeldig',
+    'main.income': 'Inkomsten',
+    'main.expense': 'Uitgaven',
+    'category.create': 'Categorie maken',
+    'category.createPlaceholder': 'Categorienaam',
+    'category.editName': 'Categorienaam bewerken',
+    'category.newName': 'Nieuwe categorienaam',
+    'category.icon': 'Categoriepictogram',
+    'about.title': 'Over F1nFlow',
+    'about.description':
+      'F1nFlow helpt je uitgaven te beheren, categorieën te volgen en je budget onder controle te houden.',
+    'about.telegramChannel': 'Telegram-kanaal',
+    'about.telegramChat': 'Telegram-chat',
+    'about.instagram': 'Instagram',
+    'about.tiktok': 'TikTok',
+    'about.tip': 'Tip',
+    'referrals.title': 'Verwijzingen',
+    'referrals.peopleTitle': 'Mensen die je hebt uitgenodigd',
+    'referrals.peopleDescription':
+      'Dit is de lijst met gebruikers die met jouw verwijzingscode zijn toegetreden.',
+    'referrals.joined': 'Toegetreden',
+    'referrals.emptyInvited': 'Je hebt nog geen uitgenodigde verwijzingen.',
+    'referrals.topTitle': 'Top 100 gebruikers op verwijzingen',
+    'referrals.topDescription':
+      'Ranglijst alleen gebaseerd op echte verwijzingsrecords uit de database.',
+    'referrals.emptyTop': 'Nog geen verwijzingsranglijstgegevens.',
+    'referrals.inviteTitle': 'Je persoonlijke uitnodigingslink',
+    'referrals.inviteDescription':
+      'Kopieer en deel hem rechtstreeks via Telegram of Viber.',
+    'referrals.copyLink': 'Link kopiëren',
+    'referrals.copied': 'Gekopieerd!',
+    'referrals.shareText': 'Doe mee met mij op F1nFlow!',
+    'badge.locked': 'Vergrendeld',
+  },
 };
 
 @Injectable({ providedIn: 'root' })
@@ -409,7 +711,7 @@ export class I18nService {
     { code: 'es', flag: '🇪🇸', nativeName: 'Español' },
     { code: 'be', flag: '🇧🇾', nativeName: 'Беларуская' },
     { code: 'fr', flag: '🇫🇷', nativeName: 'Français' },
-    { code: 'nl', flag: '🇳🇱', nativeName: 'Nederlands' }
+    { code: 'nl', flag: '🇳🇱', nativeName: 'Nederlands' },
   ];
 
   get language(): AppLanguage {
@@ -427,6 +729,9 @@ export class I18nService {
   }
 
   getLanguageLabel(language: AppLanguage): string {
-    return this.options.find((item) => item.code === language)?.nativeName ?? language;
+    return (
+      this.options.find((item) => item.code === language)?.nativeName ??
+      language
+    );
   }
 }

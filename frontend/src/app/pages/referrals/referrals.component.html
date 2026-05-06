@@ -1,29 +1,38 @@
 <section class="referrals-screen">
   <header class="screen-header">
-    <h2>Referrals</h2>
+    <h2>{{ t("referrals.title") }}</h2>
   </header>
 
-    <section class="card-block">
-     <h3>People you invited</h3>
-     <p class="section-description">This is the list of users who joined with your referral code.</p>
-     <div class="list" *ngIf="invitedPeople.length; else emptyInvited">
-      <article class="list-item" *ngFor="let person of invitedPeople; trackBy: trackById">
+  <section class="card-block">
+    <h3>{{ t("referrals.peopleTitle") }}</h3>
+    <p class="section-description">{{ t("referrals.peopleDescription") }}</p>
+    <div class="list" *ngIf="invitedPeople.length; else emptyInvited">
+      <article
+        class="list-item"
+        *ngFor="let person of invitedPeople; trackBy: trackById"
+      >
         <div>
           <div class="name">{{ person.name }}</div>
-          <div class="meta">Joined: {{ person.joinedAt | date:'dd.MM.yyyy' }}</div>
+          <div class="meta">
+            {{ t("referrals.joined") }}:
+            {{ person.joinedAt | date: "dd.MM.yyyy" }}
+          </div>
         </div>
       </article>
     </div>
     <ng-template #emptyInvited>
-      <p class="empty-state">You do not have invited referrals yet.</p>
+      <p class="empty-state">{{ t("referrals.emptyInvited") }}</p>
     </ng-template>
   </section>
 
-    <section class="card-block">
-    <h3>Top 100 users by referrals</h3>
-    <p class="section-description">Leaderboard based only on real referral records from the database.</p>
+  <section class="card-block">
+    <h3>{{ t("referrals.topTitle") }}</h3>
+    <p class="section-description">{{ t("referrals.topDescription") }}</p>
     <div class="list compact" *ngIf="topReferrers.length; else emptyTop">
-      <article class="list-item" *ngFor="let person of topReferrers; let i = index; trackBy: trackById">
+      <article
+        class="list-item"
+        *ngFor="let person of topReferrers; let i = index; trackBy: trackById"
+      >
         <div>
           <div class="name">#{{ i + 1 }} {{ person.name }}</div>
         </div>
@@ -31,20 +40,34 @@
       </article>
     </div>
     <ng-template #emptyTop>
-      <p class="empty-state">No referral leaderboard data yet.</p>
+      <p class="empty-state">{{ t("referrals.emptyTop") }}</p>
     </ng-template>
   </section>
 
   <section class="card-block">
-    <h3>Your personal invite link</h3>
-    <p class="section-description">Copy and share it directly with Telegram or Viber.</p>
+    <h3>{{ t("referrals.inviteTitle") }}</h3>
+    <p class="section-description">{{ t("referrals.inviteDescription") }}</p>
 
-    <div class="invite-link-box">{{ inviteLink || 'Loading...' }}</div>
+    <div class="invite-link-box">{{ inviteLink || t("common.loading") }}</div>
 
     <div class="share-row">
-      <button type="button" class="share-btn" (click)="copyInviteLink()">Copy link</button>
-      <a class="share-square" [href]="getTelegramShareLink()" target="_blank" rel="noopener noreferrer" aria-label="Share to Telegram">TG</a>
-      <a class="share-square" [href]="getViberShareLink()" aria-label="Share to Viber">V</a>
+      <button type="button" class="share-btn" (click)="copyInviteLink()">
+        {{ t("referrals.copyLink") }}
+      </button>
+      <a
+        class="share-square"
+        [href]="getTelegramShareLink()"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Share to Telegram"
+        >TG</a
+      >
+      <a
+        class="share-square"
+        [href]="getViberShareLink()"
+        aria-label="Share to Viber"
+        >V</a
+      >
     </div>
 
     <p class="copy-status" *ngIf="copyStatus">{{ copyStatus }}</p>

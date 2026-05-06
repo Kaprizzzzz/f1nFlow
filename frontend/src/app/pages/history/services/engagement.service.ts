@@ -6,18 +6,22 @@ import { roundToCents } from '../utils/normalization.utils';
 
 @Injectable({ providedIn: 'root' })
 export class EngagementService {
-  private readonly newsSubject = new BehaviorSubject<NewsItem[]>(this.defaultNews());
+  private readonly newsSubject = new BehaviorSubject<NewsItem[]>(
+    this.defaultNews(),
+  );
   private readonly streakCurrentSubject = new BehaviorSubject<number>(0);
   private readonly streakBestSubject = new BehaviorSubject<number>(0);
-  private readonly badgesSubject = new BehaviorSubject<string[]>(this.defaultBadges(0));
-  private readonly weeklyChallengeSubject = new BehaviorSubject<WeeklyChallenge | null>(this.defaultWeeklyChallenge());
+  private readonly badgesSubject = new BehaviorSubject<string[]>(
+    this.defaultBadges(0),
+  );
+  private readonly weeklyChallengeSubject =
+    new BehaviorSubject<WeeklyChallenge | null>(this.defaultWeeklyChallenge());
 
   news$ = this.newsSubject.asObservable();
   streakCurrent$ = this.streakCurrentSubject.asObservable();
   streakBest$ = this.streakBestSubject.asObservable();
   badges$ = this.badgesSubject.asObservable();
   weeklyChallenge$ = this.weeklyChallengeSubject.asObservable();
-
 
   get news(): NewsItem[] {
     return this.newsSubject.value;
@@ -39,8 +43,28 @@ export class EngagementService {
     return this.weeklyChallengeSubject.value;
   }
 
-    markAllNewsRead(): void {
-    this.newsSubject.next(this.newsSubject.value.map((item) => ({ ...item, isRead: true })));
+  convertWeeklyChallenge(rate: number, currency: string): void {
+    if (!Number.isFinite(rate) || rate <= 0) {
+      return;
+    }
+
+    const current = this.weeklyChallengeSubject.value;
+    if (!current) {
+      return;
+    }
+
+    this.weeklyChallengeSubject.next({
+      ...current,
+      limit: roundToCents(current.limit * rate),
+      spent: roundToCents(current.spent * rate),
+      currency,
+    });
+  }
+
+  markAllNewsRead(): void {
+    this.newsSubject.next(
+      this.newsSubject.value.map((item) => ({ ...item, isRead: true })),
+    );
   }
 
   hydrate(payload: {
@@ -49,13 +73,18 @@ export class EngagementService {
     streakBest?: number;
     badges?: string[];
     weeklyChallenge?: WeeklyChallenge | null;
+    currency?: string;
   }): void {
     this.newsSubject.next(this.normalizeNews(payload.news));
-    this.streakCurrentSubject.next(this.normalizeStreakValue(payload.streakCurrent));
+    this.streakCurrentSubject.next(
+      this.normalizeStreakValue(payload.streakCurrent),
+    );
     this.streakBestSubject.next(this.normalizeStreakValue(payload.streakBest));
     const streak = this.normalizeStreakValue(payload.streakCurrent);
     this.badgesSubject.next(this.normalizeBadges(payload.badges, streak));
-    this.weeklyChallengeSubject.next(this.normalizeWeeklyChallenge(payload.weeklyChallenge));
+    this.weeklyChallengeSubject.next(
+      this.normalizeWeeklyChallenge(payload.weeklyChallenge, payload.currency),
+    );
   }
 
   private normalizeNews(news?: NewsItem[]): NewsItem[] {
@@ -66,7 +95,7 @@ export class EngagementService {
     return news.map((item, index) => ({
       id: item.id || String(index + 1),
       title: item.title || 'News',
-      isRead: !!item.isRead
+      isRead: !!item.isRead,
     }));
   }
 
@@ -87,16 +116,56 @@ export class EngagementService {
 
   private defaultNews(): NewsItem[] {
     return [
-      { id: '1', title: 'PR: Ввімкнено режим цілей та стабільні підказки для Goals.', isRead: false },
-      { id: '2', title: 'PR: Додано валютний тренд з автооновленням для конвертера.', isRead: false },
-      { id: '3', title: 'PR: Оновлено блок Recent, щоб швидше повторювати витрати.', isRead: false },
-      { id: '4', title: 'PR: Покращено тижневий challenge з лімітом за категоріями.', isRead: false },
-      { id: '5', title: 'PR: Додано стрік-вогники для щоденної мотивації.', isRead: false },
-      { id: '6', title: 'PR: Посилили стабільність синхронізації Telegram-профілю.', isRead: false },
-      { id: '7', title: 'PR: Підсвітили ключові метрики дня/тижня/місяця у Goals.', isRead: false },
-      { id: '8', title: 'PR: Оновлено візуал бейджів та прогресу.', isRead: false },
-      { id: '9', title: 'PR: Додано кращі порівняння з учора та середнім по періоду.', isRead: false },
-      { id: '10', title: 'PR: Поліпшено UX першого входу та мовні підказки.', isRead: false }
+      {
+        id: '1',
+        title: 'PR: Ввімкнено режим цілей та стабільні підказки для Goals.',
+        isRead: false,
+      },
+      {
+        id: '2',
+        title: 'PR: Додано валютний тренд з автооновленням для конвертера.',
+        isRead: false,
+      },
+      {
+        id: '3',
+        title: 'PR: Оновлено блок Recent, щоб швидше повторювати витрати.',
+        isRead: false,
+      },
+      {
+        id: '4',
+        title: 'PR: Покращено тижневий challenge з лімітом за категоріями.',
+        isRead: false,
+      },
+      {
+        id: '5',
+        title: 'PR: Додано стрік-вогники для щоденної мотивації.',
+        isRead: false,
+      },
+      {
+        id: '6',
+        title: 'PR: Посилили стабільність синхронізації Telegram-профілю.',
+        isRead: false,
+      },
+      {
+        id: '7',
+        title: 'PR: Підсвітили ключові метрики дня/тижня/місяця у Goals.',
+        isRead: false,
+      },
+      {
+        id: '8',
+        title: 'PR: Оновлено візуал бейджів та прогресу.',
+        isRead: false,
+      },
+      {
+        id: '9',
+        title: 'PR: Додано кращі порівняння з учора та середнім по періоду.',
+        isRead: false,
+      },
+      {
+        id: '10',
+        title: 'PR: Поліпшено UX першого входу та мовні підказки.',
+        isRead: false,
+      },
     ];
   }
 
@@ -119,11 +188,15 @@ export class EngagementService {
       limit: 120,
       spent: 0,
       weekStart: weekStart.toISOString().slice(0, 10),
-      completed: true
+      completed: true,
+      currency: 'EUR',
     };
   }
 
-  private normalizeWeeklyChallenge(challenge?: WeeklyChallenge | null): WeeklyChallenge | null {
+  private normalizeWeeklyChallenge(
+    challenge?: WeeklyChallenge | null,
+    currency = 'EUR',
+  ): WeeklyChallenge | null {
     if (!challenge || !challenge.category || !challenge.weekStart) {
       return null;
     }
@@ -133,7 +206,8 @@ export class EngagementService {
       limit: roundToCents(Number(challenge.limit) || 0),
       spent: roundToCents(Number(challenge.spent) || 0),
       weekStart: challenge.weekStart,
-      completed: !!challenge.completed
+      completed: !!challenge.completed,
+      currency: challenge.currency || currency,
     };
   }
 }

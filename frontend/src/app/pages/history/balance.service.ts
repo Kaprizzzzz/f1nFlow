@@ -1,13 +1,33 @@
 import { Injectable } from '@angular/core';
-import { AppLanguage, GoalsPreferences, SphereLayout, SphereTab, Transaction, WeeklyChallenge } from './models/finance.models';
-import { CategoryItem, Currency, NewsItem } from './models/history-shared.models';
+import {
+  AppLanguage,
+  GoalsPreferences,
+  SphereLayout,
+  SphereTab,
+  Transaction,
+  WeeklyChallenge,
+} from './models/finance.models';
+import {
+  CategoryItem,
+  Currency,
+  NewsItem,
+} from './models/history-shared.models';
 import { CategoriesService } from './services/categories.service';
 import { EngagementService } from './services/engagement.service';
 import { PreferencesService } from './services/preferences.service';
-import { PersistedStatePayload, StateSyncService } from './services/state-sync.service';
+import {
+  PersistedStatePayload,
+  StateSyncService,
+} from './services/state-sync.service';
 import { TransactionsService } from './services/transactions.service';
 
-export type { GoalsPreferences, SphereLayout, SphereTab, Transaction, WeeklyChallenge };
+export type {
+  GoalsPreferences,
+  SphereLayout,
+  SphereTab,
+  Transaction,
+  WeeklyChallenge,
+};
 export type { CategoryItem, NewsItem };
 
 @Injectable({ providedIn: 'root' })
@@ -76,20 +96,35 @@ export class BalanceService {
     private readonly categoriesService: CategoriesService,
     private readonly preferencesService: PreferencesService,
     private readonly engagementService: EngagementService,
-    private readonly stateSyncService: StateSyncService
+    private readonly stateSyncService: StateSyncService,
   ) {
     this.restoreState();
-    this.stateSyncService.fetchRemoteState((payload) => this.hydrateFromRemote(payload), () => {
-      this.isHydrating = false;
-    });
+    this.stateSyncService.fetchRemoteState(
+      (payload) => this.hydrateFromRemote(payload),
+      () => {
+        this.isHydrating = false;
+      },
+    );
   }
 
-  addTransaction(amount: number, category: string, type: 'plus' | 'minus'): void {
-    const transaction = this.transactionsService.addTransaction(amount, category, type);
+  addTransaction(
+    amount: number,
+    category: string,
+    type: 'plus' | 'minus',
+  ): void {
+    const transaction = this.transactionsService.addTransaction(
+      amount,
+      category,
+      type,
+    );
     if (!transaction) {
       return;
     }
-    this.categoriesService.adjustCategoryAmount(type, category, transaction.amount);
+    this.categoriesService.adjustCategoryAmount(
+      type,
+      category,
+      transaction.amount,
+    );
     this.persistState();
   }
 
@@ -98,7 +133,11 @@ export class BalanceService {
     if (!removed) {
       return;
     }
-    this.categoriesService.adjustCategoryAmount(removed.type, removed.category, -removed.amount);
+    this.categoriesService.adjustCategoryAmount(
+      removed.type,
+      removed.category,
+      -removed.amount,
+    );
     this.persistState();
   }
 
@@ -110,9 +149,26 @@ export class BalanceService {
 
     this.isCurrencyConverting = true;
     try {
-      const rate = await this.transactionsService.convertCurrency(currentCurrency, currency, this.stateSyncService.isBrowser);
-      this.categoriesService.setCategories('plus', this.transactionsService.scaleCategories(this.categoriesService.getCategories('plus'), rate));
-      this.categoriesService.setCategories('minus', this.transactionsService.scaleCategories(this.categoriesService.getCategories('minus'), rate));
+      const rate = await this.transactionsService.convertCurrency(
+        currentCurrency,
+        currency,
+        this.stateSyncService.isBrowser,
+      );
+      this.categoriesService.setCategories(
+        'plus',
+        this.transactionsService.scaleCategories(
+          this.categoriesService.getCategories('plus'),
+          rate,
+        ),
+      );
+      this.categoriesService.setCategories(
+        'minus',
+        this.transactionsService.scaleCategories(
+          this.categoriesService.getCategories('minus'),
+          rate,
+        ),
+      );
+      this.engagementService.convertWeeklyChallenge(rate, currency);
       this.preferencesService.setCurrency(currency);
       this.persistState();
     } finally {
@@ -155,7 +211,11 @@ export class BalanceService {
     }
   }
 
-  renameCategory(type: 'plus' | 'minus', oldName: string, newName: string): void {
+  renameCategory(
+    type: 'plus' | 'minus',
+    oldName: string,
+    newName: string,
+  ): void {
     if (!this.categoriesService.renameCategory(type, oldName, newName)) {
       return;
     }
@@ -171,7 +231,27 @@ export class BalanceService {
     this.persistState();
   }
 
-  swapCategories(type: 'plus' | 'minus', firstIndex: number, secondIndex: number): void {
+  updateCategoryPosition(
+    type: 'plus' | 'minus',
+    categoryName: string,
+    position: { left: number; top: number },
+  ): void {
+    if (
+      this.categoriesService.updateCategoryPosition(
+        type,
+        categoryName,
+        position,
+      )
+    ) {
+      this.persistState();
+    }
+  }
+
+  swapCategories(
+    type: 'plus' | 'minus',
+    firstIndex: number,
+    secondIndex: number,
+  ): void {
     if (this.categoriesService.swapCategories(type, firstIndex, secondIndex)) {
       this.persistState();
     }
@@ -180,25 +260,35 @@ export class BalanceService {
   private hydrateFromRemote(payload: PersistedStatePayload): void {
     this.isHydrating = true;
 
-    const remoteTransactions = (payload.transactions ?? []).map((tx) => ({ ...tx, date: new Date(tx.date) }));
+    const remoteTransactions = (payload.transactions ?? []).map((tx) => ({
+      ...tx,
+      date: new Date(tx.date),
+    }));
     const localLayout = this.preferencesService.sphereLayout;
 
     this.transactionsService.setTransactions(remoteTransactions);
-    this.categoriesService.setCategories('plus', payload.user?.incomeCategories ?? []);
-    this.categoriesService.setCategories('minus', payload.user?.expenseCategories ?? []);
+    this.categoriesService.setCategories(
+      'plus',
+      payload.user?.incomeCategories ?? [],
+    );
+    this.categoriesService.setCategories(
+      'minus',
+      payload.user?.expenseCategories ?? [],
+    );
     this.preferencesService.hydrate({
       currency: payload.user?.currency,
       sphereLayout: localLayout ?? payload.user?.sphereLayout ?? null,
       quickTransactionsLimit: payload.user?.quickTransactionsLimit,
       goalsPreferences: payload.user?.goalsPreferences,
-      language: payload.user?.language
+      language: payload.user?.language,
     });
     this.engagementService.hydrate({
       news: payload.user?.news,
       streakCurrent: payload.user?.streakCurrent,
       streakBest: payload.user?.streakBest,
       badges: payload.user?.badges,
-      weeklyChallenge: payload.user?.weeklyChallenge
+      weeklyChallenge: payload.user?.weeklyChallenge,
+      currency: payload.user?.currency,
     });
 
     this.persistState();
@@ -225,22 +315,31 @@ export class BalanceService {
       return;
     }
 
-    this.transactionsService.setTransactions((parsed.transactions ?? []).map((tx) => ({ ...tx, date: new Date(tx.date) })));
+    this.transactionsService.setTransactions(
+      (parsed.transactions ?? []).map((tx) => ({
+        ...tx,
+        date: new Date(tx.date),
+      })),
+    );
     this.categoriesService.setCategories('plus', parsed.incomeCategories ?? []);
-    this.categoriesService.setCategories('minus', parsed.expenseCategories ?? []);
+    this.categoriesService.setCategories(
+      'minus',
+      parsed.expenseCategories ?? [],
+    );
     this.preferencesService.hydrate({
       currency: parsed.currency,
       sphereLayout: parsed.sphereLayout ?? null,
       quickTransactionsLimit: parsed.quickTransactionsLimit,
       goalsPreferences: parsed.goalsPreferences,
-      language: parsed.language
+      language: parsed.language,
     });
     this.engagementService.hydrate({
       news: parsed.news,
       streakCurrent: parsed.streakCurrent,
       streakBest: parsed.streakBest,
       badges: parsed.badges,
-      weeklyChallenge: parsed.weeklyChallenge
+      weeklyChallenge: parsed.weeklyChallenge,
+      currency: parsed.currency,
     });
   }
 
@@ -262,13 +361,15 @@ export class BalanceService {
       streakCurrent: this.engagementService.streakCurrent,
       streakBest: this.engagementService.streakBest,
       badges: this.engagementService.badges,
-      weeklyChallenge: this.engagementService.weeklyChallenge
+      weeklyChallenge: this.engagementService.weeklyChallenge,
     };
 
     this.stateSyncService.persistLocalState(payload);
     this.stateSyncService.saveRemoteState({
       ...payload,
-      transactions: this.transactionsService.getTransactions().map((item) => ({ ...item, date: item.date.toISOString() }))
+      transactions: this.transactionsService
+        .getTransactions()
+        .map((item) => ({ ...item, date: item.date.toISOString() })),
     });
   }
 }

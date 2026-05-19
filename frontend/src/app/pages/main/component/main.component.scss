@@ -1,10 +1,10 @@
 .dashboard-container {
   --dashboard-top-offset: calc(env(safe-area-inset-top, 0px) - 20px);
   --active-panel-gap: 50px;
-  --sphere-transition-duration: 1.09s;
+  --sphere-transition-duration: 1.58s;
   --sphere-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
-  --sphere-transform-duration: 1.37s;
-  --sphere-fade-duration: 0.867s;
+  --sphere-transform-duration: 1.99s;
+  --sphere-fade-duration: 1.26s;
   width: 100%;
   height: 100%;
   min-height: 100%;

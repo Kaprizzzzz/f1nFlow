@@ -70,12 +70,10 @@
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.4px;
-  background: linear-gradient(
-    180deg,
-    rgba(17, 32, 62, 0.97) 0%,
-    rgba(8, 14, 28, 0.95) 100%
-  );
-  box-shadow: 0 0 20px rgba(107, 164, 255, 0.24);
+  background: linear-gradient(180deg, rgba(9, 20, 41, 0.94) 0%, rgba(6, 12, 24, 0.92) 100%);
+  box-shadow: 0 0 16px rgba(68, 128, 225, 0.24);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: inline-flex;
   box-sizing: border-box;
   overflow: hidden;

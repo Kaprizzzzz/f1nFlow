@@ -22,7 +22,12 @@ export class TransactionsService {
     return [...this.transactions];
   }
 
-  addTransaction(amount: number, category: string, type: 'plus' | 'minus'): Transaction | null {
+  addTransaction(
+    amount: number,
+    category: string,
+    type: 'plus' | 'minus',
+    dateInput?: string | Date,
+  ): Transaction | null {
     const normalizedAmount = roundToCents(Number(amount));
     if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
       return null;
@@ -33,13 +38,28 @@ export class TransactionsService {
       amount: normalizedAmount,
       category,
       type,
-      date: new Date(),
+      date: this.resolveTransactionDate(dateInput),
       label: category
     };
 
     this.transactions = [...this.transactions, newTransaction];
     this.emitState();
     return newTransaction;
+  }
+
+  private resolveTransactionDate(dateInput?: string | Date): Date {
+    if (dateInput instanceof Date && Number.isFinite(dateInput.getTime())) {
+      return new Date(dateInput);
+    }
+
+    if (typeof dateInput === 'string' && dateInput.trim()) {
+      const parsed = new Date(`${dateInput}T12:00:00`);
+      if (Number.isFinite(parsed.getTime())) {
+        return parsed;
+      }
+    }
+
+    return new Date();
   }
 
   removeTransaction(transactionId: string): Transaction | null {

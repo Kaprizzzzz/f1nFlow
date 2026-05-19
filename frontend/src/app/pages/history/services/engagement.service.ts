@@ -6,6 +6,8 @@ import { roundToCents } from '../utils/normalization.utils';
 
 @Injectable({ providedIn: 'root' })
 export class EngagementService {
+
+  private readonly streakVisitKey = 'f1nflow.streak.lastVisitDate';
   private readonly newsSubject = new BehaviorSubject<NewsItem[]>(
     this.defaultNews(),
   );
@@ -76,15 +78,46 @@ export class EngagementService {
     currency?: string;
   }): void {
     this.newsSubject.next(this.normalizeNews(payload.news));
-    this.streakCurrentSubject.next(
+    const streakState = this.resolveStreakOnVisit(
       this.normalizeStreakValue(payload.streakCurrent),
+      this.normalizeStreakValue(payload.streakBest),
     );
-    this.streakBestSubject.next(this.normalizeStreakValue(payload.streakBest));
-    const streak = this.normalizeStreakValue(payload.streakCurrent);
+    this.streakCurrentSubject.next(streakState.current);
+    this.streakBestSubject.next(streakState.best);
+    const streak = streakState.current;
     this.badgesSubject.next(this.normalizeBadges(payload.badges, streak));
     this.weeklyChallengeSubject.next(
       this.normalizeWeeklyChallenge(payload.weeklyChallenge, payload.currency),
     );
+  }
+
+
+  private resolveStreakOnVisit(current: number, best: number): { current: number; best: number } {
+    if (typeof localStorage === 'undefined') {
+      return { current, best };
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const lastVisit = localStorage.getItem(this.streakVisitKey);
+
+    if (!lastVisit) {
+      const initialized = Math.max(1, current);
+      localStorage.setItem(this.streakVisitKey, today);
+      return { current: initialized, best: Math.max(best, initialized) };
+    }
+
+    if (lastVisit === today) {
+      return { current: Math.max(1, current), best: Math.max(best, current) };
+    }
+
+    const last = new Date(`${lastVisit}T00:00:00`);
+    const now = new Date(`${today}T00:00:00`);
+    const diffDays = Math.round((now.getTime() - last.getTime()) / 86400000);
+    const nextCurrent = diffDays === 1 ? Math.max(1, current + 1) : 1;
+    const nextBest = Math.max(best, nextCurrent);
+
+    localStorage.setItem(this.streakVisitKey, today);
+    return { current: nextCurrent, best: nextBest };
   }
 
   private normalizeNews(news?: NewsItem[]): NewsItem[] {

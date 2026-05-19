@@ -632,9 +632,9 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'referrals.copied': 'Copié !',
     'referrals.shareText': 'Rejoins-moi sur F1nFlow !',
     'badge.locked': 'Verrouillé',
-    'main.badge.streakBronze': 'Ouvrez l'app 5 jours d'affilée',
-    'main.badge.streakSilver': 'Ouvrez l'app 14 jours d'affilée',
-    'main.badge.streakGold': 'Ouvrez l'app 30 jours d'affilée',
+    'main.badge.streakBronze': 'Ouvrez l\'app 5 jours d\'affilée',
+    'main.badge.streakSilver': 'Ouvrez l\'app 14 jours d\'affilée',
+    'main.badge.streakGold': 'Ouvrez l\'app 30 jours d\'affilée',
     'main.badge.challengeWinner': 'Terminez le défi hebdomadaire',
   },
   nl: {

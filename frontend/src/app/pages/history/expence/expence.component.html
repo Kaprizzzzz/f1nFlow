@@ -2,10 +2,14 @@
   <div
     class="main-circle"
     (click)="handleCircleClick()"
+    (pointerdown)="onMainPointerDown()"
+    (pointerup)="onMainPointerUp()"
+    (pointerleave)="onMainPointerUp()"
+    (pointercancel)="onMainPointerUp()"
     [style.--category-ring]="categoriesRingGradient"
   >
     <span class="label">{{ displayLabel }}</span>
-    <span class="value">{{ displayValue | number: "1.2-2" }}</span>
+    <span class="value">{{ isAmountHidden ? "********" : (displayValue | number: "1.2-2") }}</span>
   </div>
 
   <div
@@ -143,6 +147,10 @@
         placeholder="0,00"
         inputmode="decimal"
         autocomplete="off"
+      />
+      <input
+        type="date"
+        [(ngModel)]="selectedDate"
       />
       <div class="amount-error" *ngIf="isAmountInvalid">
         {{ t("common.invalid") }}

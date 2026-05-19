@@ -34,6 +34,9 @@ export class ExpenceComponent implements OnInit, OnChanges, OnDestroy {
   totalExpense = 0;
   totalIncome = 0;
   amountInput = '';
+  selectedDate = '';
+  isAmountHidden = false;
+  private holdTimer: ReturnType<typeof setTimeout> | null = null;
   isAmountInvalid = false;
   isAmountShakeActive = false;
   selectedCategory = '';
@@ -173,6 +176,7 @@ export class ExpenceComponent implements OnInit, OnChanges, OnDestroy {
     if (this.selectedCategory) {
       this.selectedCategory = '';
       this.amountInput = '';
+      this.selectedDate = '';
       this.isAmountInvalid = false;
       this.isAmountShakeActive = false;
       return true;
@@ -241,8 +245,10 @@ export class ExpenceComponent implements OnInit, OnChanges, OnDestroy {
         amount,
         this.selectedCategory,
         'minus',
+        this.selectedDate,
       );
       this.amountInput = '';
+      this.selectedDate = '';
       this.isAmountInvalid = false;
       this.panelMode = null;
       this.syncModalUiState();
@@ -255,6 +261,7 @@ export class ExpenceComponent implements OnInit, OnChanges, OnDestroy {
   closeAmountPanel(event?: Event): void {
     event?.stopPropagation();
     this.amountInput = '';
+    this.selectedDate = '';
     this.isAmountInvalid = false;
     this.isAmountShakeActive = false;
     if (this.panelMode === 'amount') {
@@ -531,10 +538,32 @@ export class ExpenceComponent implements OnInit, OnChanges, OnDestroy {
     );
   }
 
+
+
+  onMainPointerDown(): void {
+    this.clearHoldTimer();
+    this.holdTimer = setTimeout(() => {
+      this.isAmountHidden = !this.isAmountHidden;
+      this.holdTimer = null;
+    }, 350);
+  }
+
+  onMainPointerUp(): void {
+    this.clearHoldTimer();
+  }
+
+  private clearHoldTimer(): void {
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+    }
+  }
+
   private closeTransientUi(): void {
     this.isCreateCategoryOpen = false;
     this.panelMode = null;
     this.amountInput = '';
+    this.selectedDate = '';
     this.isAmountInvalid = false;
     this.isAmountShakeActive = false;
     this.editModeCategory = '';

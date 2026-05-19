@@ -34,6 +34,9 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
   totalIncome = 0;
   totalExpense = 0;
   amountInput = '';
+  selectedDate = '';
+  isAmountHidden = false;
+  private holdTimer: ReturnType<typeof setTimeout> | null = null;
   isAmountInvalid = false;
   isAmountShakeActive = false;
   selectedCategory = '';
@@ -173,6 +176,7 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
     if (this.selectedCategory) {
       this.selectedCategory = '';
       this.amountInput = '';
+      this.selectedDate = '';
       this.isAmountInvalid = false;
       this.isAmountShakeActive = false;
       return true;
@@ -235,8 +239,9 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
     const amount = this.parseAmountInput(this.amountInput);
 
     if (amount !== null && amount > 0 && this.selectedCategory) {
-      this.balanceService.addTransaction(amount, this.selectedCategory, 'plus');
+      this.balanceService.addTransaction(amount, this.selectedCategory, 'plus', this.selectedDate);
       this.amountInput = '';
+      this.selectedDate = '';
       this.isAmountInvalid = false;
       this.panelMode = null;
       this.syncModalUiState();
@@ -249,6 +254,7 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
   closeAmountPanel(event?: Event): void {
     event?.stopPropagation();
     this.amountInput = '';
+    this.selectedDate = '';
     this.isAmountInvalid = false;
     this.isAmountShakeActive = false;
     if (this.panelMode === 'amount') {
@@ -525,10 +531,32 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
     );
   }
 
+
+
+  onMainPointerDown(): void {
+    this.clearHoldTimer();
+    this.holdTimer = setTimeout(() => {
+      this.isAmountHidden = !this.isAmountHidden;
+      this.holdTimer = null;
+    }, 350);
+  }
+
+  onMainPointerUp(): void {
+    this.clearHoldTimer();
+  }
+
+  private clearHoldTimer(): void {
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+    }
+  }
+
   private closeTransientUi(): void {
     this.isCreateCategoryOpen = false;
     this.panelMode = null;
     this.amountInput = '';
+    this.selectedDate = '';
     this.isAmountInvalid = false;
     this.isAmountShakeActive = false;
     this.editModeCategory = '';

@@ -111,11 +111,13 @@ export class BalanceService {
     amount: number,
     category: string,
     type: 'plus' | 'minus',
+    dateInput?: string | Date,
   ): void {
     const transaction = this.transactionsService.addTransaction(
       amount,
       category,
       type,
+      dateInput,
     );
     if (!transaction) {
       return;

@@ -1,0 +1,8 @@
+<section class="wallet-screen">
+  <h2>Wallet Lite</h2>
+  <p>Phase 1: balance overview, wallet history placeholder, connect/disconnect.</p>
+  <p>Status: <strong>{{ isConnected ? 'Connected' : 'Disconnected' }}</strong></p>
+  <button type="button" (click)="toggleConnection()">
+    {{ isConnected ? 'Disconnect wallet' : 'Connect wallet' }}
+  </button>
+</section>

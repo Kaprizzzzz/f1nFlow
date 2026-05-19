@@ -9,6 +9,7 @@ import {
 } from '../history/balance.service';
 import { I18nService } from '../../core/i18n.service';
 import { GOALS_TRANSLATIONS, GoalsTranslationKey } from './goals.translations';
+import { BillingService, SubscriptionPlanDto } from '../../core/billing.service';
 
 type ViewMode = 'amount' | 'segments';
 type GoalsTheme = 'default' | 'girly';
@@ -76,6 +77,11 @@ export class GoalsComponent implements OnInit, OnDestroy {
   converterAmount = 1;
   converterResult = 0;
 
+  plans: SubscriptionPlanDto[] = [];
+  activePlanCode: string | null = null;
+  isPro = false;
+  loadingBilling = true;
+
   private transactions: Transaction[] = [];
   private currentBalance = 0;
   private subscription = new Subscription();
@@ -83,6 +89,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
   constructor(
     private readonly balanceService: BalanceService,
     private readonly i18nService: I18nService,
+    private readonly billingService: BillingService,
   ) {}
 
   ngOnInit(): void {
@@ -137,6 +144,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
     );
 
     void this.refreshFx();
+    this.loadBilling();
   }
 
   ngOnDestroy(): void {
@@ -310,6 +318,36 @@ export class GoalsComponent implements OnInit, OnDestroy {
     return Array.from({ length: count }, (_, index) => index);
   }
 
+
+
+  loadBilling(): void {
+    this.loadingBilling = true;
+    this.billingService.getOverview().subscribe({
+      next: (overview) => {
+        this.plans = overview.plans;
+        this.activePlanCode = overview.activeSubscription?.plan?.code || null;
+        const status = overview.activeSubscription?.status;
+        this.isPro = status === 'active' || status === 'trial';
+        this.loadingBilling = false;
+      },
+      error: () => {
+        this.loadingBilling = false;
+      },
+    });
+  }
+
+  activatePlan(planCode: string): void {
+    this.billingService.activate(planCode).subscribe(() => this.loadBilling());
+  }
+
+  startTrial(): void {
+    this.billingService.startTrial().subscribe(() => this.loadBilling());
+  }
+
+  cancelSubscription(): void {
+    this.billingService.cancel().subscribe(() => this.loadBilling());
+  }
+
   private persistGoalsPreferences(): void {
     this.balanceService.setGoalsPreferences({
       theme: this.theme,
@@ -342,6 +380,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
     }
     this.recalculate();
     void this.refreshFx();
+    this.loadBilling();
   }
 
   private buildSummary(

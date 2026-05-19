@@ -250,3 +250,24 @@ export class SaveStateDto {
   @IsOptional()
   weeklyChallenge?: unknown;
 }
+
+export class BillingWebhookDto {
+  @IsString()
+  provider: string;
+
+  @IsString()
+  providerRef: string;
+
+  @IsString()
+  telegramId: string;
+
+  @IsString()
+  planCode: string;
+
+  @IsIn(['payment_succeeded', 'payment_failed', 'subscription_renewed'])
+  eventType: 'payment_succeeded' | 'payment_failed' | 'subscription_renewed';
+
+  @IsOptional()
+  @IsString()
+  signature?: string;
+}

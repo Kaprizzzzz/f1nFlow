@@ -12,7 +12,7 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { Request } from 'express';
-import { ActivateSubscriptionDto, ConsentDto, LoginDto, PresenceDto, SaveStateDto } from '../common/dto';
+import { ActivateSubscriptionDto, BillingWebhookDto, ConsentDto, LoginDto, PresenceDto, SaveStateDto } from '../common/dto';
 import { AuthGuard } from '../common/guards';
 import { TelegramInitDataService } from '../services/telegram-init-data.service';
 import { UsersService } from '../services/users.service';
@@ -77,6 +77,28 @@ export class UsersController {
     const telegramId = request.user?.telegramId;
     if (!telegramId) throw new BadRequestException('Authenticated user is required');
     return this.usersService.activateSubscription(telegramId, payload.planCode);
+  }
+
+
+  @Post('me/billing/trial')
+  @UseGuards(AuthGuard)
+  async startTrial(@Req() request: Request & { user?: { telegramId: string } }) {
+    const telegramId = request.user?.telegramId;
+    if (!telegramId) throw new BadRequestException('Authenticated user is required');
+    return this.usersService.startTrialSubscription(telegramId);
+  }
+
+  @Post('me/billing/cancel')
+  @UseGuards(AuthGuard)
+  async cancelBilling(@Req() request: Request & { user?: { telegramId: string } }) {
+    const telegramId = request.user?.telegramId;
+    if (!telegramId) throw new BadRequestException('Authenticated user is required');
+    return this.usersService.cancelSubscription(telegramId);
+  }
+
+  @Post('billing/webhook')
+  async handleBillingWebhook(@Body() payload: BillingWebhookDto) {
+    return this.usersService.handleBillingWebhook(payload);
   }
 
   @Post('me/consent')

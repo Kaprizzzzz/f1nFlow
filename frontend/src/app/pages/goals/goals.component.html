@@ -51,6 +51,30 @@
   </div>
 
   <section class="card">
+    <h3>Goals Pro</h3>
+    @if (loadingBilling) {
+      <p class="metric">Loading subscription...</p>
+    } @else {
+      <p class="metric">Plan: <strong>{{ activePlanCode || 'Free' }}</strong></p>
+      @if (!isPro) {
+        <p class="metric">Free: basic stats. Pro: insights, streaks, FX, challenges, badges.</p>
+        <button type="button" (click)="startTrial()">Start 7-day trial</button>
+        <div class="row">
+          @for (plan of plans; track plan.code) {
+            <button type="button" (click)="activatePlan(plan.code)">
+              {{ plan.name }} - ${{ plan.priceUsd }}
+            </button>
+          }
+        </div>
+      } @else {
+        <p class="metric">You have Pro access ✅</p>
+        <button type="button" (click)="cancelSubscription()">Cancel renewal</button>
+      }
+    }
+  </section>
+
+
+  <section class="card">
     <h3>{{ gt("miniStats") }}</h3>
     <div class="mini-stats-grid">
       <p class="metric">

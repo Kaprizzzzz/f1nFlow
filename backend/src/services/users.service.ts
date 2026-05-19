@@ -16,7 +16,7 @@ import { SubscriptionPlan } from '../entities/subscription-plan.entity';
 import { PaymentEvent } from '../entities/payment-event.entity';
 import { ConsentLog } from '../entities/consent-log.entity';
 import { SecurityAuditLog } from '../entities/security-audit-log.entity';
-import { SaveStateDto } from '../common/dto';
+import { BillingWebhookDto, SaveStateDto } from '../common/dto';
 import {
   IncomingTransaction,
   UserEngagementService,
@@ -106,45 +106,66 @@ export class UsersService {
   }
 
   async activateSubscription(telegramId: string, planCode: string) {
+    return this.activateManagedSubscription(telegramId, planCode, SubscriptionStatus.ACTIVE);
+  }
+
+
+
+  async startTrialSubscription(telegramId: string) {
+    return this.activateManagedSubscription(telegramId, 'goals_pro_monthly', SubscriptionStatus.TRIAL, 7, 'trial_started', 'system');
+  }
+
+  async cancelSubscription(telegramId: string) {
     const user = await this.ensureUser({ telegramId });
-    const plan = await this.plansRepository.findOne({
-      where: { code: planCode, isActive: true },
-    });
+    const active = await this.subscriptionsRepository.findOne({ where: { userId: user.id, status: SubscriptionStatus.ACTIVE } });
+    if (!active) throw new NotFoundException('Active subscription not found');
+    active.status = SubscriptionStatus.CANCELED;
+    active.canceledAt = new Date();
+    const subscription = await this.subscriptionsRepository.save(active);
+    await this.paymentEventsRepository.save(this.paymentEventsRepository.create({
+      userId: user.id,
+      subscriptionId: subscription.id,
+      eventType: 'subscription_canceled',
+      provider: 'manual',
+      metadata: {},
+    }));
+    return { subscription };
+  }
+
+  async handleBillingWebhook(payload: BillingWebhookDto) {
+    const existing = await this.paymentEventsRepository.findOne({ where: { provider: payload.provider, providerRef: payload.providerRef } });
+    if (existing) {
+      return { ok: true, deduplicated: true };
+    }
+
+    if (payload.eventType === 'payment_succeeded' || payload.eventType === 'subscription_renewed') {
+      return this.activateManagedSubscription(payload.telegramId, payload.planCode, SubscriptionStatus.ACTIVE, undefined, payload.eventType, payload.provider, payload.providerRef);
+    }
+
+    const user = await this.ensureUser({ telegramId: payload.telegramId });
+    await this.paymentEventsRepository.save(this.paymentEventsRepository.create({
+      userId: user.id,
+      eventType: payload.eventType,
+      provider: payload.provider,
+      providerRef: payload.providerRef,
+      metadata: { planCode: payload.planCode },
+    }));
+    return { ok: true };
+  }
+
+  private async activateManagedSubscription(telegramId: string, planCode: string, status: SubscriptionStatus, trialDays?: number, eventType = 'subscription_activated', provider = 'manual', providerRef: string | null = null) {
+    const user = await this.ensureUser({ telegramId });
+    const plan = await this.plansRepository.findOne({ where: { code: planCode, isActive: true } });
     if (!plan) throw new NotFoundException('Plan not found');
 
-    await this.subscriptionsRepository.update(
-      { userId: user.id, status: SubscriptionStatus.ACTIVE },
-      { status: SubscriptionStatus.CANCELED, canceledAt: new Date() },
-    );
+    await this.subscriptionsRepository.update({ userId: user.id, status: SubscriptionStatus.ACTIVE }, { status: SubscriptionStatus.CANCELED, canceledAt: new Date() });
     const now = new Date();
     const expiresAt = new Date(now);
-    expiresAt.setDate(
-      expiresAt.getDate() +
-        (plan.interval === 'year'
-          ? 365 * plan.intervalCount
-          : 30 * plan.intervalCount),
-    );
-    const subscription = await this.subscriptionsRepository.save(
-      this.subscriptionsRepository.create({
-        userId: user.id,
-        planId: plan.id,
-        status: SubscriptionStatus.ACTIVE,
-        startedAt: now,
-        expiresAt,
-        canceledAt: null,
-      }),
-    );
-    await this.paymentEventsRepository.save(
-      this.paymentEventsRepository.create({
-        userId: user.id,
-        subscriptionId: subscription.id,
-        eventType: 'subscription_activated',
-        amountUsd: plan.priceUsd,
-        provider: 'manual',
-        providerRef: null,
-        metadata: { planCode },
-      }),
-    );
+    if (trialDays) expiresAt.setDate(expiresAt.getDate() + trialDays);
+    else expiresAt.setDate(expiresAt.getDate() + (plan.interval === 'year' ? 365 * plan.intervalCount : 30 * plan.intervalCount));
+
+    const subscription = await this.subscriptionsRepository.save(this.subscriptionsRepository.create({ userId: user.id, planId: plan.id, status, startedAt: now, expiresAt, canceledAt: null }));
+    await this.paymentEventsRepository.save(this.paymentEventsRepository.create({ userId: user.id, subscriptionId: subscription.id, eventType, amountUsd: plan.priceUsd, provider, providerRef, metadata: { planCode } }));
     return { subscription };
   }
 

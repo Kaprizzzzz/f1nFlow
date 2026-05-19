@@ -1,7 +1,17 @@
 <div class="dashboard-container" [class.has-active]="activeTab !== null" [class.edit-mode]="isEditMode" [class.fullscreen-panel-active]="isFullscreenPanelTab()" (click)="closeActiveTab()">
-  @if (weeklyChallengeText) {
-    <div class="challenge-banner">{{ weeklyChallengeText }}</div>
-  }
+  <div class="engagement-panel">
+    <div class="streak-row">{{ t('main.streakCurrent') }}: <strong>{{ streakCurrent }}</strong> • {{ t('main.streakBest') }}: <strong>{{ streakBest }}</strong></div>
+    <div class="missions-row">{{ t('main.weeklyMissions') }}: {{ weeklyChallengeText || '—' }}</div>
+    <div class="badge-list" aria-label="{{ t('main.badges') }}">
+      @for (badge of badgeCatalog; track badge.id) {
+        <button type="button" class="badge-item" [class.unlocked]="isBadgeUnlocked(badge.id)" [style.--badge-color]="badge.color" (click)="openBadgeDescription(badge.id)">{{ badge.title }}</button>
+      }
+    </div>
+    @if (selectedBadgeDescription) {
+      <p class="badge-description">{{ selectedBadgeDescription }}</p>
+    }
+  </div>
+
   <div class="layout-controls" *ngIf="canEditLayout">
     <button
       type="button"

@@ -251,6 +251,7 @@ export class ExpenceComponent implements OnInit, OnChanges, OnDestroy {
       this.selectedDate = '';
       this.isAmountInvalid = false;
       this.panelMode = null;
+      this.selectedCategory = '';
       this.syncModalUiState();
       return;
     }

@@ -1,10 +1,10 @@
 .dashboard-container {
   --dashboard-top-offset: calc(env(safe-area-inset-top, 0px) - 20px);
   --active-panel-gap: 50px;
-  --sphere-transition-duration: 1.58s;
+  --sphere-transition-duration: 2.29s;
   --sphere-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
-  --sphere-transform-duration: 1.99s;
-  --sphere-fade-duration: 1.26s;
+  --sphere-transform-duration: 2.89s;
+  --sphere-fade-duration: 1.83s;
   width: 100%;
   height: 100%;
   min-height: 100%;
@@ -46,20 +46,6 @@
   pointer-events: none;
 }
 
-.challenge-banner {
-  position: fixed;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1002;
-  border: 1px solid rgba(114, 193, 255, 0.5);
-  background: rgba(6, 19, 37, 0.92);
-  color: #cfe6ff;
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-size: 12px;
-  white-space: nowrap;
-}
 
 .engagement-panel {
   position: fixed;

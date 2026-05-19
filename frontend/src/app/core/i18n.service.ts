@@ -81,7 +81,11 @@ type TranslationKey =
   | 'referrals.copyLink'
   | 'referrals.copied'
   | 'referrals.shareText'
-  | 'badge.locked';
+  | 'badge.locked'
+  | 'main.badge.streakBronze'
+  | 'main.badge.streakSilver'
+  | 'main.badge.streakGold'
+  | 'main.badge.challengeWinner';
 
 export interface LanguageOption {
   code: AppLanguage;
@@ -175,6 +179,10 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'referrals.copied': 'Скопійовано!',
     'referrals.shareText': 'Приєднуйся до мене у F1nFlow!',
     'badge.locked': 'Заблоковано',
+    'main.badge.streakBronze': 'Відкрий застосунок 5 днів поспіль',
+    'main.badge.streakSilver': 'Відкрий застосунок 14 днів поспіль',
+    'main.badge.streakGold': 'Відкрий застосунок 30 днів поспіль',
+    'main.badge.challengeWinner': 'Виконай тижневий челендж',
   },
   en: {
     'nav.main': 'Main',
@@ -261,6 +269,10 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'referrals.copied': 'Copied!',
     'referrals.shareText': 'Join me on F1nFlow!',
     'badge.locked': 'Locked',
+    'main.badge.streakBronze': 'Open app 5 days in a row',
+    'main.badge.streakSilver': 'Open app 14 days in a row',
+    'main.badge.streakGold': 'Open app 30 days in a row',
+    'main.badge.challengeWinner': 'Complete weekly challenge',
   },
   ru: {
     'nav.main': 'Главная',
@@ -348,6 +360,10 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'referrals.copied': 'Скопировано!',
     'referrals.shareText': 'Присоединяйся ко мне в F1nFlow!',
     'badge.locked': 'Заблокировано',
+    'main.badge.streakBronze': 'Открывай приложение 5 дней подряд',
+    'main.badge.streakSilver': 'Открывай приложение 14 дней подряд',
+    'main.badge.streakGold': 'Открывай приложение 30 дней подряд',
+    'main.badge.challengeWinner': 'Выполни недельный челлендж',
   },
   es: {
     'nav.main': 'Inicio',
@@ -433,6 +449,10 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'referrals.copied': '¡Copiado!',
     'referrals.shareText': '¡Únete a mí en F1nFlow!',
     'badge.locked': 'Bloqueado',
+    'main.badge.streakBronze': 'Abre la app 5 días seguidos',
+    'main.badge.streakSilver': 'Abre la app 14 días seguidos',
+    'main.badge.streakGold': 'Abre la app 30 días seguidos',
+    'main.badge.challengeWinner': 'Completa el desafío semanal',
   },
   be: {
     'nav.main': 'Галоўная',
@@ -519,6 +539,10 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'referrals.copied': 'Скапіравана!',
     'referrals.shareText': 'Далучайся да мяне ў F1nFlow!',
     'badge.locked': 'Заблакавана',
+    'main.badge.streakBronze': 'Адкрывай праграму 5 дзён запар',
+    'main.badge.streakSilver': 'Адкрывай праграму 14 дзён запар',
+    'main.badge.streakGold': 'Адкрывай праграму 30 дзён запар',
+    'main.badge.challengeWinner': 'Выканай тыднёвы чэлендж',
   },
   fr: {
     'nav.main': 'Accueil',
@@ -608,6 +632,10 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'referrals.copied': 'Copié !',
     'referrals.shareText': 'Rejoins-moi sur F1nFlow !',
     'badge.locked': 'Verrouillé',
+    'main.badge.streakBronze': 'Ouvrez l'app 5 jours d'affilée',
+    'main.badge.streakSilver': 'Ouvrez l'app 14 jours d'affilée',
+    'main.badge.streakGold': 'Ouvrez l'app 30 jours d'affilée',
+    'main.badge.challengeWinner': 'Terminez le défi hebdomadaire',
   },
   nl: {
     'nav.main': 'Start',
@@ -695,6 +723,10 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'referrals.copied': 'Gekopieerd!',
     'referrals.shareText': 'Doe mee met mij op F1nFlow!',
     'badge.locked': 'Vergrendeld',
+    'main.badge.streakBronze': 'Open de app 5 dagen op rij',
+    'main.badge.streakSilver': 'Open de app 14 dagen op rij',
+    'main.badge.streakGold': 'Open de app 30 dagen op rij',
+    'main.badge.challengeWinner': 'Voltooi de wekelijkse challenge',
   },
 };
 

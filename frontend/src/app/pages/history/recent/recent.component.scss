@@ -228,6 +228,8 @@ $recent-glow: #ff78c7;
   max-height: calc(100dvh - var(--panel-top-offset) - var(--panel-bottom-offset) + var(--panel-lift));
   margin-top: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
   border-radius: 24px;
   padding: 16px;
   z-index: 2200;

@@ -74,25 +74,25 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       id: 'streak-bronze',
       title: '🥉',
       color: '#b87333',
-      descriptionKey: 'Visit app 5 days in a row',
+      descriptionKey: 'main.badge.streakBronze',
     },
     {
       id: 'streak-silver',
       title: '🥈',
       color: '#c0c0c0',
-      descriptionKey: 'Visit app 14 days in a row',
+      descriptionKey: 'main.badge.streakSilver',
     },
     {
       id: 'streak-gold',
       title: '🥇',
       color: '#ffd700',
-      descriptionKey: 'Visit app 30 days in a row',
+      descriptionKey: 'main.badge.streakGold',
     },
     {
       id: 'challenge-winner',
       title: '🏆',
       color: '#61dafb',
-      descriptionKey: 'Complete weekly challenge',
+      descriptionKey: 'main.badge.challengeWinner',
     },
   ];
   newsPanelAnchorBottom = 0;
@@ -295,7 +295,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     const status = this.isBadgeUnlocked(id)
       ? ''
       : ` (${this.t('badge.locked')})`;
-    this.selectedBadgeDescription = `${badge.title}${status}: ${badge.descriptionKey}`;
+    this.selectedBadgeDescription = `${badge.title}${status}: ${this.t(badge.descriptionKey)}`;
   }
 
   @HostListener('window:keydown.escape')

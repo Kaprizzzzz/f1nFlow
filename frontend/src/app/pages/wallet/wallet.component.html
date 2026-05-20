@@ -1,8 +1,16 @@
 <section class="wallet-screen">
-  <h2>Wallet Lite</h2>
-  <p>Phase 1: balance overview, wallet history placeholder, connect/disconnect.</p>
-  <p>Status: <strong>{{ isConnected ? 'Connected' : 'Disconnected' }}</strong></p>
-  <button type="button" (click)="toggleConnection()">
-    {{ isConnected ? 'Disconnect wallet' : 'Connect wallet' }}
-  </button>
+  <header class="wallet-header">
+    <h2>Wallet</h2>
+    <span class="wallet-status" [class.connected]="isConnected">{{ isConnected ? 'Connected' : 'Disconnected' }}</span>
+  </header>
+
+  <p class="wallet-subtitle">Secure your account and manage wallet access in one place.</p>
+
+  <div class="wallet-card">
+    <div class="wallet-card-title">Connection</div>
+    <div class="wallet-card-value">{{ isConnected ? 'Wallet linked' : 'No wallet linked' }}</div>
+    <button type="button" class="wallet-btn" (click)="toggleConnection()">
+      {{ isConnected ? 'Disconnect wallet' : 'Connect wallet' }}
+    </button>
+  </div>
 </section>

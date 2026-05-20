@@ -1,6 +1,5 @@
 <div class="dashboard-container" [class.has-active]="activeTab !== null" [class.edit-mode]="isEditMode" [class.fullscreen-panel-active]="isFullscreenPanelTab()" (click)="closeActiveTab()">
   <div class="engagement-panel">
-    <div class="streak-row">{{ t('main.streakCurrent') }}: <strong>{{ streakCurrent }}</strong> • {{ t('main.streakBest') }}: <strong>{{ streakBest }}</strong></div>
     <div class="missions-row">{{ t('main.weeklyMissions') }}: {{ weeklyChallengeText || '—' }}</div>
     <div class="badge-list" [attr.aria-label]="t('main.badges')">
       @for (badge of badgeCatalog; track badge.id) {

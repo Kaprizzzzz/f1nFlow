@@ -229,7 +229,9 @@ select {
 
 .amount-modal {
   width: min(320px, 100%);
-  transform: translateY(-84px);
+  transform: translateY(min(-84px, -10vh));
+  max-height: min(520px, calc(100dvh - 32px));
+  overflow-y: auto;
   background: rgba(27, 13, 4, 0.96);
   border: 1px solid rgba($expense-glow, 0.6);
   border-radius: 16px;
@@ -302,4 +304,14 @@ select {
   80% {
     transform: translateY(-84px) translateX(4px);
   }
+}
+
+
+.date-input {
+  color-scheme: dark;
+  min-height: 42px;
+}
+
+.date-input::-webkit-datetime-edit {
+  color: #ffedda;
 }

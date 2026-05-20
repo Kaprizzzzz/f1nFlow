@@ -62,6 +62,7 @@ export class ExpenceComponent implements OnInit, OnChanges, OnDestroy {
   private didDragCategory = false;
 
   private subscriptions = new Subscription();
+  private readonly todayDate = new Date().toISOString().split('T')[0];
 
   constructor(
     private balanceService: BalanceService,
@@ -233,6 +234,7 @@ export class ExpenceComponent implements OnInit, OnChanges, OnDestroy {
     const isSameCategory = this.selectedCategory === category.name;
     this.selectedCategory = category.name;
     this.amountInput = '';
+    this.selectedDate = this.todayDate;
     this.panelMode =
       isSameCategory && this.panelMode === 'amount' ? null : 'amount';
   }

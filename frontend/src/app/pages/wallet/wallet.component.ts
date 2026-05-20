@@ -32,7 +32,10 @@ export class WalletComponent {
   }
 
   connectTelegramWallet(): void {
-    const entered = typeof window !== 'undefined' ? window.prompt('Telegram wallet username or ID', this.telegramWalletId) : null;
+    const entered =
+      typeof window !== 'undefined'
+        ? window.prompt(this.t('wallet.telegramPrompt'), this.telegramWalletId)
+        : null;
     if (!entered) return;
     this.telegramWalletId = entered.trim();
     this.isConnected = true;

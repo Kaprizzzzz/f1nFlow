@@ -85,7 +85,18 @@ type TranslationKey =
   | 'main.badge.streakBronze'
   | 'main.badge.streakSilver'
   | 'main.badge.streakGold'
-  | 'main.badge.challengeWinner';
+  | 'main.badge.challengeWinner'
+  | 'tab.wallet'
+  | 'status.online'
+  | 'status.offline'
+  | 'wallet.subtitle'
+  | 'wallet.connection'
+  | 'wallet.linked'
+  | 'wallet.notLinked'
+  | 'wallet.disconnect'
+  | 'wallet.connect'
+  | 'wallet.connectTelegram'
+  | 'wallet.telegramPrompt';
 
 export interface LanguageOption {
   code: AppLanguage;
@@ -183,6 +194,17 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Відкрий застосунок 14 днів поспіль',
     'main.badge.streakGold': 'Відкрий застосунок 30 днів поспіль',
     'main.badge.challengeWinner': 'Виконай тижневий челендж',
+    'tab.wallet': 'Гаманець',
+    'status.online': 'Онлайн',
+    'status.offline': 'Офлайн',
+    'wallet.subtitle': 'Підключи гаманець для синхронізації оплат і балансу.',
+    'wallet.connection': 'Підключення',
+    'wallet.linked': 'Підключено',
+    'wallet.notLinked': 'Не підключено',
+    'wallet.disconnect': 'Відключити',
+    'wallet.connect': 'Підключити',
+    'wallet.connectTelegram': 'Підключити Telegram Wallet',
+    'wallet.telegramPrompt': 'Telegram wallet username або ID',
   },
   en: {
     'nav.main': 'Main',
@@ -273,6 +295,17 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Open app 14 days in a row',
     'main.badge.streakGold': 'Open app 30 days in a row',
     'main.badge.challengeWinner': 'Complete weekly challenge',
+    'tab.wallet': 'Wallet',
+    'status.online': 'Online',
+    'status.offline': 'Offline',
+    'wallet.subtitle': 'Connect a wallet to sync payments and balance.',
+    'wallet.connection': 'Connection',
+    'wallet.linked': 'Connected',
+    'wallet.notLinked': 'Not connected',
+    'wallet.disconnect': 'Disconnect',
+    'wallet.connect': 'Connect',
+    'wallet.connectTelegram': 'Connect Telegram Wallet',
+    'wallet.telegramPrompt': 'Telegram wallet username or ID',
   },
   ru: {
     'nav.main': 'Главная',
@@ -364,6 +397,17 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Открывай приложение 14 дней подряд',
     'main.badge.streakGold': 'Открывай приложение 30 дней подряд',
     'main.badge.challengeWinner': 'Выполни недельный челлендж',
+    'tab.wallet': 'Кошелёк',
+    'status.online': 'Онлайн',
+    'status.offline': 'Офлайн',
+    'wallet.subtitle': 'Подключите кошелёк для синхронизации оплат и баланса.',
+    'wallet.connection': 'Подключение',
+    'wallet.linked': 'Подключено',
+    'wallet.notLinked': 'Не подключено',
+    'wallet.disconnect': 'Отключить',
+    'wallet.connect': 'Подключить',
+    'wallet.connectTelegram': 'Подключить Telegram Wallet',
+    'wallet.telegramPrompt': 'Username или ID Telegram wallet',
   },
   es: {
     'nav.main': 'Inicio',
@@ -453,6 +497,17 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Abre la app 14 días seguidos',
     'main.badge.streakGold': 'Abre la app 30 días seguidos',
     'main.badge.challengeWinner': 'Completa el desafío semanal',
+    'tab.wallet': 'Billetera',
+    'status.online': 'En línea',
+    'status.offline': 'Sin conexión',
+    'wallet.subtitle': 'Conecta una billetera para sincronizar pagos y saldo.',
+    'wallet.connection': 'Conexión',
+    'wallet.linked': 'Conectada',
+    'wallet.notLinked': 'No conectada',
+    'wallet.disconnect': 'Desconectar',
+    'wallet.connect': 'Conectar',
+    'wallet.connectTelegram': 'Conectar Telegram Wallet',
+    'wallet.telegramPrompt': 'Usuario o ID de Telegram wallet',
   },
   be: {
     'nav.main': 'Галоўная',
@@ -543,6 +598,17 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Адкрывай праграму 14 дзён запар',
     'main.badge.streakGold': 'Адкрывай праграму 30 дзён запар',
     'main.badge.challengeWinner': 'Выканай тыднёвы чэлендж',
+    'tab.wallet': 'Кашалёк',
+    'status.online': 'Анлайн',
+    'status.offline': 'Афлайн',
+    'wallet.subtitle': 'Падключы кашалёк для сінхранізацыі аплат і балансу.',
+    'wallet.connection': 'Падключэнне',
+    'wallet.linked': 'Падключана',
+    'wallet.notLinked': 'Не падключана',
+    'wallet.disconnect': 'Адключыць',
+    'wallet.connect': 'Падключыць',
+    'wallet.connectTelegram': 'Падключыць Telegram Wallet',
+    'wallet.telegramPrompt': 'Username або ID Telegram wallet',
   },
   fr: {
     'nav.main': 'Accueil',
@@ -636,6 +702,17 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Ouvrez l\'app 14 jours d\'affilée',
     'main.badge.streakGold': 'Ouvrez l\'app 30 jours d\'affilée',
     'main.badge.challengeWinner': 'Terminez le défi hebdomadaire',
+    'tab.wallet': 'Wallet',
+    'status.online': 'En ligne',
+    'status.offline': 'Hors ligne',
+    'wallet.subtitle': 'Connectez un wallet pour synchroniser paiements et solde.',
+    'wallet.connection': 'Connexion',
+    'wallet.linked': 'Connecté',
+    'wallet.notLinked': 'Non connecté',
+    'wallet.disconnect': 'Déconnecter',
+    'wallet.connect': 'Connecter',
+    'wallet.connectTelegram': 'Connecter Telegram Wallet',
+    'wallet.telegramPrompt': 'Nom utilisateur ou ID Telegram wallet',
   },
   nl: {
     'nav.main': 'Start',
@@ -727,6 +804,17 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Open de app 14 dagen op rij',
     'main.badge.streakGold': 'Open de app 30 dagen op rij',
     'main.badge.challengeWinner': 'Voltooi de wekelijkse challenge',
+    'tab.wallet': 'Wallet',
+    'status.online': 'Online',
+    'status.offline': 'Offline',
+    'wallet.subtitle': 'Koppel een wallet om betalingen en saldo te synchroniseren.',
+    'wallet.connection': 'Verbinding',
+    'wallet.linked': 'Gekoppeld',
+    'wallet.notLinked': 'Niet gekoppeld',
+    'wallet.disconnect': 'Ontkoppelen',
+    'wallet.connect': 'Koppelen',
+    'wallet.connectTelegram': 'Telegram Wallet koppelen',
+    'wallet.telegramPrompt': 'Telegram wallet gebruikersnaam of ID',
   },
 };
 

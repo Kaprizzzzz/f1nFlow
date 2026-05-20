@@ -268,6 +268,9 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.activeTab = null;
+    this.spherePositions = this.sphereLayoutService.clonePositions(
+      this.savedSpherePositions,
+    );
     this.syncFullscreenUiState(null);
   }
 

@@ -44,4 +44,9 @@ export class WalletComponent {
       localStorage.setItem('wallet-connected', '1');
     }
   }
+
+  openTelegramWalletBot(): void {
+    if (typeof window === 'undefined') return;
+    window.open('https://t.me/wallet', '_blank', 'noopener,noreferrer');
+  }
 }

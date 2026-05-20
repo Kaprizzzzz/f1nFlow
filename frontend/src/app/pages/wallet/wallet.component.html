@@ -1,30 +1,20 @@
 <section class="wallet-screen">
   <header class="wallet-header">
-    <h2>Wallet</h2>
-    <span class="wallet-status" [class.connected]="isConnected">{{ isConnected ? 'Connected' : 'Disconnected' }}</span>
+    <h2>{{ t('tab.wallet') }}</h2>
+    <span class="wallet-status" [class.connected]="isConnected">{{ isConnected ? t('status.online') : t('status.offline') }}</span>
   </header>
 
-  <p class="wallet-subtitle">Secure your account and manage wallet access in one place.</p>
+  <p class="wallet-subtitle">{{ t('wallet.subtitle') }}</p>
 
   <div class="wallet-grid">
     <article class="wallet-card wallet-card-main">
-      <div class="wallet-card-title">Connection</div>
-      <div class="wallet-card-value">{{ isConnected ? 'Wallet linked' : 'No wallet linked' }}</div>
+      <div class="wallet-card-title">{{ t('wallet.connection') }}</div>
+      <div class="wallet-card-value">{{ isConnected ? t('wallet.linked') : t('wallet.notLinked') }}</div>
       <button type="button" class="wallet-btn" (click)="toggleConnection()">
-        {{ isConnected ? 'Disconnect wallet' : 'Connect wallet' }}
+        {{ isConnected ? t('wallet.disconnect') : t('wallet.connect') }}
       </button>
-    </article>
-
-    <article class="wallet-card wallet-card-soft">
-      <div class="wallet-card-title">Protection</div>
-      <div class="wallet-card-value">2FA & device checks</div>
-      <p class="wallet-note">Same glass style as Goals with soft 3D glow and compact cards.</p>
-    </article>
-
-    <article class="wallet-card wallet-card-soft">
-      <div class="wallet-card-title">Sync</div>
-      <div class="wallet-card-value">Auto backup</div>
-      <p class="wallet-note">Your wallet state is synced with profile preferences.</p>
+      <button type="button" class="wallet-btn wallet-btn-ghost" (click)="connectTelegramWallet()">Connect Telegram Wallet</button>
+      <p class="wallet-note" *ngIf="telegramWalletId">@{{ telegramWalletId }}</p>
     </article>
   </div>
 </section>

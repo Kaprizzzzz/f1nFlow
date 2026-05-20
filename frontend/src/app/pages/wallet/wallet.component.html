@@ -6,11 +6,25 @@
 
   <p class="wallet-subtitle">Secure your account and manage wallet access in one place.</p>
 
-  <div class="wallet-card">
-    <div class="wallet-card-title">Connection</div>
-    <div class="wallet-card-value">{{ isConnected ? 'Wallet linked' : 'No wallet linked' }}</div>
-    <button type="button" class="wallet-btn" (click)="toggleConnection()">
-      {{ isConnected ? 'Disconnect wallet' : 'Connect wallet' }}
-    </button>
+  <div class="wallet-grid">
+    <article class="wallet-card wallet-card-main">
+      <div class="wallet-card-title">Connection</div>
+      <div class="wallet-card-value">{{ isConnected ? 'Wallet linked' : 'No wallet linked' }}</div>
+      <button type="button" class="wallet-btn" (click)="toggleConnection()">
+        {{ isConnected ? 'Disconnect wallet' : 'Connect wallet' }}
+      </button>
+    </article>
+
+    <article class="wallet-card wallet-card-soft">
+      <div class="wallet-card-title">Protection</div>
+      <div class="wallet-card-value">2FA & device checks</div>
+      <p class="wallet-note">Same glass style as Goals with soft 3D glow and compact cards.</p>
+    </article>
+
+    <article class="wallet-card wallet-card-soft">
+      <div class="wallet-card-title">Sync</div>
+      <div class="wallet-card-value">Auto backup</div>
+      <p class="wallet-note">Your wallet state is synced with profile preferences.</p>
+    </article>
   </div>
 </section>

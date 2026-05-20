@@ -229,8 +229,8 @@ select {
 
 .amount-modal {
   width: min(320px, 100%);
-  transform: translateY(min(-84px, -10vh));
-  max-height: min(520px, calc(100dvh - 32px));
+  transform: translateY(clamp(-48px, -6vh, -20px));
+  max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px);
   overflow-y: auto;
   background: rgba(27, 13, 4, 0.96);
   border: 1px solid rgba($expense-glow, 0.6);
@@ -310,8 +310,26 @@ select {
 .date-input {
   color-scheme: dark;
   min-height: 42px;
+  border: 1px solid #7d5a3d;
+  border-radius: 10px;
+  background: #170b04;
+  color: #ffedda;
 }
 
-.date-input::-webkit-datetime-edit {
+.date-input::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+.date-input::-webkit-datetime-edit,
+.date-input::-webkit-datetime-edit-fields-wrapper,
+.date-input::-webkit-datetime-edit-text,
+.date-input::-webkit-datetime-edit-month-field,
+.date-input::-webkit-datetime-edit-day-field,
+.date-input::-webkit-datetime-edit-year-field {
   color: #ffedda;
+  opacity: 1;
+}
+
+.date-input:invalid::before {
+  content: attr(value);
 }

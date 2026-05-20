@@ -47,53 +47,6 @@
 }
 
 
-.engagement-panel {
-  position: fixed;
-  top: 44px;
-  right: 10px;
-  z-index: 1002;
-  width: min(320px, calc(100vw - 20px));
-  border: 1px solid rgba(114, 193, 255, 0.35);
-  border-radius: 14px;
-  background: rgba(5, 15, 32, 0.9);
-  color: #d7e8ff;
-  padding: 10px;
-  font-size: 11px;
-
-
-  .missions-row ul {
-    margin: 4px 0 8px 16px;
-    padding: 0;
-  }
-
-  .badge-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 4px;
-  }
-
-  .badge-item {
-    border: 1px solid rgba(187, 199, 214, 0.35);
-    border-radius: 999px;
-    background: rgba(112, 123, 138, 0.4);
-    color: #e9f0f8;
-    padding: 3px 8px;
-    font-size: 10px;
-
-    &.unlocked {
-      background: color-mix(in srgb, var(--badge-color, #61dafb) 36%, #0f223b);
-      border-color: color-mix(in srgb, var(--badge-color, #61dafb) 78%, #c7d7ea);
-      box-shadow: 0 0 12px color-mix(in srgb, var(--badge-color, #61dafb) 44%, transparent);
-    }
-  }
-
-  .badge-description {
-    margin: 8px 0 0;
-    color: #c8ddff;
-  }
-}
-
 .layout-controls button {
   pointer-events: auto;
 }

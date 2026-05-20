@@ -290,19 +290,19 @@ select {
 @keyframes modal-shake {
   0%,
   100% {
-    transform: translateY(-84px) translateX(0);
+    transform: translateY(clamp(-48px, -6vh, -20px)) translateX(0);
   }
   20% {
-    transform: translateY(-84px) translateX(-5px);
+    transform: translateY(clamp(-48px, -6vh, -20px)) translateX(-5px);
   }
   40% {
-    transform: translateY(-84px) translateX(5px);
+    transform: translateY(clamp(-48px, -6vh, -20px)) translateX(5px);
   }
   60% {
-    transform: translateY(-84px) translateX(-4px);
+    transform: translateY(clamp(-48px, -6vh, -20px)) translateX(-4px);
   }
   80% {
-    transform: translateY(-84px) translateX(4px);
+    transform: translateY(clamp(-48px, -6vh, -20px)) translateX(4px);
   }
 }
 

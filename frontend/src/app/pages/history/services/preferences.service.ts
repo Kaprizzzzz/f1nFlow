@@ -86,7 +86,7 @@ export class PreferencesService {
       expense: layout.expense,
       saving: layout.saving,
       news: layout.news,
-      recent: layout.recent ?? { top: 330, left: 250 }
+      recent: layout.recent ?? { top: 300, left: 250 }
     };
   }
 }

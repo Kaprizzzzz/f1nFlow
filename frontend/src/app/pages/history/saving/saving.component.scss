@@ -257,7 +257,7 @@ $saving-glow: #63ffd0;
 
 .circle-wrapper.active .history-list {
   --panel-top-offset: calc(env(safe-area-inset-top, 0px) - 48px);
-  --panel-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + 10px);
+  --panel-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + 2px);
   position: fixed;
   --panel-lift: 5dvh;
   top: calc(var(--panel-top-offset) - var(--panel-lift) + 5dvh);

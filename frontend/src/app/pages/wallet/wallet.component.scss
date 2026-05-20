@@ -1,25 +1,19 @@
+
 .wallet-screen {
   margin: 0 auto;
   width: min(360px, calc(100vw - 24px));
-  padding: 14px;
-  border-radius: 18px;
-  border: 1px solid rgba(143, 187, 255, 0.38);
-  background: linear-gradient(180deg, rgba(11, 22, 42, 0.92) 0%, rgba(6, 13, 27, 0.96) 100%);
+  padding: 12px;
   color: #e4efff;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.34);
 }
 
 .wallet-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
-.wallet-header h2 {
-  margin: 0;
-  font-size: 20px;
-}
+.wallet-header h2 { margin: 0; font-size: 20px; }
 
 .wallet-status {
   border: 1px solid rgba(255, 167, 167, 0.45);
@@ -29,28 +23,28 @@
   padding: 4px 10px;
   font-size: 12px;
 }
+.wallet-status.connected { border-color: rgba(130, 255, 211, 0.55); background: rgba(12, 89, 70, 0.55); color: #c6ffe8; }
+.wallet-subtitle { margin: 0 0 12px; color: #bcd2f3; font-size: 12px; }
 
-.wallet-status.connected {
-  border-color: rgba(130, 255, 211, 0.55);
-  background: rgba(12, 89, 70, 0.55);
-  color: #c6ffe8;
-}
-
-.wallet-subtitle {
-  margin: 0 0 12px;
-  color: #bcd2f3;
-  font-size: 12px;
-}
+.wallet-grid { display: grid; gap: 10px; }
 
 .wallet-card {
-  border: 1px solid rgba(143, 187, 255, 0.35);
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 12px;
-  background: rgba(9, 20, 38, 0.78);
+  border: 1px solid rgba(143, 187, 255, 0.35);
+  background: linear-gradient(180deg, rgba(24, 39, 69, 0.94) 0%, rgba(10, 17, 33, 0.96) 100%);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(228, 245, 255, 0.12);
 }
-
+.wallet-card-main {
+  border-color: rgba(120, 198, 255, 0.45);
+  box-shadow: 0 18px 36px rgba(9, 23, 48, 0.48), inset 0 1px 0 rgba(219, 239, 255, 0.18);
+}
+.wallet-card-soft {
+  background: linear-gradient(180deg, rgba(19, 30, 55, 0.9) 0%, rgba(9, 15, 29, 0.95) 100%);
+}
 .wallet-card-title { font-size: 12px; color: #a8c4ed; }
-.wallet-card-value { margin: 6px 0 12px; font-size: 16px; font-weight: 700; }
+.wallet-card-value { margin: 6px 0 10px; font-size: 16px; font-weight: 700; }
+.wallet-note { margin: 0; font-size: 12px; color: #bfd4f3; }
 
 .wallet-btn {
   width: 100%;

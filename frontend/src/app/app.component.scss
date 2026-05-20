@@ -187,7 +187,7 @@
   border: 1px solid rgba(117, 150, 218, 0.22);
   backdrop-filter: blur(10px);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 
   align-items: center;
   z-index: 1000;

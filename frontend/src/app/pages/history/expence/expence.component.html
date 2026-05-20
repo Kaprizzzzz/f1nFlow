@@ -152,6 +152,7 @@
         type="date"
         class="date-input"
         [(ngModel)]="selectedDate"
+        [attr.aria-label]="t('common.date')"
       />
       <div class="amount-error" *ngIf="isAmountInvalid">
         {{ t("common.invalid") }}

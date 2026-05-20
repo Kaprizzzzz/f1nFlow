@@ -200,6 +200,7 @@ export class ExpenceComponent implements OnInit, OnChanges, OnDestroy {
     this.selectedCategory = category.name;
     this.panelMode = null;
     this.amountInput = '';
+    this.syncModalUiState();
   }
 
   getMiniCircleStyle(index: number, total: number): Record<string, string> {
@@ -237,6 +238,7 @@ export class ExpenceComponent implements OnInit, OnChanges, OnDestroy {
     this.selectedDate = this.todayDate;
     this.panelMode =
       isSameCategory && this.panelMode === 'amount' ? null : 'amount';
+    this.syncModalUiState();
   }
 
   saveData(): void {
@@ -566,6 +568,7 @@ export class ExpenceComponent implements OnInit, OnChanges, OnDestroy {
     this.isCreateCategoryOpen = false;
     this.panelMode = null;
     this.amountInput = '';
+    this.syncModalUiState();
     this.selectedDate = '';
     this.isAmountInvalid = false;
     this.isAmountShakeActive = false;

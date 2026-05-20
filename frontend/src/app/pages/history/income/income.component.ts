@@ -239,7 +239,8 @@ export class IncomeComponent implements OnInit, OnChanges, OnDestroy {
     this.syncModalUiState();
   }
 
-  saveData(): void {
+  saveData(event?: Event): void {
+    event?.stopPropagation();
     const amount = this.parseAmountInput(this.amountInput);
 
     if (amount !== null && amount > 0 && this.selectedCategory) {

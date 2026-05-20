@@ -14,6 +14,7 @@
         {{ isConnected ? t('wallet.disconnect') : t('wallet.connect') }}
       </button>
       <button type="button" class="wallet-btn wallet-btn-ghost" (click)="connectTelegramWallet()">{{ t('wallet.connectTelegram') }}</button>
+      <button type="button" class="wallet-btn wallet-btn-ghost" (click)="openTelegramWalletBot()">Open @wallet</button>
       <p class="wallet-note" *ngIf="telegramWalletId">&#64;{{ telegramWalletId }}</p>
     </article>
   </div>

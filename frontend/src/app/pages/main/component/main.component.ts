@@ -321,6 +321,11 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @HostListener('window:resize')
   onResize(): void {
+    if (this.activeTab !== null) {
+      this.updateNewsPanelAnchorBottom();
+      return;
+    }
+
     this.measureSphereSizes();
     this.clampAllCurrentSpherePositions();
     this.updateNewsPanelAnchorBottom();

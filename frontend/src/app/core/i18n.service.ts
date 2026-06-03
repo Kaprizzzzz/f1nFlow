@@ -3,100 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 
 export type AppLanguage = 'uk' | 'en' | 'ru' | 'es' | 'be' | 'fr' | 'nl';
 
-type TranslationKey =
-  | 'nav.main'
-  | 'nav.goals'
-  | 'nav.referrals'
-  | 'nav.about'
-  | 'lang.modalTitle'
-  | 'lang.modalSubtitle'
-  | 'lang.current'
-  | 'lang.select'
-  | 'lang.cancel'
-  | 'tips.title'
-  | 'tips.subtitle'
-  | 'tips.step1'
-  | 'tips.step2'
-  | 'tips.step3'
-  | 'tips.next'
-  | 'tips.gotIt'
-  | 'tips.skip'
-  | 'tips.back'
-  | 'tab.news'
-  | 'tab.recent'
-  | 'tab.savings'
-  | 'panel.closeNews'
-  | 'panel.closeRecent'
-  | 'panel.closeHistory'
-  | 'recent.quickCount'
-  | 'recent.empty'
-  | 'recent.transactionsCount'
-  | 'recent.total'
-  | 'recent.repeatLatest'
-  | 'recent.payment'
-  | 'recent.repeat'
-  | 'saving.historyTitle'
-  | 'saving.income'
-  | 'saving.expense'
-  | 'saving.delete'
-  | 'saving.noRecords'
-  | 'news.empty'
-  | 'main.weeklyChallenge'
-  | 'main.challengeSpendLess'
-  | 'main.challengeNoSpendingDay'
-  | 'main.streakCurrent'
-  | 'main.streakBest'
-  | 'main.days'
-  | 'main.badges'
-  | 'main.weeklyMissions'
-  | 'common.cancel'
-  | 'common.save'
-  | 'common.close'
-  | 'common.loading'
-  | 'common.invalid'
-  | 'main.income'
-  | 'main.expense'
-  | 'category.create'
-  | 'category.createPlaceholder'
-  | 'category.editName'
-  | 'category.newName'
-  | 'category.icon'
-  | 'about.title'
-  | 'about.description'
-  | 'about.telegramChannel'
-  | 'about.telegramChat'
-  | 'about.instagram'
-  | 'about.tiktok'
-  | 'about.tip'
-  | 'referrals.title'
-  | 'referrals.peopleTitle'
-  | 'referrals.peopleDescription'
-  | 'referrals.joined'
-  | 'referrals.emptyInvited'
-  | 'referrals.topTitle'
-  | 'referrals.topDescription'
-  | 'referrals.emptyTop'
-  | 'referrals.inviteTitle'
-  | 'referrals.inviteDescription'
-  | 'referrals.copyLink'
-  | 'referrals.copied'
-  | 'referrals.shareText'
-  | 'badge.locked'
-  | 'main.badge.streakBronze'
-  | 'main.badge.streakSilver'
-  | 'main.badge.streakGold'
-  | 'main.badge.challengeWinner'
-  | 'tab.wallet'
-  | 'status.online'
-  | 'status.offline'
-  | 'wallet.subtitle'
-  | 'wallet.connection'
-  | 'wallet.linked'
-  | 'wallet.notLinked'
-  | 'wallet.disconnect'
-  | 'wallet.connect'
-  | 'wallet.connectTelegram'
-  | 'wallet.telegramPrompt';
+export type TranslationKey = string;
 
 export interface LanguageOption {
   code: AppLanguage;
@@ -194,6 +101,26 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Відкрий застосунок 14 днів поспіль',
     'main.badge.streakGold': 'Відкрий застосунок 30 днів поспіль',
     'main.badge.challengeWinner': 'Виконай тижневий челендж',
+    'nav.wallet': 'Гаманець',
+    'common.date': 'Дата',
+    'common.guest': 'Гість',
+    'common.userNickname': 'Нікнейм користувача Telegram',
+    'common.chooseCurrency': 'Оберіть валюту',
+    'common.loadingScreen': 'Екран завантаження застосунку',
+    'loading.status': 'Завантаження',
+    'events.placeholder': 'Події скоро зʼявляться.',
+    'history.placeholder': 'Історія скоро зʼявиться.',
+    'user.placeholder': 'Профіль користувача скоро зʼявиться.',
+    'wallet.openTelegram': 'Відкрити @wallet',
+    'share.telegram': 'Поділитися в Telegram',
+    'share.viber': 'Поділитися у Viber',
+    'news.markAsRead': 'Позначити прочитаним',
+    'layout.toggleEdit': 'Увімкнути режим редагування',
+    'layout.editActions': 'Дії редагування',
+    'layout.save': 'Зберегти макет',
+    'layout.reset': 'Скинути макет',
+    'debug.sphereCoordinates': 'Координати сфер',
+    'debug.sphereCoords': 'Координати сфер',
     'tab.wallet': 'Гаманець',
     'status.online': 'Онлайн',
     'status.offline': 'Офлайн',
@@ -295,6 +222,26 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Open app 14 days in a row',
     'main.badge.streakGold': 'Open app 30 days in a row',
     'main.badge.challengeWinner': 'Complete weekly challenge',
+    'nav.wallet': 'Wallet',
+    'common.date': 'Date',
+    'common.guest': 'Guest',
+    'common.userNickname': 'Telegram user nickname',
+    'common.chooseCurrency': 'Choose currency',
+    'common.loadingScreen': 'Application loading screen',
+    'loading.status': 'Loading',
+    'events.placeholder': 'Events will appear soon.',
+    'history.placeholder': 'History will appear soon.',
+    'user.placeholder': 'User profile will appear soon.',
+    'wallet.openTelegram': 'Open @wallet',
+    'share.telegram': 'Share to Telegram',
+    'share.viber': 'Share to Viber',
+    'news.markAsRead': 'Mark as read',
+    'layout.toggleEdit': 'Toggle edit mode',
+    'layout.editActions': 'Edit actions',
+    'layout.save': 'Save layout',
+    'layout.reset': 'Reset layout',
+    'debug.sphereCoordinates': 'Sphere coordinates',
+    'debug.sphereCoords': 'Sphere coords',
     'tab.wallet': 'Wallet',
     'status.online': 'Online',
     'status.offline': 'Offline',
@@ -397,6 +344,26 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Открывай приложение 14 дней подряд',
     'main.badge.streakGold': 'Открывай приложение 30 дней подряд',
     'main.badge.challengeWinner': 'Выполни недельный челлендж',
+    'nav.wallet': 'Кошелёк',
+    'common.date': 'Дата',
+    'common.guest': 'Гость',
+    'common.userNickname': 'Никнейм пользователя Telegram',
+    'common.chooseCurrency': 'Выберите валюту',
+    'common.loadingScreen': 'Экран загрузки приложения',
+    'loading.status': 'Загрузка',
+    'events.placeholder': 'События скоро появятся.',
+    'history.placeholder': 'История скоро появится.',
+    'user.placeholder': 'Профиль пользователя скоро появится.',
+    'wallet.openTelegram': 'Открыть @wallet',
+    'share.telegram': 'Поделиться в Telegram',
+    'share.viber': 'Поделиться в Viber',
+    'news.markAsRead': 'Отметить прочитанным',
+    'layout.toggleEdit': 'Переключить режим редактирования',
+    'layout.editActions': 'Действия редактирования',
+    'layout.save': 'Сохранить макет',
+    'layout.reset': 'Сбросить макет',
+    'debug.sphereCoordinates': 'Координаты сфер',
+    'debug.sphereCoords': 'Координаты сфер',
     'tab.wallet': 'Кошелёк',
     'status.online': 'Онлайн',
     'status.offline': 'Офлайн',
@@ -497,6 +464,26 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Abre la app 14 días seguidos',
     'main.badge.streakGold': 'Abre la app 30 días seguidos',
     'main.badge.challengeWinner': 'Completa el desafío semanal',
+    'nav.wallet': 'Cartera',
+    'common.date': 'Fecha',
+    'common.guest': 'Invitado',
+    'common.userNickname': 'Apodo de usuario de Telegram',
+    'common.chooseCurrency': 'Elegir moneda',
+    'common.loadingScreen': 'Pantalla de carga de la aplicación',
+    'loading.status': 'Cargando',
+    'events.placeholder': 'Los eventos aparecerán pronto.',
+    'history.placeholder': 'El historial aparecerá pronto.',
+    'user.placeholder': 'El perfil de usuario aparecerá pronto.',
+    'wallet.openTelegram': 'Abrir @wallet',
+    'share.telegram': 'Compartir en Telegram',
+    'share.viber': 'Compartir en Viber',
+    'news.markAsRead': 'Marcar como leído',
+    'layout.toggleEdit': 'Alternar modo de edición',
+    'layout.editActions': 'Acciones de edición',
+    'layout.save': 'Guardar diseño',
+    'layout.reset': 'Restablecer diseño',
+    'debug.sphereCoordinates': 'Coordenadas de esferas',
+    'debug.sphereCoords': 'Coordenadas',
     'tab.wallet': 'Billetera',
     'status.online': 'En línea',
     'status.offline': 'Sin conexión',
@@ -598,6 +585,26 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Адкрывай праграму 14 дзён запар',
     'main.badge.streakGold': 'Адкрывай праграму 30 дзён запар',
     'main.badge.challengeWinner': 'Выканай тыднёвы чэлендж',
+    'nav.wallet': 'Кашалёк',
+    'common.date': 'Дата',
+    'common.guest': 'Госць',
+    'common.userNickname': 'Нік карыстальніка Telegram',
+    'common.chooseCurrency': 'Выберыце валюту',
+    'common.loadingScreen': 'Экран загрузкі праграмы',
+    'loading.status': 'Загрузка',
+    'events.placeholder': 'Падзеі хутка зʼявяцца.',
+    'history.placeholder': 'Гісторыя хутка зʼявіцца.',
+    'user.placeholder': 'Профіль карыстальніка хутка зʼявіцца.',
+    'wallet.openTelegram': 'Адкрыць @wallet',
+    'share.telegram': 'Падзяліцца ў Telegram',
+    'share.viber': 'Падзяліцца ў Viber',
+    'news.markAsRead': 'Пазначыць прачытаным',
+    'layout.toggleEdit': 'Пераключыць рэжым рэдагавання',
+    'layout.editActions': 'Дзеянні рэдагавання',
+    'layout.save': 'Захаваць макет',
+    'layout.reset': 'Скінуць макет',
+    'debug.sphereCoordinates': 'Каардынаты сфер',
+    'debug.sphereCoords': 'Каардынаты сфер',
     'tab.wallet': 'Кашалёк',
     'status.online': 'Анлайн',
     'status.offline': 'Афлайн',
@@ -702,6 +709,26 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Ouvrez l\'app 14 jours d\'affilée',
     'main.badge.streakGold': 'Ouvrez l\'app 30 jours d\'affilée',
     'main.badge.challengeWinner': 'Terminez le défi hebdomadaire',
+    'nav.wallet': 'Portefeuille',
+    'common.date': 'Date',
+    'common.guest': 'Invité',
+    'common.userNickname': 'Pseudo Telegram',
+    'common.chooseCurrency': 'Choisir une devise',
+    'common.loadingScreen': 'Écran de chargement de l’application',
+    'loading.status': 'Chargement',
+    'events.placeholder': 'Les événements apparaîtront bientôt.',
+    'history.placeholder': 'L’historique apparaîtra bientôt.',
+    'user.placeholder': 'Le profil utilisateur apparaîtra bientôt.',
+    'wallet.openTelegram': 'Ouvrir @wallet',
+    'share.telegram': 'Partager sur Telegram',
+    'share.viber': 'Partager sur Viber',
+    'news.markAsRead': 'Marquer comme lu',
+    'layout.toggleEdit': 'Basculer le mode édition',
+    'layout.editActions': 'Actions d’édition',
+    'layout.save': 'Enregistrer la disposition',
+    'layout.reset': 'Réinitialiser la disposition',
+    'debug.sphereCoordinates': 'Coordonnées des sphères',
+    'debug.sphereCoords': 'Coordonnées',
     'tab.wallet': 'Wallet',
     'status.online': 'En ligne',
     'status.offline': 'Hors ligne',
@@ -804,6 +831,26 @@ const TRANSLATIONS: Record<AppLanguage, Record<TranslationKey, string>> = {
     'main.badge.streakSilver': 'Open de app 14 dagen op rij',
     'main.badge.streakGold': 'Open de app 30 dagen op rij',
     'main.badge.challengeWinner': 'Voltooi de wekelijkse challenge',
+    'nav.wallet': 'Wallet',
+    'common.date': 'Datum',
+    'common.guest': 'Gast',
+    'common.userNickname': 'Telegram-gebruikersnaam',
+    'common.chooseCurrency': 'Valuta kiezen',
+    'common.loadingScreen': 'Laadscherm van de app',
+    'loading.status': 'Laden',
+    'events.placeholder': 'Evenementen verschijnen binnenkort.',
+    'history.placeholder': 'Geschiedenis verschijnt binnenkort.',
+    'user.placeholder': 'Gebruikersprofiel verschijnt binnenkort.',
+    'wallet.openTelegram': 'Open @wallet',
+    'share.telegram': 'Delen via Telegram',
+    'share.viber': 'Delen via Viber',
+    'news.markAsRead': 'Markeren als gelezen',
+    'layout.toggleEdit': 'Bewerkmodus wisselen',
+    'layout.editActions': 'Bewerkacties',
+    'layout.save': 'Lay-out opslaan',
+    'layout.reset': 'Lay-out resetten',
+    'debug.sphereCoordinates': 'Bolcoördinaten',
+    'debug.sphereCoords': 'Bolcoords',
     'tab.wallet': 'Wallet',
     'status.online': 'Online',
     'status.offline': 'Offline',

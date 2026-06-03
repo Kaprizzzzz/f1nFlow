@@ -1,5 +1,5 @@
-<aside class="coords-panel" aria-label="Sphere coordinates">
-  <div class="coords-title">Sphere coords</div>
+<aside class="coords-panel" [attr.aria-label]="t('debug.sphereCoordinates')">
+  <div class="coords-title">{{ t('debug.sphereCoords') }}</div>
   @for (item of coordinates; track item.tab) {
     <div class="coord-row" [class.dragging]="item.isDragging">
       <span class="coord-name">{{ item.tab }}</span>

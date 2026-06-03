@@ -3,6 +3,7 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { BalanceService } from '../history/balance.service';
 import { Currency } from '../history/models/history-shared.models';
+import { I18nService } from '../../core/i18n.service';
 
 @Component({
   selector: 'app-currency-picker',
@@ -19,7 +20,14 @@ export class CurrencyPickerComponent implements OnInit, OnDestroy {
 
   private subscription = new Subscription();
 
-  constructor(private balanceService: BalanceService) {}
+  constructor(
+    private balanceService: BalanceService,
+    private readonly i18nService: I18nService,
+  ) {}
+
+  t(key: string): string {
+    return this.i18nService.t(key);
+  }
 
   ngOnInit(): void {
     this.subscription.add(

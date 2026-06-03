@@ -99,6 +99,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   spherePositions!: Record<SphereTab, SpherePosition>;
   private savedSpherePositions!: Record<SphereTab, SpherePosition>;
+  private preActiveSpherePositions: Record<SphereTab, SpherePosition> | null = null;
   private sphereSizes!: Record<SphereTab, SphereSize>;
   private dragState: DragState | null = null;
 
@@ -198,13 +199,16 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
         this.badges = vm.badges;
 
         if (vm.sphereLayout && this.hasExternalLayoutUpdate(vm.sphereLayout)) {
-          this.spherePositions = this.sphereLayoutService.clonePositions(
-            vm.sphereLayout,
-          );
           this.savedSpherePositions = this.sphereLayoutService.clonePositions(
             vm.sphereLayout,
           );
           this.lastAppliedLayoutKey = this.getLayoutKey(vm.sphereLayout);
+
+          if (!this.activeTab && !this.isEditMode) {
+            this.spherePositions = this.sphereLayoutService.clonePositions(
+              vm.sphereLayout,
+            );
+          }
         }
 
         if (!this.canEditLayout && this.isEditMode) {
@@ -249,7 +253,15 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       this.closeActiveTab();
       return;
     }
-    const nextTab = this.activeTab === tab ? null : tab;
+    if (this.activeTab === tab) {
+      this.closeActiveTab();
+      return;
+    }
+
+    const nextTab = tab;
+    this.preActiveSpherePositions = this.sphereLayoutService.clonePositions(
+      this.spherePositions,
+    );
     this.activeTab = nextTab;
     this.syncFullscreenUiState(nextTab);
     this.updateNewsPanelAnchorBottom();
@@ -269,8 +281,9 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.activeTab = null;
     this.spherePositions = this.sphereLayoutService.clonePositions(
-      this.savedSpherePositions,
+      this.preActiveSpherePositions ?? this.savedSpherePositions,
     );
+    this.preActiveSpherePositions = null;
     this.syncFullscreenUiState(null);
   }
 

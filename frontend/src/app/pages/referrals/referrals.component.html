@@ -59,13 +59,13 @@
         [href]="getTelegramShareLink()"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Share to Telegram"
+        [attr.aria-label]="t('share.telegram')"
         >TG</a
       >
       <a
         class="share-square"
         [href]="getViberShareLink()"
-        aria-label="Share to Viber"
+        [attr.aria-label]="t('share.viber')"
         >V</a
       >
     </div>

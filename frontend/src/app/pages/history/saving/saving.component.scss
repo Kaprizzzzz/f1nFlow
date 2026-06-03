@@ -8,13 +8,24 @@ $saving-glow: #63ffd0;
 
   .main-circle {
     --income-share: 0;
-    --news-ring: conic-gradient(rgba(120, 255, 209, 0.26) 0deg, rgba(120, 255, 209, 0.26) 360deg);
+    --news-ring: conic-gradient(
+      rgba(120, 255, 209, 0.26) 0deg,
+      rgba(120, 255, 209, 0.26) 360deg
+    );
     width: 108px;
     height: 108px;
     border-radius: 50%;
-    background: radial-gradient(circle at 55% 20%, #9fffe1 0%, #42dfaf 18%, #0c8466 54%, #02241d 100%);
+    background: radial-gradient(
+      circle at 55% 20%,
+      #9fffe1 0%,
+      #42dfaf 18%,
+      #0c8466 54%,
+      #02241d 100%
+    );
     border: 2px solid rgba($saving-glow, 0.9);
-    box-shadow: 0 0 20px rgba($saving-glow, 0.45), inset 0 -15px 24px rgba(0, 0, 0, 0.42);
+    box-shadow:
+      0 0 20px rgba($saving-glow, 0.45),
+      inset 0 -15px 24px rgba(0, 0, 0, 0.42);
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -22,11 +33,13 @@ $saving-glow: #63ffd0;
     align-items: center;
     transform: scale(1);
     transform-origin: center;
-    transition: transform 0.903s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.683s ease;
+    transition:
+      transform 0.903s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.683s ease;
     position: relative;
 
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       inset: -14px;
       border-radius: 50%;
@@ -43,7 +56,7 @@ $saving-glow: #63ffd0;
     }
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       inset: -6px;
       border-radius: 50%;
@@ -60,8 +73,16 @@ $saving-glow: #63ffd0;
 
     &.negative {
       border-color: rgba(255, 119, 119, 0.9);
-      box-shadow: 0 0 20px rgba(255, 119, 119, 0.5), inset 0 -15px 24px rgba(0, 0, 0, 0.42);
-      background: radial-gradient(circle at 55% 20%, #ffb8b8 0%, #ff7373 18%, #9a2424 54%, #2b0505 100%);
+      box-shadow:
+        0 0 20px rgba(255, 119, 119, 0.5),
+        inset 0 -15px 24px rgba(0, 0, 0, 0.42);
+      background: radial-gradient(
+        circle at 55% 20%,
+        #ffb8b8 0%,
+        #ff7373 18%,
+        #9a2424 54%,
+        #2b0505 100%
+      );
     }
 
     .label {
@@ -105,9 +126,15 @@ $saving-glow: #63ffd0;
   margin-top: 24px;
   padding: 12px 12px 14px;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(53, 24, 96, 0.84) 0%, rgba(30, 12, 61, 0.9) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(53, 24, 96, 0.84) 0%,
+    rgba(30, 12, 61, 0.9) 100%
+  );
   border: 1px solid rgba($saving-glow, 0.45);
-  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(228, 255, 244, 0.12);
+  box-shadow:
+    0 16px 42px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(228, 255, 244, 0.12);
   max-height: 230px;
   overflow: auto;
   transition: margin-top 0.35s ease;
@@ -245,7 +272,7 @@ $saving-glow: #63ffd0;
   color: #26083f;
   font-weight: 700;
 }
-.circle-wrapper.active .history-list { 
+.circle-wrapper.active .history-list {
   margin-top: 108px;
 }
 
@@ -259,16 +286,23 @@ $saving-glow: #63ffd0;
   --panel-top-offset: calc(env(safe-area-inset-top, 0px) - 48px);
   --panel-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + 2px);
   --panel-nav-gap: 2px;
-  --panel-extra-down: 250px;
+  --panel-extra-down: 370px;
   position: fixed;
   --panel-lift: 5dvh;
   top: calc(var(--panel-top-offset) - var(--panel-lift) + 5dvh);
   left: 9px;
   right: 9px;
-  bottom: calc(max(var(--panel-nav-gap), env(safe-area-inset-bottom, 0px)) - var(--panel-extra-down));
+  bottom: calc(
+    max(var(--panel-nav-gap), env(safe-area-inset-bottom, 0px)) - var(
+        --panel-extra-down
+      )
+  );
   width: auto;
   min-height: 0;
-  max-height: calc(100dvh - var(--panel-top-offset) - var(--panel-bottom-offset) + 8px + var(--panel-extra-down));
+  max-height: calc(
+    100dvh - var(--panel-top-offset) - var(--panel-bottom-offset) + 8px +
+      var(--panel-extra-down)
+  );
   margin-top: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;

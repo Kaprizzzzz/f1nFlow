@@ -19,31 +19,69 @@ export interface SubscriptionDto {
   plan?: SubscriptionPlanDto;
 }
 
+export interface PaymentDto {
+  id: string;
+  provider: string | null;
+  providerRef: string;
+  paymentUrl: string;
+  amountUsd: string;
+  planCode: string;
+  merchantWallet: string;
+}
+
+export interface BillingOverviewDto {
+  plans: SubscriptionPlanDto[];
+  activeSubscription: SubscriptionDto | null;
+  hasGoalsAccess: boolean;
+  pendingPayment?: unknown;
+}
+
 @Injectable({ providedIn: 'root' })
 export class BillingService {
   private readonly apiUrl = environment.apiUrl;
 
   constructor(private readonly http: HttpClient) {}
 
-  getOverview(): Observable<{ plans: SubscriptionPlanDto[]; activeSubscription: SubscriptionDto | null }> {
-    return this.http.get<{ plans: SubscriptionPlanDto[]; activeSubscription: SubscriptionDto | null }>(`${this.apiUrl}/users/me/billing`);
+  getOverview(): Observable<BillingOverviewDto> {
+    return this.http.get<BillingOverviewDto>(`${this.apiUrl}/users/me/billing`);
+  }
+
+  createPayment(
+    planCode: string,
+    source = 'goals_popup',
+  ): Observable<PaymentDto> {
+    return this.http
+      .post<{ payment: PaymentDto }>(
+        `${this.apiUrl}/users/me/billing/payment`,
+        {
+          planCode,
+          source,
+        },
+      )
+      .pipe(map((response) => response.payment));
   }
 
   activate(planCode: string): Observable<SubscriptionDto> {
-    return this.http.post<{ subscription: SubscriptionDto }>(`${this.apiUrl}/users/me/billing/activate`, { planCode }).pipe(
-      map((response) => response.subscription),
-    );
+    return this.http
+      .post<{
+        subscription: SubscriptionDto;
+      }>(`${this.apiUrl}/users/me/billing/activate`, { planCode })
+      .pipe(map((response) => response.subscription));
   }
 
-  startTrial(): Observable<SubscriptionDto> {
-    return this.http.post<{ subscription: SubscriptionDto }>(`${this.apiUrl}/users/me/billing/trial`, {}).pipe(
-      map((response) => response.subscription),
-    );
+  startTrial(): Observable<PaymentDto> {
+    return this.http
+      .post<{
+        payment: PaymentDto;
+      }>(`${this.apiUrl}/users/me/billing/trial`, {})
+      .pipe(map((response) => response.payment));
   }
 
   cancel(): Observable<SubscriptionDto> {
-    return this.http.post<{ subscription: SubscriptionDto }>(`${this.apiUrl}/users/me/billing/cancel`, {}).pipe(
-      map((response) => response.subscription),
-    );
+    return this.http
+      .post<{
+        subscription: SubscriptionDto;
+      }>(`${this.apiUrl}/users/me/billing/cancel`, {})
+      .pipe(map((response) => response.subscription));
   }
 }

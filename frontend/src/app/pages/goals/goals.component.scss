@@ -206,3 +206,149 @@ select {
   opacity: 0.35;
   filter: grayscale(1) !important;
 }
+
+.goals-content {
+  display: grid;
+  gap: 14px;
+  transition:
+    filter 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.goals-content.is-locked {
+  filter: blur(8px);
+  opacity: 0.46;
+  pointer-events: none;
+  user-select: none;
+}
+
+.subscription-card {
+  position: relative;
+  z-index: 2;
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.plan-card {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  border: 1px solid rgba(124, 165, 238, 0.45);
+  border-radius: 14px;
+  background: rgba(13, 27, 50, 0.82);
+  color: #d9e8ff;
+  padding: 10px;
+  text-align: left;
+}
+
+.plan-card.selected {
+  border-color: rgba(113, 255, 210, 0.8);
+  box-shadow: 0 0 18px rgba(113, 255, 210, 0.2);
+}
+
+.pay-button {
+  width: 100%;
+  border: 1px solid rgba(121, 192, 255, 0.74);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #3c8dff 0%, #1d4f9a 100%);
+  color: #f8fbff;
+  padding: 11px 12px;
+  font-weight: 800;
+}
+
+.pay-button.secondary {
+  background: rgba(13, 27, 50, 0.7);
+}
+
+.pay-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.subscription-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2400;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(2, 6, 15, 0.42);
+  backdrop-filter: blur(4px);
+}
+
+.subscription-modal {
+  width: min(420px, 100%);
+  border: 1px solid rgba(136, 191, 255, 0.42);
+  border-radius: 24px;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 30, 58, 0.98),
+    rgba(7, 13, 27, 0.98)
+  );
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #eaf3ff;
+  padding: 18px;
+}
+
+.modal-kicker {
+  margin: 0 0 6px;
+  color: #8fffd2;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.subscription-modal h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.subscription-modal p {
+  color: #bdd3f4;
+}
+
+.price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.price-row span {
+  font-size: 36px;
+  font-weight: 900;
+}
+
+.price-row small,
+.saving-line {
+  color: #8fffd2;
+  font-weight: 700;
+}
+
+.modal-plans {
+  grid-template-columns: 1fr 1fr;
+}
+
+.payment-link {
+  display: block;
+  margin-top: 10px;
+  color: #9fd0ff;
+  text-align: center;
+}
+
+.payment-error {
+  color: #ffd0d0 !important;
+}
+
+.modal-note {
+  margin-bottom: 0;
+  font-size: 12px;
+}

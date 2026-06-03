@@ -9,7 +9,11 @@ import {
 } from '../history/balance.service';
 import { I18nService } from '../../core/i18n.service';
 import { GOALS_TRANSLATIONS, GoalsTranslationKey } from './goals.translations';
-import { BillingService, SubscriptionPlanDto } from '../../core/billing.service';
+import {
+  BillingService,
+  PaymentDto,
+  SubscriptionPlanDto,
+} from '../../core/billing.service';
 
 type ViewMode = 'amount' | 'segments';
 type GoalsTheme = 'default' | 'girly';
@@ -81,6 +85,10 @@ export class GoalsComponent implements OnInit, OnDestroy {
   activePlanCode: string | null = null;
   isPro = false;
   loadingBilling = true;
+  selectedPlanCode = 'goals_pro_monthly';
+  paymentUrl = '';
+  paymentError = '';
+  isPaymentStarting = false;
 
   private transactions: Transaction[] = [];
   private currentBalance = 0;
@@ -178,6 +186,71 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
   closeUiPicker(): void {
     this.isUiPickerOpen = false;
+  }
+
+  get selectedPlan(): SubscriptionPlanDto | null {
+    return (
+      this.plans.find((plan) => plan.code === this.selectedPlanCode) ??
+      this.plans[0] ??
+      null
+    );
+  }
+
+  get selectedPlanPrice(): number {
+    return Number(this.selectedPlan?.priceUsd ?? 5);
+  }
+
+  get monthlyPlanPrice(): number {
+    return Number(
+      this.plans.find((plan) => plan.code === 'goals_pro_monthly')?.priceUsd ??
+        5,
+    );
+  }
+
+  get selectedPlanDays(): number {
+    const plan = this.selectedPlan;
+    if (!plan) return 7;
+    return plan.interval === 'year'
+      ? 30 * plan.intervalCount
+      : 7 * plan.intervalCount;
+  }
+
+  get savingsAmount(): number {
+    if (this.selectedPlanCode === 'goals_pro_yearly') {
+      return Math.max(0, this.monthlyPlanPrice * 4 - this.selectedPlanPrice);
+    }
+
+    return 0;
+  }
+
+  get savingsPercent(): number {
+    const base =
+      this.selectedPlanCode === 'goals_pro_yearly'
+        ? this.monthlyPlanPrice * 4
+        : 0;
+    return base > 0 ? (this.savingsAmount / base) * 100 : 0;
+  }
+
+  selectPlan(planCode: string): void {
+    this.selectedPlanCode = planCode;
+    this.paymentError = '';
+  }
+
+  startPayment(planCode = this.selectedPlanCode): void {
+    this.isPaymentStarting = true;
+    this.paymentError = '';
+
+    this.subscription.add(
+      this.billingService
+        .createPayment(planCode, 'goals_blur_popup')
+        .subscribe({
+          next: (payment) => this.handlePayment(payment),
+          error: () => {
+            this.isPaymentStarting = false;
+            this.paymentError = this.gt('paymentError');
+          },
+        }),
+    );
   }
 
   async onFxPairChange(): Promise<void> {
@@ -318,16 +391,17 @@ export class GoalsComponent implements OnInit, OnDestroy {
     return Array.from({ length: count }, (_, index) => index);
   }
 
-
-
   loadBilling(): void {
     this.loadingBilling = true;
     this.billingService.getOverview().subscribe({
-      next: (overview) => {
-        this.plans = overview.plans;
-        this.activePlanCode = overview.activeSubscription?.plan?.code || null;
-        const status = overview.activeSubscription?.status;
-        this.isPro = status === 'active' || status === 'trial';
+      next: ({ plans, activeSubscription, hasGoalsAccess }) => {
+        this.plans = plans;
+        this.selectedPlanCode =
+          plans.find((plan) => plan.code === 'goals_pro_monthly')?.code ??
+          plans[0]?.code ??
+          this.selectedPlanCode;
+        this.activePlanCode = activeSubscription?.plan?.code ?? null;
+        this.isPro = hasGoalsAccess;
         this.loadingBilling = false;
       },
       error: () => {
@@ -337,15 +411,32 @@ export class GoalsComponent implements OnInit, OnDestroy {
   }
 
   activatePlan(planCode: string): void {
-    this.billingService.activate(planCode).subscribe(() => this.loadBilling());
+    this.startPayment(planCode);
   }
 
   startTrial(): void {
-    this.billingService.startTrial().subscribe(() => this.loadBilling());
+    this.isPaymentStarting = true;
+    this.paymentError = '';
+    this.billingService.startTrial().subscribe({
+      next: (payment) => this.handlePayment(payment),
+      error: () => {
+        this.isPaymentStarting = false;
+        this.paymentError = this.gt('paymentError');
+      },
+    });
   }
 
   cancelSubscription(): void {
     this.billingService.cancel().subscribe(() => this.loadBilling());
+  }
+
+  private handlePayment(payment: PaymentDto): void {
+    this.paymentUrl = payment.paymentUrl;
+    this.isPaymentStarting = false;
+
+    if (typeof window !== 'undefined') {
+      window.open(payment.paymentUrl, '_blank', 'noopener,noreferrer');
+    }
   }
 
   private persistGoalsPreferences(): void {

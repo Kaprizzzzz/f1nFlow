@@ -100,6 +100,15 @@ export class User {
   @Column({ nullable: true })
   sessionTokenHash: string | null;
 
+  @Column({ nullable: true })
+  telegramWalletId: string | null;
+
+  @Column({ default: false })
+  telegramWalletConnected: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  telegramWalletConnectedAt: Date | null;
+
   @Column({ default: false })
   isOnline: boolean;
 

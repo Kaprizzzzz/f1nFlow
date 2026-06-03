@@ -50,295 +50,389 @@
     }
   </div>
 
-  <section class="card">
+  <section class="card subscription-card">
     <h3>{{ gt("goalsPro") }}</h3>
     @if (loadingBilling) {
       <p class="metric">{{ gt("subscriptionLoading") }}</p>
     } @else {
-      <p class="metric">{{ gt("plan") }}: <strong>{{ activePlanCode || gt("freePlan") }}</strong></p>
-      @if (!isPro) {
+      <p class="metric">
+        {{ gt("plan") }}:
+        <strong>{{ activePlanCode || gt("freePlan") }}</strong>
+      </p>
+      @if (isPro) {
+        <p class="metric">{{ gt("proAccess") }}</p>
+        <button
+          type="button"
+          class="pay-button secondary"
+          (click)="cancelSubscription()"
+        >
+          {{ gt("cancelRenewal") }}
+        </button>
+      } @else {
         <p class="metric">{{ gt("freeVsProDescription") }}</p>
-        <button type="button" (click)="startTrial()">{{ gt("startTrial") }}</button>
-        <div class="row">
+        <div class="plan-grid">
           @for (plan of plans; track plan.code) {
-            <button type="button" (click)="activatePlan(plan.code)">
-              {{ plan.name }} - ${{ plan.priceUsd }}
+            <button
+              type="button"
+              class="plan-card"
+              [class.selected]="selectedPlanCode === plan.code"
+              (click)="selectPlan(plan.code)"
+            >
+              <span>{{ plan.name }}</span>
+              <strong>${{ plan.priceUsd }}</strong>
             </button>
           }
         </div>
-      } @else {
-        <p class="metric">{{ gt("proAccess") }}</p>
-        <button type="button" (click)="cancelSubscription()">{{ gt("cancelRenewal") }}</button>
+        <button
+          type="button"
+          class="pay-button"
+          [disabled]="isPaymentStarting"
+          (click)="startTrial()"
+        >
+          {{ gt("startTrial") }} · ${{ selectedPlanPrice | number: "1.2-2" }}
+        </button>
       }
     }
   </section>
 
+  <div class="goals-content" [class.is-locked]="!isPro">
+    <section class="card">
+      <h3>{{ gt("miniStats") }}</h3>
+      <div class="mini-stats-grid">
+        <p class="metric">
+          {{ gt("todaySpent") }}:
+          <strong>{{ todaySpent | number: "1.2-2" }}</strong>
+        </p>
+        <p class="metric">
+          {{ gt("yesterdaySpent") }}:
+          <strong>{{ yesterdaySpent | number: "1.2-2" }}</strong>
+        </p>
+        <p class="metric">
+          {{ gt("vsYesterday") }}:
+          <strong>{{ todayVsYesterdayPercent | number: "1.0-1" }}%</strong> ({{
+            todayVsYesterdayDirection
+          }})
+        </p>
+        <p class="metric">
+          {{ gt("vsMonthAvgDay") }}:
+          <strong>{{ todayVsMonthlyAvgPercent | number: "1.0-1" }}%</strong> ({{
+            todayVsMonthlyDirection
+          }})
+        </p>
+        <p class="metric">
+          {{ gt("monthAvgDay") }}:
+          <strong>{{ monthlyAverageDaily | number: "1.2-2" }}</strong>
+        </p>
+        <p class="metric">
+          {{ gt("trend") }}: <strong>{{ spendingTrendLabel }}</strong>
+        </p>
+      </div>
+    </section>
 
-  <section class="card">
-    <h3>{{ gt("miniStats") }}</h3>
-    <div class="mini-stats-grid">
-      <p class="metric">
-        {{ gt("todaySpent") }}:
-        <strong>{{ todaySpent | number: "1.2-2" }}</strong>
-      </p>
-      <p class="metric">
-        {{ gt("yesterdaySpent") }}:
-        <strong>{{ yesterdaySpent | number: "1.2-2" }}</strong>
-      </p>
-      <p class="metric">
-        {{ gt("vsYesterday") }}:
-        <strong>{{ todayVsYesterdayPercent | number: "1.0-1" }}%</strong> ({{
-          todayVsYesterdayDirection
-        }})
-      </p>
-      <p class="metric">
-        {{ gt("vsMonthAvgDay") }}:
-        <strong>{{ todayVsMonthlyAvgPercent | number: "1.0-1" }}%</strong> ({{
-          todayVsMonthlyDirection
-        }})
-      </p>
-      <p class="metric">
-        {{ gt("monthAvgDay") }}:
-        <strong>{{ monthlyAverageDaily | number: "1.2-2" }}</strong>
-      </p>
-      <p class="metric">
-        {{ gt("trend") }}: <strong>{{ spendingTrendLabel }}</strong>
-      </p>
-    </div>
-  </section>
-
-  <section class="card">
-    <h3>{{ gt("periodCategories") }}</h3>
-    <div class="row">
-      <label
-        >{{ gt("from") }}
-        <input
-          type="date"
-          [(ngModel)]="periodStart"
-          [max]="periodEnd"
-          (change)="onPeriodChange()"
-      /></label>
-      <label
-        >{{ gt("to") }}
-        <input
-          type="date"
-          [(ngModel)]="periodEnd"
-          [min]="periodStart"
-          [max]="todayDate"
-          (change)="onPeriodChange()"
-      /></label>
-    </div>
-
-    <div class="category-columns">
-      <div>
-        <h4>{{ gt("income") }}:</h4>
-        @if (incomeSummary.length === 0) {
-          <p class="empty">{{ gt("noIncomePeriod") }}</p>
-        } @else {
-          @for (item of incomeSummary; track trackByCategory($index, item)) {
-            <div class="category-line">
-              <span>{{ item.name }} - {{ item.amount | number: "1.2-2" }}</span>
-              @if (visualizationMode === "segments") {
-                <span class="segments" aria-hidden="true">
-                  @for (_ of getSegmentsArray(item.segments); track $index) {
-                    <i></i>
-                  }
-                </span>
-              }
-            </div>
-          }
-        }
+    <section class="card">
+      <h3>{{ gt("periodCategories") }}</h3>
+      <div class="row">
+        <label
+          >{{ gt("from") }}
+          <input
+            type="date"
+            [(ngModel)]="periodStart"
+            [max]="periodEnd"
+            (change)="onPeriodChange()"
+        /></label>
+        <label
+          >{{ gt("to") }}
+          <input
+            type="date"
+            [(ngModel)]="periodEnd"
+            [min]="periodStart"
+            [max]="todayDate"
+            (change)="onPeriodChange()"
+        /></label>
       </div>
 
-      <div>
-        <h4>{{ gt("expense") }}:</h4>
-        @if (expenseSummary.length === 0) {
-          <p class="empty">{{ gt("noExpensePeriod") }}</p>
-        } @else {
-          @for (item of expenseSummary; track trackByCategory($index, item)) {
-            <div class="category-line">
-              <span>{{ item.name }} - {{ item.amount | number: "1.2-2" }}</span>
-              @if (visualizationMode === "segments") {
-                <span class="segments" aria-hidden="true">
-                  @for (_ of getSegmentsArray(item.segments); track $index) {
-                    <i></i>
-                  }
-                </span>
-              }
-            </div>
+      <div class="category-columns">
+        <div>
+          <h4>{{ gt("income") }}:</h4>
+          @if (incomeSummary.length === 0) {
+            <p class="empty">{{ gt("noIncomePeriod") }}</p>
+          } @else {
+            @for (item of incomeSummary; track trackByCategory($index, item)) {
+              <div class="category-line">
+                <span
+                  >{{ item.name }} - {{ item.amount | number: "1.2-2" }}</span
+                >
+                @if (visualizationMode === "segments") {
+                  <span class="segments" aria-hidden="true">
+                    @for (_ of getSegmentsArray(item.segments); track $index) {
+                      <i></i>
+                    }
+                  </span>
+                }
+              </div>
+            }
           }
-        }
+        </div>
+
+        <div>
+          <h4>{{ gt("expense") }}:</h4>
+          @if (expenseSummary.length === 0) {
+            <p class="empty">{{ gt("noExpensePeriod") }}</p>
+          } @else {
+            @for (item of expenseSummary; track trackByCategory($index, item)) {
+              <div class="category-line">
+                <span
+                  >{{ item.name }} - {{ item.amount | number: "1.2-2" }}</span
+                >
+                @if (visualizationMode === "segments") {
+                  <span class="segments" aria-hidden="true">
+                    @for (_ of getSegmentsArray(item.segments); track $index) {
+                      <i></i>
+                    }
+                  </span>
+                }
+              </div>
+            }
+          }
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="card">
-    <h3>{{ gt("spendingInPeriod") }}</h3>
-    <p class="metric">
-      {{ gt("spentInPeriod") }}:
-      <strong>{{ periodSpent | number: "1.2-2" }}</strong>
-    </p>
-    <p class="metric">
-      {{ gt("avgPerDay") }}:
-      <strong>{{ spentPerDay | number: "1.2-2" }}</strong>
-    </p>
-    <p class="metric">
-      {{ gt("avgPerWeek") }}:
-      <strong>{{ spentPerWeek | number: "1.2-2" }}</strong>
-    </p>
-    <p class="metric">
-      {{ gt("avgPerMonth") }}:
-      <strong>{{ spentPerMonth | number: "1.2-2" }}</strong>
-    </p>
-    <p class="metric">
-      {{ gt("todayVsPeriodAvg") }}:
-      <strong>{{ todayVsSelectedAvgPercent | number: "1.0-1" }}%</strong> ({{
-        todayVsPeriodDirection
-      }})
-    </p>
-  </section>
+    <section class="card">
+      <h3>{{ gt("spendingInPeriod") }}</h3>
+      <p class="metric">
+        {{ gt("spentInPeriod") }}:
+        <strong>{{ periodSpent | number: "1.2-2" }}</strong>
+      </p>
+      <p class="metric">
+        {{ gt("avgPerDay") }}:
+        <strong>{{ spentPerDay | number: "1.2-2" }}</strong>
+      </p>
+      <p class="metric">
+        {{ gt("avgPerWeek") }}:
+        <strong>{{ spentPerWeek | number: "1.2-2" }}</strong>
+      </p>
+      <p class="metric">
+        {{ gt("avgPerMonth") }}:
+        <strong>{{ spentPerMonth | number: "1.2-2" }}</strong>
+      </p>
+      <p class="metric">
+        {{ gt("todayVsPeriodAvg") }}:
+        <strong>{{ todayVsSelectedAvgPercent | number: "1.0-1" }}%</strong> ({{
+          todayVsPeriodDirection
+        }})
+      </p>
+    </section>
 
-  <section class="card">
-    <h3>{{ gt("smartHints") }}</h3>
-    @for (item of smartInsights; track $index) {
-      <p class="metric">• {{ item }}</p>
-    }
-  </section>
-
-  <section class="card">
-    <h3>{{ gt("streak") }}</h3>
-    <p class="metric">
-      {{ gt("currentStreak") }}: <strong>{{ streakCurrent }}</strong>
-      {{ gt("days") }}
-    </p>
-    <p class="metric">
-      {{ gt("bestStreak") }}: <strong>{{ streakBest }}</strong> {{ gt("days") }}
-    </p>
-    <div class="streak-flame-strip" [attr.aria-label]="gt('streakFlames')">
-      @for (_ of streakFlames; track $index) {
-        <span class="flame" [class.today]="$index === streakFlames.length - 1"
-          >🔥</span
-        >
+    <section class="card">
+      <h3>{{ gt("smartHints") }}</h3>
+      @for (item of smartInsights; track $index) {
+        <p class="metric">• {{ item }}</p>
       }
-    </div>
-    @if (streakFlames.length > 0) {
-      <p class="metric streak-caption">
-        {{ gt("todayVisited") }}: <strong>+1 🔥</strong>
-      </p>
-    }
-  </section>
+    </section>
 
-  <section class="card">
-    <h3>{{ gt("weeklyChallenge") }}</h3>
-    @if (weeklyChallenge) {
+    <section class="card">
+      <h3>{{ gt("streak") }}</h3>
       <p class="metric">
-        {{ gt("challengeTarget") }}
-        <strong>{{ weeklyChallenge.category }}</strong>
-        {{ gt("challengeLimitWord") }}
-        <strong
-          >{{ weeklyChallenge.limit | number: "1.2-2" }}
-          {{ weeklyChallenge.currency || currency }}</strong
-        >.
+        {{ gt("currentStreak") }}: <strong>{{ streakCurrent }}</strong>
+        {{ gt("days") }}
       </p>
       <p class="metric">
-        {{ gt("challengeCurrent") }}:
-        <strong
-          >{{ weeklyChallenge.spent | number: "1.2-2" }}
-          {{ weeklyChallenge.currency || currency }}</strong
-        >
-        ({{
-          weeklyChallenge.completed
-            ? "✅ " + gt("challengeDone")
-            : "⏳ " + gt("challengeInProgress")
-        }}).
+        {{ gt("bestStreak") }}: <strong>{{ streakBest }}</strong>
+        {{ gt("days") }}
       </p>
-      <div class="streak-flame-strip" [attr.aria-label]="gt('weeklyChallengeFlames')">
-        @for (flame of weeklyChallengeFlames; track $index) {
-          <span
-            class="flame"
-            [class.dim]="!flame.active"
-            [style.filter]="flame.active ? getFlameGlow(flame.index) : null"
+      <div class="streak-flame-strip" [attr.aria-label]="gt('streakFlames')">
+        @for (_ of streakFlames; track $index) {
+          <span class="flame" [class.today]="$index === streakFlames.length - 1"
             >🔥</span
           >
         }
       </div>
-    } @else {
-      <p class="metric">{{ gt("challengeNotEnoughData") }}</p>
-    }
-  </section>
+      @if (streakFlames.length > 0) {
+        <p class="metric streak-caption">
+          {{ gt("todayVisited") }}: <strong>+1 🔥</strong>
+        </p>
+      }
+    </section>
 
-  <section class="card">
-    <h3>{{ gt("badges") }}</h3>
-    @if (badges.length === 0) {
-      <p class="metric">{{ gt("noBadges") }}</p>
-    } @else {
-      <p class="metric">{{ badges.join(" · ") }}</p>
-      <div class="streak-flame-strip" [attr.aria-label]="gt('badgeFlames')">
-        @for (badge of badges; track $index) {
-          <span class="flame">{{ badge }}</span>
-        }
-      </div>
-    }
-  </section>
+    <section class="card">
+      <h3>{{ gt("weeklyChallenge") }}</h3>
+      @if (weeklyChallenge) {
+        <p class="metric">
+          {{ gt("challengeTarget") }}
+          <strong>{{ weeklyChallenge.category }}</strong>
+          {{ gt("challengeLimitWord") }}
+          <strong
+            >{{ weeklyChallenge.limit | number: "1.2-2" }}
+            {{ weeklyChallenge.currency || currency }}</strong
+          >.
+        </p>
+        <p class="metric">
+          {{ gt("challengeCurrent") }}:
+          <strong
+            >{{ weeklyChallenge.spent | number: "1.2-2" }}
+            {{ weeklyChallenge.currency || currency }}</strong
+          >
+          ({{
+            weeklyChallenge.completed
+              ? "✅ " + gt("challengeDone")
+              : "⏳ " + gt("challengeInProgress")
+          }}).
+        </p>
+        <div
+          class="streak-flame-strip"
+          [attr.aria-label]="gt('weeklyChallengeFlames')"
+        >
+          @for (flame of weeklyChallengeFlames; track $index) {
+            <span
+              class="flame"
+              [class.dim]="!flame.active"
+              [style.filter]="flame.active ? getFlameGlow(flame.index) : null"
+              >🔥</span
+            >
+          }
+        </div>
+      } @else {
+        <p class="metric">{{ gt("challengeNotEnoughData") }}</p>
+      }
+    </section>
 
-  <section class="card">
-    <h3>{{ gt("deadlinePlanner") }}</h3>
-    <label
-      >{{ gt("deadlineDate") }}
-      <input
-        type="date"
-        [(ngModel)]="deadline"
-        [min]="todayDate"
-        (change)="onDeadlineChange()"
-    /></label>
-    <p class="metric">
-      {{ gt("recommendedDailyLimit") }}:
-      <strong>{{ safeSpendPerDay | number: "1.2-2" }}</strong>
-    </p>
-  </section>
+    <section class="card">
+      <h3>{{ gt("badges") }}</h3>
+      @if (badges.length === 0) {
+        <p class="metric">{{ gt("noBadges") }}</p>
+      } @else {
+        <p class="metric">{{ badges.join(" · ") }}</p>
+        <div class="streak-flame-strip" [attr.aria-label]="gt('badgeFlames')">
+          @for (badge of badges; track $index) {
+            <span class="flame">{{ badge }}</span>
+          }
+        </div>
+      }
+    </section>
 
-  <section class="card">
-    <h3>{{ gt("fxTrend") }}</h3>
-    <div class="row">
+    <section class="card">
+      <h3>{{ gt("deadlinePlanner") }}</h3>
       <label
-        >{{ gt("from") }}
-        <select [(ngModel)]="fxBase" (change)="onFxPairChange()">
-          <option *ngFor="let c of fxCurrencies" [value]="c">{{ c }}</option>
-        </select>
-      </label>
-      <label
-        >{{ gt("to") }}
-        <select [(ngModel)]="fxTarget" (change)="onFxPairChange()">
-          <option *ngFor="let c of fxCurrencies" [value]="c">{{ c }}</option>
-        </select>
-      </label>
-    </div>
-    <p class="metric">
-      1 {{ fxBase }} = <strong>{{ fxRate | number: "1.4-4" }}</strong>
-      {{ fxTarget }}
-    </p>
-    <svg *ngIf="fxSparkline" viewBox="0 0 280 80" class="fx-chart">
-      <polyline [attr.points]="fxSparkline"></polyline>
-    </svg>
-  </section>
-
-  <section class="card">
-    <h3>{{ gt("fxConverter") }}</h3>
-    <div class="row">
-      <label
-        >{{ gt("amount") }}
+        >{{ gt("deadlineDate") }}
         <input
-          type="number"
-          min="0"
-          step="0.01"
-          [(ngModel)]="converterAmount"
-          (input)="recalculateConverter()"
-        />
-      </label>
-      <p class="metric converter-result">
-        {{ gt("result") }}:
-        <strong>{{ converterResult | number: "1.2-2" }} {{ fxTarget }}</strong>
+          type="date"
+          [(ngModel)]="deadline"
+          [min]="todayDate"
+          (change)="onDeadlineChange()"
+      /></label>
+      <p class="metric">
+        {{ gt("recommendedDailyLimit") }}:
+        <strong>{{ safeSpendPerDay | number: "1.2-2" }}</strong>
       </p>
+    </section>
+
+    <section class="card">
+      <h3>{{ gt("fxTrend") }}</h3>
+      <div class="row">
+        <label
+          >{{ gt("from") }}
+          <select [(ngModel)]="fxBase" (change)="onFxPairChange()">
+            <option *ngFor="let c of fxCurrencies" [value]="c">{{ c }}</option>
+          </select>
+        </label>
+        <label
+          >{{ gt("to") }}
+          <select [(ngModel)]="fxTarget" (change)="onFxPairChange()">
+            <option *ngFor="let c of fxCurrencies" [value]="c">{{ c }}</option>
+          </select>
+        </label>
+      </div>
+      <p class="metric">
+        1 {{ fxBase }} = <strong>{{ fxRate | number: "1.4-4" }}</strong>
+        {{ fxTarget }}
+      </p>
+      <svg *ngIf="fxSparkline" viewBox="0 0 280 80" class="fx-chart">
+        <polyline [attr.points]="fxSparkline"></polyline>
+      </svg>
+    </section>
+
+    <section class="card">
+      <h3>{{ gt("fxConverter") }}</h3>
+      <div class="row">
+        <label
+          >{{ gt("amount") }}
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            [(ngModel)]="converterAmount"
+            (input)="recalculateConverter()"
+          />
+        </label>
+        <p class="metric converter-result">
+          {{ gt("result") }}:
+          <strong
+            >{{ converterResult | number: "1.2-2" }} {{ fxTarget }}</strong
+          >
+        </p>
+      </div>
+    </section>
+  </div>
+
+  @if (!isPro && !loadingBilling) {
+    <div class="subscription-overlay" (click)="$event.stopPropagation()">
+      <article class="subscription-modal">
+        <p class="modal-kicker">{{ gt("lockedKicker") }}</p>
+        <h2>{{ gt("subscribeTitle") }}</h2>
+        <p>{{ gt("subscribeSubtitle") }}</p>
+
+        <div class="price-row">
+          <span>${{ selectedPlanPrice | number: "1.2-2" }}</span>
+          <small>{{ selectedPlanDays }} {{ gt("days") }}</small>
+        </div>
+
+        @if (savingsAmount > 0) {
+          <p class="saving-line">
+            {{ gt("youSave") }} ${{ savingsAmount | number: "1.2-2" }} ({{
+              savingsPercent | number: "1.0-0"
+            }}%)
+          </p>
+        }
+
+        <div class="plan-grid modal-plans">
+          @for (plan of plans; track plan.code) {
+            <button
+              type="button"
+              class="plan-card"
+              [class.selected]="selectedPlanCode === plan.code"
+              (click)="selectPlan(plan.code)"
+            >
+              <span>{{ plan.name }}</span>
+              <strong>${{ plan.priceUsd }}</strong>
+            </button>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="pay-button"
+          [disabled]="isPaymentStarting"
+          (click)="startPayment()"
+        >
+          {{
+            isPaymentStarting ? gt("paymentStarting") : gt("payWithTelegram")
+          }}
+        </button>
+        @if (paymentUrl) {
+          <a
+            class="payment-link"
+            [href]="paymentUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{{ gt("openPaymentLink") }}</a
+          >
+        }
+        @if (paymentError) {
+          <p class="payment-error">{{ paymentError }}</p>
+        }
+        <p class="modal-note">{{ gt("afterPaymentNote") }}</p>
+      </article>
     </div>
-  </section>
+  }
 </section>

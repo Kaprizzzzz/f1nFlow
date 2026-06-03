@@ -7,15 +7,15 @@
       [class.active]="isEditMode"
       (click)="toggleEditMode()"
       [attr.aria-pressed]="isEditMode"
-      aria-label="Toggle edit mode"
+      [attr.aria-label]="t('layout.toggleEdit')"
     >
       ✎
     </button>
 
     @if (isEditMode) {
-      <div class="edit-actions" aria-label="Edit actions">
-        <button type="button" class="action-hex option visible" (click)="saveLayout()" aria-label="Save layout">💾</button>
-        <button type="button" class="action-hex option visible secondary" (click)="resetToDefaultLayout()" aria-label="Reset layout">↺</button>
+      <div class="edit-actions" [attr.aria-label]="t('layout.editActions')">
+        <button type="button" class="action-hex option visible" (click)="saveLayout()" [attr.aria-label]="t('layout.save')">💾</button>
+        <button type="button" class="action-hex option visible secondary" (click)="resetToDefaultLayout()" [attr.aria-label]="t('layout.reset')">↺</button>
       </div>
     }
   </div>

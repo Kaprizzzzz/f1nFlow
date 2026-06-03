@@ -12,7 +12,7 @@
 
   <div class="top-controls">
     <div class="top-spacer" aria-hidden="true"></div>
-    <button type="button" class="user-strip" aria-label="Telegram user nickname" (click)="openLanguageModal()">
+    <button type="button" class="user-strip" [attr.aria-label]="t('common.userNickname')" (click)="openLanguageModal()">
       <span class="hex-cap" aria-hidden="true"></span>
       <span class="user-label">{{ userName }}</span>
       <span class="hex-cap" aria-hidden="true"></span>
@@ -38,7 +38,7 @@
     </a>
     <a routerLink="/wallet" routerLinkActive="active">
       <span class="icon">💼</span>
-      <span>Wallet</span>
+      <span>{{ t('nav.wallet') }}</span>
     </a>
     <a routerLink="/referrals" routerLinkActive="active">
       <span class="icon">👥</span>

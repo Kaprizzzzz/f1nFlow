@@ -67,7 +67,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.subscription.add(
       this.sessionService.user$.subscribe((user) => {
-        this.userName = user?.userName || 'Guest';
+        this.userName = user?.userName || this.t('common.guest');
       })
     );
 

@@ -8,7 +8,7 @@
       type="button"
       class="ui-hex-trigger"
       (click)="toggleUiPicker($event)"
-      aria-label="Open goals UI options"
+      [attr.aria-label]="gt('openUiOptions')"
     >
       ⬢
     </button>
@@ -51,14 +51,14 @@
   </div>
 
   <section class="card">
-    <h3>Goals Pro</h3>
+    <h3>{{ gt("goalsPro") }}</h3>
     @if (loadingBilling) {
-      <p class="metric">Loading subscription...</p>
+      <p class="metric">{{ gt("subscriptionLoading") }}</p>
     } @else {
-      <p class="metric">Plan: <strong>{{ activePlanCode || 'Free' }}</strong></p>
+      <p class="metric">{{ gt("plan") }}: <strong>{{ activePlanCode || gt("freePlan") }}</strong></p>
       @if (!isPro) {
-        <p class="metric">Free: basic stats. Pro: insights, streaks, FX, challenges, badges.</p>
-        <button type="button" (click)="startTrial()">Start 7-day trial</button>
+        <p class="metric">{{ gt("freeVsProDescription") }}</p>
+        <button type="button" (click)="startTrial()">{{ gt("startTrial") }}</button>
         <div class="row">
           @for (plan of plans; track plan.code) {
             <button type="button" (click)="activatePlan(plan.code)">
@@ -67,8 +67,8 @@
           }
         </div>
       } @else {
-        <p class="metric">You have Pro access ✅</p>
-        <button type="button" (click)="cancelSubscription()">Cancel renewal</button>
+        <p class="metric">{{ gt("proAccess") }}</p>
+        <button type="button" (click)="cancelSubscription()">{{ gt("cancelRenewal") }}</button>
       }
     }
   </section>
@@ -214,7 +214,7 @@
     <p class="metric">
       {{ gt("bestStreak") }}: <strong>{{ streakBest }}</strong> {{ gt("days") }}
     </p>
-    <div class="streak-flame-strip" aria-label="Streak flames">
+    <div class="streak-flame-strip" [attr.aria-label]="gt('streakFlames')">
       @for (_ of streakFlames; track $index) {
         <span class="flame" [class.today]="$index === streakFlames.length - 1"
           >🔥</span
@@ -252,7 +252,7 @@
             : "⏳ " + gt("challengeInProgress")
         }}).
       </p>
-      <div class="streak-flame-strip" aria-label="Weekly challenge flames">
+      <div class="streak-flame-strip" [attr.aria-label]="gt('weeklyChallengeFlames')">
         @for (flame of weeklyChallengeFlames; track $index) {
           <span
             class="flame"
@@ -273,7 +273,7 @@
       <p class="metric">{{ gt("noBadges") }}</p>
     } @else {
       <p class="metric">{{ badges.join(" · ") }}</p>
-      <div class="streak-flame-strip" aria-label="Badge flames">
+      <div class="streak-flame-strip" [attr.aria-label]="gt('badgeFlames')">
         @for (badge of badges; track $index) {
           <span class="flame">{{ badge }}</span>
         }

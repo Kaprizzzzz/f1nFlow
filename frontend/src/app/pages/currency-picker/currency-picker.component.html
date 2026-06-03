@@ -4,7 +4,7 @@
     class="currency-hex selected"
     (click)="toggle()"
     [attr.aria-expanded]="isOpen"
-    aria-label="Choose currency"
+    [attr.aria-label]="t('common.chooseCurrency')"
   >
     {{ selectedCurrency }}
   </button>

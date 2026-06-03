@@ -1,5 +1,5 @@
 
-<div class="loading-screen" role="status" aria-live="polite" aria-label="Application loading screen">
+<div class="loading-screen" role="status" aria-live="polite" [attr.aria-label]="t('common.loadingScreen')">
   <div class="loading-card">
     <div class="ambient-glow"></div>
 
@@ -12,6 +12,6 @@
       <div class="platform-base"></div>
      </div>
 
-    <p class="status-text">Loading<span class="dots">...</span></p>
+    <p class="status-text">{{ t('loading.status') }}<span class="dots">...</span></p>
    </div>
 </div>

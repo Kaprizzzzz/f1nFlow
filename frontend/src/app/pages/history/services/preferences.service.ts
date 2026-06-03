@@ -77,16 +77,29 @@ export class PreferencesService {
   }
 
   private normalizeSphereLayout(layout: SphereLayout | null): SphereLayout | null {
-    if (!layout) {
-      return null;
+    if (!layout || !this.hasCompleteSphereLayout(layout)) {
+      return this.sphereLayoutSubject.value && this.hasCompleteSphereLayout(this.sphereLayoutSubject.value)
+        ? { ...this.sphereLayoutSubject.value }
+        : null;
     }
 
     return {
-      income: layout.income,
-      expense: layout.expense,
-      saving: layout.saving,
-      news: layout.news,
-      recent: layout.recent ?? { top: 300, left: 250 }
+      income: { ...layout.income },
+      expense: { ...layout.expense },
+      saving: { ...layout.saving },
+      news: { ...layout.news },
+      recent: { ...layout.recent }
     };
+  }
+
+  private hasCompleteSphereLayout(layout: Partial<SphereLayout>): layout is SphereLayout {
+    return ['income', 'expense', 'saving', 'news', 'recent'].every((tab) => {
+      const position = layout[tab as keyof SphereLayout];
+      return (
+        !!position &&
+        Number.isFinite(position.top) &&
+        Number.isFinite(position.left)
+      );
+    });
   }
 }

@@ -19,7 +19,7 @@
             <article class="news-card" [class.unread]="!item.isRead">
               <h4 class="news-title">{{ item.title }}</h4>
               <p class="news-theme">{{ t('tab.news') }}</p>
-              <button type="button" class="read-btn">Mark as read</button>
+              <button type="button" class="read-btn">{{ t('news.markAsRead') }}</button>
             </article>
           }
         </div>

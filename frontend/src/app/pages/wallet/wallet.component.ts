@@ -1,48 +1,102 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { I18nService } from '../../core/i18n.service';
+import { WalletService } from '../../core/wallet.service';
 
 @Component({
   selector: 'app-wallet',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './wallet.component.html',
   styleUrl: './wallet.component.scss',
 })
-export class WalletComponent {
+export class WalletComponent implements OnInit, OnDestroy {
   private readonly i18n = inject(I18nService);
+  private readonly walletService = inject(WalletService);
+  private readonly subscription = new Subscription();
+
   isConnected = false;
   telegramWalletId = '';
+  walletDraft = '';
+  connectedAt: string | null = null;
+  isSaving = false;
+  errorMessage = '';
 
-  constructor() {
-    if (typeof window === 'undefined') return;
-    this.isConnected = localStorage.getItem('wallet-connected') === '1';
-    this.telegramWalletId = localStorage.getItem('wallet-telegram-id') ?? '';
+  ngOnInit(): void {
+    this.loadWallet();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   t(key: string): string {
     return this.i18n.t(key as never);
   }
 
-  toggleConnection(): void {
-    this.isConnected = !this.isConnected;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('wallet-connected', this.isConnected ? '1' : '0');
-    }
+  loadWallet(): void {
+    this.subscription.add(
+      this.walletService.getWallet().subscribe({
+        next: (wallet) => {
+          this.isConnected = wallet.isConnected;
+          this.telegramWalletId = wallet.telegramWalletId ?? '';
+          this.walletDraft = this.telegramWalletId;
+          this.connectedAt = wallet.connectedAt;
+          this.errorMessage = '';
+        },
+        error: () => {
+          this.errorMessage = this.t('wallet.loadError');
+        },
+      }),
+    );
   }
 
   connectTelegramWallet(): void {
-    const entered =
-      typeof window !== 'undefined'
-        ? window.prompt(this.t('wallet.telegramPrompt'), this.telegramWalletId)
-        : null;
-    if (!entered) return;
-    this.telegramWalletId = entered.trim();
-    this.isConnected = true;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('wallet-telegram-id', this.telegramWalletId);
-      localStorage.setItem('wallet-connected', '1');
+    const nextWallet = this.walletDraft.trim();
+    if (!nextWallet) {
+      this.errorMessage = this.t('wallet.required');
+      return;
     }
+
+    this.isSaving = true;
+    this.subscription.add(
+      this.walletService.connectTelegramWallet(nextWallet).subscribe({
+        next: (wallet) => {
+          this.isConnected = wallet.isConnected;
+          this.telegramWalletId = wallet.telegramWalletId ?? '';
+          this.walletDraft = this.telegramWalletId;
+          this.connectedAt = wallet.connectedAt;
+          this.isSaving = false;
+          this.errorMessage = '';
+        },
+        error: () => {
+          this.isSaving = false;
+          this.errorMessage = this.t('wallet.saveError');
+        },
+      }),
+    );
+  }
+
+  disconnectTelegramWallet(): void {
+    this.isSaving = true;
+    this.subscription.add(
+      this.walletService.disconnectTelegramWallet().subscribe({
+        next: (wallet) => {
+          this.isConnected = wallet.isConnected;
+          this.telegramWalletId = wallet.telegramWalletId ?? '';
+          this.walletDraft = '';
+          this.connectedAt = wallet.connectedAt;
+          this.isSaving = false;
+          this.errorMessage = '';
+        },
+        error: () => {
+          this.isSaving = false;
+          this.errorMessage = this.t('wallet.saveError');
+        },
+      }),
+    );
   }
 
   openTelegramWalletBot(): void {

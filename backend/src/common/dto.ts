@@ -168,6 +168,20 @@ export class ActivateSubscriptionDto {
   planCode: string;
 }
 
+export class CreatePaymentDto {
+  @IsString()
+  planCode: string;
+
+  @IsOptional()
+  @IsString()
+  source?: string;
+}
+
+export class ConnectTelegramWalletDto {
+  @IsString()
+  telegramWalletId: string;
+}
+
 export class ConsentDto {
   @IsIn(['privacy', 'terms'])
   documentType: 'privacy' | 'terms';

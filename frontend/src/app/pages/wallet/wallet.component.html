@@ -1,21 +1,64 @@
 <section class="wallet-screen">
   <header class="wallet-header">
-    <h2>{{ t('tab.wallet') }}</h2>
-    <span class="wallet-status" [class.connected]="isConnected">{{ isConnected ? t('status.online') : t('status.offline') }}</span>
+    <h2>{{ t("tab.wallet") }}</h2>
+    <span class="wallet-status" [class.connected]="isConnected">{{
+      isConnected ? t("status.online") : t("status.offline")
+    }}</span>
   </header>
 
-  <p class="wallet-subtitle">{{ t('wallet.subtitle') }}</p>
+  <p class="wallet-subtitle">{{ t("wallet.subtitle") }}</p>
 
   <div class="wallet-grid">
     <article class="wallet-card wallet-card-main">
-      <div class="wallet-card-title">{{ t('wallet.connection') }}</div>
-      <div class="wallet-card-value">{{ isConnected ? t('wallet.linked') : t('wallet.notLinked') }}</div>
-      <button type="button" class="wallet-btn" (click)="toggleConnection()">
-        {{ isConnected ? t('wallet.disconnect') : t('wallet.connect') }}
+      <div class="wallet-card-title">{{ t("wallet.connection") }}</div>
+      <div class="wallet-card-value">
+        {{ isConnected ? t("wallet.linked") : t("wallet.notLinked") }}
+      </div>
+
+      <label class="wallet-field">
+        <span>{{ t("wallet.telegramPrompt") }}</span>
+        <input
+          type="text"
+          [(ngModel)]="walletDraft"
+          placeholder="@wallet_username або Telegram wallet ID"
+          autocomplete="off"
+        />
+      </label>
+
+      <button
+        type="button"
+        class="wallet-btn"
+        [disabled]="isSaving"
+        (click)="connectTelegramWallet()"
+      >
+        {{
+          isConnected ? t("wallet.updateTelegram") : t("wallet.connectTelegram")
+        }}
       </button>
-      <button type="button" class="wallet-btn wallet-btn-ghost" (click)="connectTelegramWallet()">{{ t('wallet.connectTelegram') }}</button>
-      <button type="button" class="wallet-btn wallet-btn-ghost" (click)="openTelegramWalletBot()">{{ t('wallet.openTelegram') }}</button>
-      <p class="wallet-note" *ngIf="telegramWalletId">&#64;{{ telegramWalletId }}</p>
+      <button
+        type="button"
+        class="wallet-btn wallet-btn-ghost"
+        (click)="openTelegramWalletBot()"
+      >
+        {{ t("wallet.openTelegram") }}
+      </button>
+      <button
+        *ngIf="isConnected"
+        type="button"
+        class="wallet-btn wallet-btn-danger"
+        [disabled]="isSaving"
+        (click)="disconnectTelegramWallet()"
+      >
+        {{ t("wallet.disconnect") }}
+      </button>
+
+      <p class="wallet-note" *ngIf="telegramWalletId">
+        {{ t("wallet.connectedWallet") }}: {{ telegramWalletId }}
+      </p>
+      <p class="wallet-note" *ngIf="connectedAt">
+        {{ t("wallet.connectedAt") }}: {{ connectedAt | date: "short" }}
+      </p>
+      <p class="wallet-error" *ngIf="errorMessage">{{ errorMessage }}</p>
     </article>
   </div>
 </section>

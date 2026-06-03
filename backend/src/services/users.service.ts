@@ -5,7 +5,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHash, randomBytes } from 'crypto';
-import { DataSource, QueryFailedError, Repository } from 'typeorm';
+import {
+  DataSource,
+  IsNull,
+  MoreThan,
+  QueryFailedError,
+  Repository,
+} from 'typeorm';
 import { User } from '../entities/user.entity';
 import { Transaction } from '../entities/transaction.entity';
 import {
@@ -98,75 +104,276 @@ export class UsersService {
       where: { isActive: true },
       order: { intervalCount: 'ASC' },
     });
-    const activeSubscription = await this.subscriptionsRepository.findOne({
-      where: { userId: user.id, status: SubscriptionStatus.ACTIVE },
-      relations: { plan: true },
+    const activeSubscription = await this.getActivePaidSubscription(user.id);
+    const pendingPayment = await this.paymentEventsRepository.findOne({
+      where: { userId: user.id, eventType: 'payment_initiated' },
+      order: { createdAt: 'DESC' },
     });
-    return { plans, activeSubscription };
+
+    return {
+      plans,
+      activeSubscription,
+      hasGoalsAccess: Boolean(activeSubscription),
+      pendingPayment,
+    };
   }
 
   async activateSubscription(telegramId: string, planCode: string) {
-    return this.activateManagedSubscription(telegramId, planCode, SubscriptionStatus.ACTIVE);
+    return this.activateManagedSubscription(
+      telegramId,
+      planCode,
+      SubscriptionStatus.ACTIVE,
+      undefined,
+      'subscription_activated',
+      'manual',
+    );
   }
 
+  async createPayment(
+    telegramId: string,
+    planCode: string,
+    source = 'goals_popup',
+  ) {
+    const user = await this.ensureUser({ telegramId });
+    const plan = await this.plansRepository.findOne({
+      where: { code: planCode, isActive: true },
+    });
+    if (!plan) throw new NotFoundException('Plan not found');
 
+    const providerRef = `tg-wallet-${Date.now()}-${randomBytes(4).toString('hex')}`;
+    const merchantWallet =
+      process.env.TELEGRAM_WALLET_USERNAME ||
+      process.env.TELEGRAM_WALLET_ID ||
+      '@wallet';
+    const cleanMerchant = merchantWallet.replace(/^@/, '');
+    const amountUsd = Number(plan.priceUsd).toFixed(2);
+    const paymentUrl = `https://t.me/${cleanMerchant}?start=pay_${providerRef}`;
+
+    const event = await this.paymentEventsRepository.save(
+      this.paymentEventsRepository.create({
+        userId: user.id,
+        subscriptionId: null,
+        eventType: 'payment_initiated',
+        amountUsd,
+        provider: 'telegram_wallet',
+        providerRef,
+        metadata: {
+          planCode,
+          source,
+          paymentUrl,
+          merchantWallet,
+          userWalletId: user.telegramWalletId,
+        },
+      }),
+    );
+
+    return {
+      payment: {
+        id: event.id,
+        provider: event.provider,
+        providerRef,
+        paymentUrl,
+        amountUsd,
+        planCode,
+        merchantWallet,
+      },
+    };
+  }
 
   async startTrialSubscription(telegramId: string) {
-    return this.activateManagedSubscription(telegramId, 'goals_pro_monthly', SubscriptionStatus.TRIAL, 7, 'trial_started', 'system');
+    return this.createPayment(
+      telegramId,
+      'goals_pro_monthly',
+      '7_day_trial_gate',
+    );
   }
 
   async cancelSubscription(telegramId: string) {
     const user = await this.ensureUser({ telegramId });
-    const active = await this.subscriptionsRepository.findOne({ where: { userId: user.id, status: SubscriptionStatus.ACTIVE } });
+    const active = await this.getActivePaidSubscription(user.id);
     if (!active) throw new NotFoundException('Active subscription not found');
     active.status = SubscriptionStatus.CANCELED;
     active.canceledAt = new Date();
     const subscription = await this.subscriptionsRepository.save(active);
-    await this.paymentEventsRepository.save(this.paymentEventsRepository.create({
-      userId: user.id,
-      subscriptionId: subscription.id,
-      eventType: 'subscription_canceled',
-      provider: 'manual',
-      metadata: {},
-    }));
+    await this.paymentEventsRepository.save(
+      this.paymentEventsRepository.create({
+        userId: user.id,
+        subscriptionId: subscription.id,
+        eventType: 'subscription_canceled',
+        provider: 'manual',
+        metadata: {},
+      }),
+    );
     return { subscription };
   }
 
   async handleBillingWebhook(payload: BillingWebhookDto) {
-    const existing = await this.paymentEventsRepository.findOne({ where: { provider: payload.provider, providerRef: payload.providerRef } });
+    const existing = await this.paymentEventsRepository.findOne({
+      where: {
+        provider: payload.provider,
+        providerRef: payload.providerRef,
+        eventType: payload.eventType,
+      },
+    });
     if (existing) {
       return { ok: true, deduplicated: true };
     }
 
-    if (payload.eventType === 'payment_succeeded' || payload.eventType === 'subscription_renewed') {
-      return this.activateManagedSubscription(payload.telegramId, payload.planCode, SubscriptionStatus.ACTIVE, undefined, payload.eventType, payload.provider, payload.providerRef);
+    if (
+      payload.eventType === 'payment_succeeded' ||
+      payload.eventType === 'subscription_renewed'
+    ) {
+      return this.activateManagedSubscription(
+        payload.telegramId,
+        payload.planCode,
+        SubscriptionStatus.ACTIVE,
+        undefined,
+        payload.eventType,
+        payload.provider,
+        payload.providerRef,
+      );
     }
 
     const user = await this.ensureUser({ telegramId: payload.telegramId });
-    await this.paymentEventsRepository.save(this.paymentEventsRepository.create({
-      userId: user.id,
-      eventType: payload.eventType,
-      provider: payload.provider,
-      providerRef: payload.providerRef,
-      metadata: { planCode: payload.planCode },
-    }));
+    await this.paymentEventsRepository.save(
+      this.paymentEventsRepository.create({
+        userId: user.id,
+        eventType: payload.eventType,
+        provider: payload.provider,
+        providerRef: payload.providerRef,
+        metadata: { planCode: payload.planCode },
+      }),
+    );
     return { ok: true };
   }
 
-  private async activateManagedSubscription(telegramId: string, planCode: string, status: SubscriptionStatus, trialDays?: number, eventType = 'subscription_activated', provider = 'manual', providerRef: string | null = null) {
+  private async activateManagedSubscription(
+    telegramId: string,
+    planCode: string,
+    status: SubscriptionStatus,
+    trialDays?: number,
+    eventType = 'subscription_activated',
+    provider = 'manual',
+    providerRef: string | null = null,
+  ) {
     const user = await this.ensureUser({ telegramId });
-    const plan = await this.plansRepository.findOne({ where: { code: planCode, isActive: true } });
+    const plan = await this.plansRepository.findOne({
+      where: { code: planCode, isActive: true },
+    });
     if (!plan) throw new NotFoundException('Plan not found');
 
-    await this.subscriptionsRepository.update({ userId: user.id, status: SubscriptionStatus.ACTIVE }, { status: SubscriptionStatus.CANCELED, canceledAt: new Date() });
+    await this.subscriptionsRepository.update(
+      { userId: user.id, status: SubscriptionStatus.ACTIVE },
+      { status: SubscriptionStatus.CANCELED, canceledAt: new Date() },
+    );
     const now = new Date();
     const expiresAt = new Date(now);
     if (trialDays) expiresAt.setDate(expiresAt.getDate() + trialDays);
-    else expiresAt.setDate(expiresAt.getDate() + (plan.interval === 'year' ? 365 * plan.intervalCount : 30 * plan.intervalCount));
+    else expiresAt.setDate(expiresAt.getDate() + this.getPlanAccessDays(plan));
 
-    const subscription = await this.subscriptionsRepository.save(this.subscriptionsRepository.create({ userId: user.id, planId: plan.id, status, startedAt: now, expiresAt, canceledAt: null }));
-    await this.paymentEventsRepository.save(this.paymentEventsRepository.create({ userId: user.id, subscriptionId: subscription.id, eventType, amountUsd: plan.priceUsd, provider, providerRef, metadata: { planCode } }));
+    const subscription = await this.subscriptionsRepository.save(
+      this.subscriptionsRepository.create({
+        userId: user.id,
+        planId: plan.id,
+        status,
+        startedAt: now,
+        expiresAt,
+        canceledAt: null,
+      }),
+    );
+    await this.paymentEventsRepository.save(
+      this.paymentEventsRepository.create({
+        userId: user.id,
+        subscriptionId: subscription.id,
+        eventType,
+        amountUsd: plan.priceUsd,
+        provider,
+        providerRef,
+        metadata: { planCode },
+      }),
+    );
     return { subscription };
+  }
+
+  private getPlanAccessDays(plan: SubscriptionPlan): number {
+    if (plan.code === 'goals_pro_monthly') return 7 * plan.intervalCount;
+    if (plan.code === 'goals_pro_yearly') return 30 * plan.intervalCount;
+
+    return plan.interval === 'year'
+      ? 365 * plan.intervalCount
+      : 30 * plan.intervalCount;
+  }
+
+  async getTelegramWallet(telegramId: string) {
+    const user = await this.ensureUser({ telegramId });
+    return {
+      telegramWalletId: user.telegramWalletId,
+      isConnected: user.telegramWalletConnected,
+      connectedAt: user.telegramWalletConnectedAt,
+    };
+  }
+
+  async connectTelegramWallet(telegramId: string, telegramWalletId: string) {
+    const user = await this.ensureUser({ telegramId });
+    const normalizedWalletId = telegramWalletId
+      .trim()
+      .replace(/^https:\/\/t.me\//, '@');
+
+    if (!normalizedWalletId) {
+      throw new BadRequestException('telegramWalletId is required');
+    }
+
+    user.telegramWalletId = normalizedWalletId;
+    user.telegramWalletConnected = true;
+    user.telegramWalletConnectedAt = new Date();
+    await this.usersRepository.save(user);
+
+    await this.securityAuditRepository.save(
+      this.securityAuditRepository.create({
+        userId: user.id,
+        eventType: 'telegram_wallet_connected',
+        metadata: { telegramWalletId: normalizedWalletId },
+      }),
+    );
+
+    return this.getTelegramWallet(telegramId);
+  }
+
+  async disconnectTelegramWallet(telegramId: string) {
+    const user = await this.ensureUser({ telegramId });
+    user.telegramWalletId = null;
+    user.telegramWalletConnected = false;
+    user.telegramWalletConnectedAt = null;
+    await this.usersRepository.save(user);
+
+    await this.securityAuditRepository.save(
+      this.securityAuditRepository.create({
+        userId: user.id,
+        eventType: 'telegram_wallet_disconnected',
+      }),
+    );
+
+    return this.getTelegramWallet(telegramId);
+  }
+
+  private async getActivePaidSubscription(userId: string) {
+    const now = new Date();
+    return this.subscriptionsRepository.findOne({
+      where: [
+        {
+          userId,
+          status: SubscriptionStatus.ACTIVE,
+          expiresAt: MoreThan(now),
+        },
+        {
+          userId,
+          status: SubscriptionStatus.ACTIVE,
+          expiresAt: IsNull(),
+        },
+      ],
+      relations: { plan: true },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async recordConsent(

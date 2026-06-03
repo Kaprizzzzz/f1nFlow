@@ -7,23 +7,36 @@ $recent-glow: #ff78c7;
   align-items: center;
 
   .main-circle {
-    --quick-ring: conic-gradient(rgba(255, 167, 223, 0.95) 0deg, rgba(112, 34, 76, 0.44) 360deg);
+    --quick-ring: conic-gradient(
+      rgba(255, 167, 223, 0.95) 0deg,
+      rgba(112, 34, 76, 0.44) 360deg
+    );
     position: relative;
     width: 114px;
     height: 114px;
     border-radius: 50%;
-    background: radial-gradient(circle at 55% 18%, #ffc2e6 0%, #ff7fca 18%, #bc2a80 56%, #430722 100%);
+    background: radial-gradient(
+      circle at 55% 18%,
+      #ffc2e6 0%,
+      #ff7fca 18%,
+      #bc2a80 56%,
+      #430722 100%
+    );
     border: 2px solid rgba($recent-glow, 0.9);
-    box-shadow: 0 0 18px rgba($recent-glow, 0.5), inset 0 -14px 22px rgba(0, 0, 0, 0.42);
+    box-shadow:
+      0 0 18px rgba($recent-glow, 0.5),
+      inset 0 -14px 22px rgba(0, 0, 0, 0.42);
     color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
     transform: scale(1);
-    transition: transform 0.993s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.751s ease;
+    transition:
+      transform 0.993s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.751s ease;
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       inset: -8px;
       border-radius: 50%;
@@ -43,7 +56,7 @@ $recent-glow: #ff78c7;
     transform: scale(1.82);
 
     .label {
-       font-size: 34px;
+      font-size: 34px;
     }
   }
 }
@@ -54,9 +67,15 @@ $recent-glow: #ff78c7;
   width: 320px;
   border-radius: 18px;
   padding: 12px 12px 14px;
-  background: linear-gradient(180deg, rgba(66, 20, 96, 0.88) 0%, rgba(41, 11, 65, 0.92) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(66, 20, 96, 0.88) 0%,
+    rgba(41, 11, 65, 0.92) 100%
+  );
   border: 1px solid rgba($recent-glow, 0.45);
-  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 220, 255, 0.15);
+  box-shadow:
+    0 16px 42px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 220, 255, 0.15);
   display: grid;
   align-content: start;
   gap: 12px;
@@ -110,7 +129,11 @@ $recent-glow: #ff78c7;
   width: 100%;
   border-radius: 11px;
   border: 1px solid rgba(255, 181, 224, 0.55);
-  background: linear-gradient(180deg, rgba(153, 38, 95, 0.9) 0%, rgba(95, 17, 61, 0.92) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(153, 38, 95, 0.9) 0%,
+    rgba(95, 17, 61, 0.92) 100%
+  );
   color: #ffeaf7;
   font-size: 12px;
   font-weight: 600;
@@ -127,7 +150,11 @@ $recent-glow: #ff78c7;
   width: 100%;
   border-radius: 11px;
   border: 1px solid rgba(255, 181, 224, 0.55);
-  background: radial-gradient(circle at 30% 10%, rgba(255, 179, 223, 0.2) 0%, rgba(95, 16, 59, 0.96) 85%);
+  background: radial-gradient(
+    circle at 30% 10%,
+    rgba(255, 179, 223, 0.2) 0%,
+    rgba(95, 16, 59, 0.96) 85%
+  );
   color: #ffe5f4;
   display: grid;
   grid-template-columns: auto auto 1fr;
@@ -169,7 +196,11 @@ $recent-glow: #ff78c7;
 .quick-limit-current {
   border: 1px solid rgba(255, 181, 224, 0.6);
   border-radius: 10px;
-  background: linear-gradient(180deg, rgba(112, 19, 70, 0.9) 0%, rgba(64, 10, 39, 0.9) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(112, 19, 70, 0.9) 0%,
+    rgba(64, 10, 39, 0.9) 100%
+  );
   color: #ffe5f4;
   padding: 4px 10px;
   font-size: 12px;
@@ -219,16 +250,23 @@ $recent-glow: #ff78c7;
   --panel-top-offset: calc(env(safe-area-inset-top, 0px) - 23px);
   --panel-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + 2px);
   --panel-nav-gap: 2px;
-  --panel-extra-down: 250px;
+  --panel-extra-down: 370px;
   position: fixed;
   --panel-lift: 0dvh;
   top: calc(var(--panel-top-offset) - 2dvh);
   left: 9px;
   right: 9px;
-  bottom: calc(max(var(--panel-nav-gap), env(safe-area-inset-bottom, 0px)) - var(--panel-extra-down));
+  bottom: calc(
+    max(var(--panel-nav-gap), env(safe-area-inset-bottom, 0px)) - var(
+        --panel-extra-down
+      )
+  );
   width: auto;
   min-height: 0;
-  max-height: calc(100dvh - var(--panel-top-offset) - var(--panel-bottom-offset) + 8px + var(--panel-extra-down));
+  max-height: calc(
+    100dvh - var(--panel-top-offset) - var(--panel-bottom-offset) + 8px +
+      var(--panel-extra-down)
+  );
   margin-top: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
